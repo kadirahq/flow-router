@@ -1,5 +1,9 @@
 ClientRouter = {};
 
 ClientRouter.addRoute = function (path, options) {
-  // body...
+  console.log('> adding client route', path, options);
+}
+
+ClientRouter.setState = function (name, value) {
+  console.log('> settings route state', name, value);
 }
