@@ -1,4 +1,4 @@
-Tinytest.add('FlowRouter.route() - add route', function (test) {
+Tinytest.add('FlowRouter - route() - add route', function (test) {
   var context = {};
   context._routeMap = {};
   context._FlowRoute = function (path, options) {
@@ -12,7 +12,7 @@ Tinytest.add('FlowRouter.route() - add route', function (test) {
 });
 
 
-Tinytest.add('FlowRouter.middleware() - add middleware', function (test) {
+Tinytest.add('FlowRouter - middleware() - add middleware', function (test) {
   var context = {};
   context._middleware = [];
   FlowRouter.middleware.call(context, 'middleware');

@@ -1,4 +1,4 @@
-Tinytest.add('FlowRouter.route() - add route', function (test) {
+Tinytest.add('FlowRouter - route() - add route', function (test) {
   var context = {};
   context._routeMap = {};
   context._FlowRoute = FlowRouter._FlowRoute;
@@ -9,7 +9,7 @@ Tinytest.add('FlowRouter.route() - add route', function (test) {
 });
 
 
-Tinytest.add('FlowRouter.middleware() - add middleware', function (test) {
+Tinytest.add('FlowRouter - middleware() - add middleware', function (test) {
   var context = {};
   context._middleware = [];
 
@@ -29,7 +29,7 @@ Tinytest.add('FlowRouter.middleware() - add middleware', function (test) {
 });
 
 
-Tinytest.add('FlowRouter.setState() - set local', function (test) {
+Tinytest.add('FlowRouter - setState() - set local', function (test) {
   var context = {};
   context._getDefaultStateOptions = FlowRouter._getDefaultStateOptions;
   context._getCurrentRoute = function () {
@@ -49,7 +49,7 @@ Tinytest.add('FlowRouter.setState() - set local', function (test) {
 });
 
 
-Tinytest.add('FlowRouter.setState() - set global', function (test) {
+Tinytest.add('FlowRouter - setState() - set global', function (test) {
   var context = {};
   context._globalStates = new ReactiveDict;
   context._getDefaultStateOptions = FlowRouter._getDefaultStateOptions;
@@ -68,7 +68,7 @@ Tinytest.add('FlowRouter.setState() - set global', function (test) {
 });
 
 
-Tinytest.add('FlowRouter.getState() - get local', function (test) {
+Tinytest.add('FlowRouter - getState() - get local', function (test) {
   var context = {};
   context._globalStates = new ReactiveDict;
   context._globalStates.set('name', 'global-value');
@@ -87,7 +87,7 @@ Tinytest.add('FlowRouter.getState() - get local', function (test) {
 });
 
 
-Tinytest.add('FlowRouter.getState() - get global', function (test) {
+Tinytest.add('FlowRouter - getState() - get global', function (test) {
   var context = {};
   context._globalStates = new ReactiveDict;
   context._globalStates.set('name', 'global-value');
@@ -106,7 +106,7 @@ Tinytest.add('FlowRouter.getState() - get global', function (test) {
 });
 
 
-Tinytest.add('FlowRouter._getDefaultStateOptions() - simple', function (test) {
+Tinytest.add('FlowRouter - _getDefaultStateOptions() - simple', function (test) {
   var context = {};
   var options = FlowRouter._getDefaultStateOptions.call(context);
   test.equal(options, {
@@ -115,7 +115,7 @@ Tinytest.add('FlowRouter._getDefaultStateOptions() - simple', function (test) {
 });
 
 
-Tinytest.add('FlowRouter._getCurrentRoute() - simple', function (test) {
+Tinytest.add('FlowRouter - _getCurrentRoute() - simple', function (test) {
   var context = {};
   context._current = 'path';
   context._routeMap = {};
