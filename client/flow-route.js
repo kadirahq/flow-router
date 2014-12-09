@@ -14,7 +14,7 @@ FlowRoute.prototype._clientRouter = ClientRouter;
 FlowRoute.prototype.middleware = function (middleware) {
   this._middleware.push(middleware);
   this._clientRouter.middleware(middleware, {
-    path: this.path;
+    path: this.path,
   });
 };
 
