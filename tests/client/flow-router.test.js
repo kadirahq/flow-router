@@ -1,7 +1,10 @@
 Tinytest.add('FlowRouter - route() - add route', function (test) {
   var context = {};
   context._routeMap = {};
-  context._FlowRoute = FlowRouter._FlowRoute;
+  context._FlowRoute = function (path, options) {
+    this.args = _.toArray(arguments);
+  };
+
   FlowRouter.route.call(context, 'path', 'options');
   test.equal(context._routeMap, {
     'path': new context._FlowRoute('path', 'options')
