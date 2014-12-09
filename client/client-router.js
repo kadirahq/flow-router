@@ -1,6 +1,6 @@
 ClientRouter = {};
 
-ClientRouter.addRoute = function (path, options) {
+ClientRouter.route = function (path, options) {
   console.log('> adding client route', path, options);
 }
 

@@ -10,7 +10,9 @@ Package.onUse(function(api) {
   api.use('underscore');
   api.use('reactive-dict');
   api.addFiles('client/client-router.js', 'client');
+  api.addFiles('server/flow-route.js', 'client');
   api.addFiles('client/flow-router.js', 'client');
+  api.addFiles('server/flow-route.js', 'server');
   api.addFiles('server/flow-router.js', 'server');
   api.export('FlowRouter');
 });
