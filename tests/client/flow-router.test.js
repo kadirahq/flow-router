@@ -22,6 +22,26 @@ Tinytest.add('FlowRouter.route() - add route', function (test) {
 });
 
 
+Tinytest.add('FlowRouter.middleware() - add middleware', function (test) {
+  var context = {};
+  context._middleware = [];
+
+  context._clientRouter = {};
+  context._clientRouter.middleware = function (middleware) {
+    this.args = this.args || [];
+    this.args.push(_.toArray(arguments));
+  };
+
+  FlowRouter.middleware.call(context, 'middleware');
+  test.equal(context._middleware, [
+    'middleware'
+  ]);
+  test.equal(context._clientRouter.args, [
+    ['middleware']
+  ]);
+});
+
+
 Tinytest.add('FlowRouter.setState() - set local', function (test) {
   var context = {};
   context._getDefaultStateOptions = FlowRouter._getDefaultStateOptions;

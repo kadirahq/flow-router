@@ -1,6 +1,7 @@
 FlowRouter = {
   _current: null,
   _routeMap: {},
+  _middleware: [],
   _clientRouter: ClientRouter,
   _FlowRoute: FlowRoute,
   _globalStates: new ReactiveDict,
@@ -11,6 +12,12 @@ FlowRouter.route = function (path, options) {
   var route = new this._FlowRoute(path, options);
   this._routeMap[path] = route;
   this._clientRouter.route(path, options);
+}
+
+
+FlowRouter.middleware = function (middleware) {
+  this._middleware.push(middleware);
+  this._clientRouter.middleware(middleware);
 }
 
 
