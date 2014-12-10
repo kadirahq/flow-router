@@ -15,7 +15,7 @@ if(Meteor.isClient) {
     test.equal(context.render, 'render');
     test.equal(context.subscriptions, 'subscriptions');
     test.equal(context._middleware, []);
-    test.equal(context._states, new ReactiveDict);
+    test.equal(context._states, {});
     test.equal(context._clientRouter.args, [
       ['path', options]
     ]);
@@ -127,3 +127,48 @@ Tinytest.add('FlowRoute - _getDefaultSubOptions() - simple', function (test) {
     client: true,
   })
 });
+
+
+if(Meteor.isClient) {
+  Tinytest.add('FlowRoute - setState() - set local', function (test) {
+    var context = {};
+    context._states = {};
+
+    context._clientRouter = {};
+    context._clientRouter.setState = function () {
+      this.args = this.args || [];
+      this.args.push(_.toArray(arguments));
+    }
+
+    FlowRoute.prototype.setState.call(context, 'name', 'value', 'options');
+    var value = context._states['name'];
+    test.equal(value, 'value');
+    test.equal(context._clientRouter.args, [
+      ['name', 'value', 'options']
+    ]);
+  });
+}
+
+
+if(Meteor.isClient) {
+  Tinytest.add('FlowRoute - getState() - get local', function (test) {
+    var context = {};
+    context._states = {'name': 'value'};
+    var value = FlowRoute.prototype.getState.call(context, 'name');
+    test.equal(value, 'value');
+  });
+}
+
+
+if(Meteor.isClient) {
+  Tinytest.add('FlowRoute - getStates() - get local', function (test) {
+    var context = {};
+    context._states = {
+      'first': 'first-value',
+      'second': 'second-value',
+    };
+
+    var values = FlowRoute.prototype.getStates.call(context);
+    test.equal(values, context._states);
+  });
+}

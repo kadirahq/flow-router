@@ -65,6 +65,44 @@ Tinytest.add('FlowRouter - subscribe() - current route', function (test) {
 
 
 if(Meteor.isClient) {
+  Tinytest.add('FlowRouter - go() - simple', function (test) {
+    var context = {};
+    context._current = null;
+
+    context._subsComputation = {}
+    context._subsComputation.invalidate = function () {
+      this.args = this.args || [];
+      this.args.push(_.toArray(arguments));
+    };
+
+    context.getStates = function () {
+      this.args = this.args || [];
+      this.args.push(_.toArray(arguments));
+      return 'states';
+    };
+
+    context._clientRouter = {}
+    context._clientRouter.go = function () {
+      this.args = this.args || [];
+      this.args.push(_.toArray(arguments));
+    };
+
+    FlowRouter.go.call(context, 'path');
+    test.equal(context._current, 'path');
+    test.equal(context._clientRouter.args, [
+      ['path', {states: 'states'}]
+    ]);
+    test.equal(context.args, [
+      []
+    ]);
+    test.equal(context._subsComputation.args, [
+      []
+    ]);
+  });
+}
+
+
+if(Meteor.isClient) {
   Tinytest.add('FlowRouter - setState() - set local', function (test) {
     var context = {};
     context._getDefaultStateOptions = function () {
@@ -90,7 +128,7 @@ if(Meteor.isClient) {
 if(Meteor.isClient) {
   Tinytest.add('FlowRouter - setState() - set global', function (test) {
     var context = {};
-    context._globalStates = new ReactiveDict;
+    context._globalStates = {};
     context._getDefaultStateOptions = function () {
       return {foo: 'bar'};
     };
@@ -102,7 +140,7 @@ if(Meteor.isClient) {
     };
 
     FlowRouter.setState.call(context, 'name', 'value', {global: true});
-    test.equal(context._globalStates.get('name'), 'value');
+    test.equal(context._globalStates['name'], 'value');
     test.equal(context._clientRouter.args, [
       ['name', 'value', {global: true, foo: 'bar'}]
     ]);
@@ -113,20 +151,22 @@ if(Meteor.isClient) {
 if(Meteor.isClient) {
   Tinytest.add('FlowRouter - getState() - get local', function (test) {
     var context = {};
-    context._globalStates = new ReactiveDict;
-    context._globalStates.set('name', 'global-value');
-    context._current = 'path';
-    context._routeMap = {};
-    context._routeMap['path'] = {
-      getState: function (name, value, options) {
-        this.args = this.args || [];
-        this.args.push(_.toArray(arguments));
-        return 'local-value';
+    context._globalStates = {'name': 'global-value'};
+    context._getCurrentRoute = function () {
+      return {
+        getState: function () {
+          context.args = context.args || [];
+          context.args.push(_.toArray(arguments));
+          return 'local-value';
+        }
       }
     };
 
     var value = FlowRouter.getState.call(context, 'name');
     test.equal(value, 'local-value');
+    test.equal(context.args, [
+      ['name']
+    ]);
   });
 }
 
@@ -134,20 +174,56 @@ if(Meteor.isClient) {
 if(Meteor.isClient) {
   Tinytest.add('FlowRouter - getState() - get global', function (test) {
     var context = {};
-    context._globalStates = new ReactiveDict;
-    context._globalStates.set('name', 'global-value');
-    context._current = 'path';
-    context._routeMap = {};
-    context._routeMap['path'] = {
-      getState: function (name, value, options) {
-        this.args = this.args || [];
-        this.args.push(_.toArray(arguments));
-        return null;
+    context._globalStates = {'name': 'global-value'};
+    context._getCurrentRoute = function () {
+      return {
+        getState: function () {
+          context.args = context.args || [];
+          context.args.push(_.toArray(arguments));
+          return null;
+        }
       }
     };
 
     var value = FlowRouter.getState.call(context, 'name');
     test.equal(value, 'global-value');
+    test.equal(context.args, [
+      ['name']
+    ]);
+  });
+}
+
+
+if(Meteor.isClient) {
+  Tinytest.add('FlowRouter - getStates() - all states', function (test) {
+    var context = {};
+    context._globalStates = {
+      'global': 'global-value',
+      'common': 'common-global-value'
+    };
+
+    context._getCurrentRoute = function () {
+      return {
+        getStates: function () {
+          context.args = context.args || [];
+          context.args.push(_.toArray(arguments));
+          return {
+            'local': 'local-value',
+            'common': 'common-local-value'
+          };
+        }
+      }
+    };
+
+    var values = FlowRouter.getStates.call(context);
+    test.equal(values, {
+      'global': 'global-value',
+      'local': 'local-value',
+      'common': 'common-local-value'
+    });
+    test.equal(context.args, [
+      []
+    ]);
   });
 }
 

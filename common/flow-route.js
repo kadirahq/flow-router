@@ -6,15 +6,10 @@ FlowRoute = function (path, options) {
   this._subsMap = {};
 
   if(Meteor.isClient) {
-    this._states = new ReactiveDict;
+    this._states = {};
     this._clientRouter.route(path, options);
   }
 };
-
-
-if(Meteor.isClient) {
-  FlowRoute.prototype._clientRouter = ClientRouter;
-}
 
 
 FlowRoute.prototype.middleware = function (middleware) {
@@ -37,22 +32,30 @@ FlowRoute.prototype.subscribe = function (name, sub, options) {
 };
 
 
+FlowRoute.prototype._getDefaultSubOptions = function() {
+  return {
+    server: true,
+    client: true,
+  };
+};
+
+
 if(Meteor.isClient) {
+  FlowRoute.prototype._clientRouter = ClientRouter;
+
+
   FlowRoute.prototype.setState = function (name, value, options) {
-    this._states.set(name, value);
+    this._states[name] = value;
     this._clientRouter.setState(name, value, options)
   };
 
 
   FlowRoute.prototype.getState = function (name) {
-    this._states.get(name);
+    return this._states[name];
   };
-}
 
 
-FlowRoute.prototype._getDefaultSubOptions = function() {
-  return {
-    server: true,
-    client: true,
+  FlowRoute.prototype.getStates = function () {
+    return this._states;
   };
 }

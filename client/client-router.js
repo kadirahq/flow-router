@@ -14,3 +14,8 @@ ClientRouter.setState = function (name, value) {
 ClientRouter.middleware = function (middleware, options) {
   console.log('> adding global middleware', middleware, options);
 }
+
+
+ClientRouter.go = function (path) {
+  console.log('> going to path', path);
+}

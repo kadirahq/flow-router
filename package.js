@@ -8,7 +8,7 @@ Package.describe({
 Package.onUse(function(api) {
   api.versionsFrom('1.0');
   api.use('underscore');
-  api.use('reactive-dict');
+  api.use('tracker');
   api.addFiles('client/client-router.js', 'client');
   api.addFiles('common/flow-route.js');
   api.addFiles('common/flow-router.js');
@@ -17,7 +17,6 @@ Package.onUse(function(api) {
 
 Package.onTest(function(api) {
   api.use('tinytest');
-  api.use('reactive-dict');
   api.use('meteorhacks:flow-router');
   api.addFiles('tests/flow-route.test.js');
   api.addFiles('tests/flow-router.test.js');
