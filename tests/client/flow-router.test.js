@@ -52,7 +52,9 @@ Tinytest.add('FlowRouter - subscribe() - current route', function (test) {
 
 Tinytest.add('FlowRouter - setState() - set local', function (test) {
   var context = {};
-  context._getDefaultStateOptions = FlowRouter._getDefaultStateOptions;
+  context._getDefaultStateOptions = function () {
+    return 'defaults';
+  };
   context._getCurrentRoute = function () {
     return {
       setState: function () {
@@ -62,10 +64,9 @@ Tinytest.add('FlowRouter - setState() - set local', function (test) {
     }
   };
 
-  var defaultOptions = FlowRouter._getDefaultStateOptions.call(null);
   FlowRouter.setState.call(context, 'name', 'value');
   test.equal(context.args, [
-    ['name', 'value', defaultOptions]
+    ['name', 'value', 'defaults']
   ]);
 });
 
@@ -73,7 +74,9 @@ Tinytest.add('FlowRouter - setState() - set local', function (test) {
 Tinytest.add('FlowRouter - setState() - set global', function (test) {
   var context = {};
   context._globalStates = new ReactiveDict;
-  context._getDefaultStateOptions = FlowRouter._getDefaultStateOptions;
+  context._getDefaultStateOptions = function () {
+    return {foo: 'bar'};
+  };
 
   context._clientRouter = {};
   context._clientRouter.setState = function (name, value, options) {
@@ -84,7 +87,7 @@ Tinytest.add('FlowRouter - setState() - set global', function (test) {
   FlowRouter.setState.call(context, 'name', 'value', {global: true});
   test.equal(context._globalStates.get('name'), 'value');
   test.equal(context._clientRouter.args, [
-    ['name', 'value', {global: true}]
+    ['name', 'value', {global: true, foo: 'bar'}]
   ]);
 });
 
