@@ -14,3 +14,8 @@ FlowRouter.route = function (path, options) {
 FlowRouter.middleware = function (middleware) {
   this._middleware.push(middleware);
 }
+
+
+FlowRouter._getCurrentRoute = function () {
+  return this._routeMap[this._current];
+}

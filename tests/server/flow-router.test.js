@@ -20,3 +20,13 @@ Tinytest.add('FlowRouter - middleware() - add middleware', function (test) {
     'middleware'
   ]);
 });
+
+
+Tinytest.add('FlowRouter - _getCurrentRoute() - simple', function (test) {
+  var context = {};
+  context._current = 'path';
+  context._routeMap = {};
+  context._routeMap['path'] = 'route';
+  var route = FlowRouter._getCurrentRoute.call(context);
+  test.equal(route, 'route');
+});
