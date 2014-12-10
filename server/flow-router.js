@@ -16,6 +16,12 @@ FlowRouter.middleware = function (middleware) {
 }
 
 
+FlowRouter.subscribe = function (middleware) {
+  var route = this._getCurrentRoute();
+  route.subscriptions();
+}
+
+
 FlowRouter._getCurrentRoute = function () {
   return this._routeMap[this._current];
 }

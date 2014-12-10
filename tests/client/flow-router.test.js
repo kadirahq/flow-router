@@ -32,6 +32,24 @@ Tinytest.add('FlowRouter - middleware() - add middleware', function (test) {
 });
 
 
+Tinytest.add('FlowRouter - subscribe() - current route', function (test) {
+  var context = {};
+  context._getCurrentRoute = function () {
+    return {
+      subscriptions: function () {
+        context.args = context.args || [];
+        context.args.push(_.toArray(arguments));
+      }
+    }
+  };
+
+  FlowRouter.subscribe.call(context);
+  test.equal(context.args, [
+    []
+  ]);
+});
+
+
 Tinytest.add('FlowRouter - setState() - set local', function (test) {
   var context = {};
   context._getDefaultStateOptions = FlowRouter._getDefaultStateOptions;

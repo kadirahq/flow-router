@@ -20,8 +20,14 @@ FlowRouter.middleware = function (middleware) {
 }
 
 
+FlowRouter.subscribe = function (middleware) {
+  var route = this._getCurrentRoute();
+  route.subscriptions();
+}
+
+
 FlowRouter.setState = function (name, value, options) {
-  options = options || this._getDefaultStateOptions();
+  options = _.extend(this._getDefaultStateOptions(), options);
   if(options.global) {
     this._globalStates.set(name, value);
     this._clientRouter.setState(name, value, options);
