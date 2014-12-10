@@ -3,6 +3,7 @@ FlowRoute = function (path, options) {
   this.render = options.render || Function.prototype;
   this.subscriptions = options.subscriptions || Function.prototype;
   this._middleware = [];
+  this._subsMap = {};
 };
 
 
@@ -11,6 +12,17 @@ FlowRoute.prototype.middleware = function (middleware) {
 };
 
 
-FlowRoute.prototype.subscribe = function () {
-  this.subscriptions();
+FlowRoute.prototype.subscribe = function (name, sub, options) {
+  options = _.extend(this._getDefaultSubOptions(), options);
+  if(options.server) {
+    this._subsMap[name] = sub;
+  }
 };
+
+
+FlowRoute.prototype._getDefaultSubOptions = function() {
+  return {
+    server: true,
+    client: true,
+  }
+}

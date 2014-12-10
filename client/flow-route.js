@@ -19,8 +19,11 @@ FlowRoute.prototype.middleware = function (middleware) {
 };
 
 
-FlowRoute.prototype.subscribe = function (middleware) {
-  this.subscriptions();
+FlowRoute.prototype.subscribe = function (name, sub, options) {
+  options = _.extend(this._getDefaultSubOptions(), options);
+  if(options.client) {
+    this._subsMap[name] = sub;
+  }
 };
 
 
@@ -33,3 +36,11 @@ FlowRoute.prototype.setState = function (name, value, options) {
 FlowRoute.prototype.getState = function (name) {
   this._states.get(name);
 };
+
+
+FlowRoute.prototype._getDefaultSubOptions = function() {
+  return {
+    server: true,
+    client: true,
+  }
+}
