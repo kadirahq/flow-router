@@ -19,6 +19,11 @@ FlowRoute.prototype.middleware = function (middleware) {
 };
 
 
+FlowRoute.prototype.subscribe = function (middleware) {
+  this.subscriptions();
+};
+
+
 FlowRoute.prototype.setState = function (name, value, options) {
   this._states.set(name, value);
   this._clientRouter.setState(name, value, options)

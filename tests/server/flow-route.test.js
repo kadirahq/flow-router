@@ -21,3 +21,17 @@ Tinytest.add('FlowRoute - middleware() - add middleware', function (test) {
     'middleware'
   ]);
 });
+
+
+Tinytest.add('FlowRoute - subscribe() - run subscriptions', function (test) {
+  var context = {};
+  context.subscriptions = function () {
+    this.args = this.args || [];
+    this.args.push(_.toArray(arguments));
+  };
+  FlowRoute = FlowRouter._FlowRoute;
+  FlowRoute.prototype.subscribe.call(context);
+  test.equal(context.args, [
+    []
+  ]);
+});

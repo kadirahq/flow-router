@@ -5,6 +5,12 @@ FlowRoute = function (path, options) {
   this._middleware = [];
 };
 
+
 FlowRoute.prototype.middleware = function (middleware) {
   this._middleware.push(middleware);
+};
+
+
+FlowRoute.prototype.subscribe = function () {
+  this.subscriptions();
 };
