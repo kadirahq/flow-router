@@ -10,10 +10,8 @@ Package.onUse(function(api) {
   api.use('underscore');
   api.use('reactive-dict');
   api.addFiles('client/client-router.js', 'client');
-  api.addFiles('client/flow-route.js', 'client');
-  api.addFiles('client/flow-router.js', 'client');
-  api.addFiles('server/flow-route.js', 'server');
-  api.addFiles('server/flow-router.js', 'server');
+  api.addFiles('common/flow-route.js');
+  api.addFiles('common/flow-router.js');
   api.export('FlowRouter');
 });
 
@@ -21,8 +19,6 @@ Package.onTest(function(api) {
   api.use('tinytest');
   api.use('reactive-dict');
   api.use('meteorhacks:flow-router');
-  api.addFiles('tests/client/flow-route.test.js', 'client');
-  api.addFiles('tests/client/flow-router.test.js', 'client');
-  api.addFiles('tests/server/flow-route.test.js', 'server');
-  api.addFiles('tests/server/flow-router.test.js', 'server');
+  api.addFiles('tests/flow-route.test.js');
+  api.addFiles('tests/flow-router.test.js');
 });
