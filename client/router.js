@@ -84,3 +84,7 @@ page(function (ctx, next) {
     next();
   }, 0);
 });
+
+Meteor.startup(function () {
+  page();
+})
