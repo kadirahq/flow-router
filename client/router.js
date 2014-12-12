@@ -69,7 +69,7 @@ FlowRouter._tracker = Tracker.autorun(function () {
       history.replaceState({}, "", location.pathname + '?' + query);
     }
 
-    route.subscriptions();
+    route.subscriptions(context.params);
     route.render(context.params);
   }
 })
