@@ -16,8 +16,11 @@ Tinytest.addAsync('parse params and query string', function (test, next) {
     test.equal(rendered, 1);
     test.equal(params.foo, 'bar');
     test.equal(params.query, {'baz': 'bat'});
+
+    // clear states before other tests
+    FlowRouter._states = {};
     next();
-  }, 50)
+  }, 100);
 });
 
 
@@ -35,7 +38,7 @@ Tinytest.addAsync('subscribe to route subs', function (test, next) {
   setTimeout(function() {
     test.isTrue(!!GetSub('foo'));
     next();
-  }, 50)
+  }, 100);
 });
 
 
@@ -66,8 +69,8 @@ Tinytest.addAsync('unsubscribe to other subs', function (test, next) {
       test.isTrue(!!GetSub('bar'));
       test.isFalse(!!GetSub('foo'));
       next();
-    }, 50)
-  }, 50)
+    }, 100);
+  }, 100);
 });
 
 
@@ -105,8 +108,8 @@ Tinytest.addAsync('use global middleware', function (test, next) {
       test.equal(log, [0, 1, 0, 2]);
       done = true;
       next();
-    }, 50)
-  }, 50)
+    }, 100);
+  }, 100);
 });
 
 
@@ -138,13 +141,14 @@ Tinytest.addAsync('route specific middleware', function (test, next) {
     setTimeout(function() {
       test.equal(log, [0, 1, 2]);
       next();
-    }, 50)
-  }, 50);
+    }, 100);
+  }, 100);
 });
 
 
 Tinytest.addAsync('set global state', function (test, next) {
   var rand = Random.id();
+  var randValue = Random.id();
   var rendered = 0;
 
   FlowRouter.route('/' + rand, {
@@ -156,18 +160,50 @@ Tinytest.addAsync('set global state', function (test, next) {
   FlowRouter.go('/' + rand);
 
   setTimeout(function() {
-    FlowRouter.setState('foo', 'bar');
-    FlowRouter.setState('bar', 'baz');
+    FlowRouter.setState('str', randValue);
+    FlowRouter.setState('arr', [randValue]);
+    FlowRouter.setState('obj', {key: randValue});
 
     setTimeout(function() {
-      test.equal(rendered, 1);
-      test.equal(location.search, '?foo=bar&bar=baz');
+      var query = '?str='+randValue+'&arr[0]='+randValue+'&obj[key]='+randValue;
+      test.equal(rendered, 2);
+      test.equal(location.search, query);
+      // clear states before other tests
+      FlowRouter._states = {};
       next();
-    }, 50)
-  }, 50)
+    }, 100);
+  }, 100);
 })
-
 
 Tinytest.addAsync('get global state', function (test, next) {
-  // get state
+  var rand = Random.id();
+  FlowRouter.go('/');
+
+  setTimeout(function() {
+    FlowRouter.setState('rand', rand);
+
+    setTimeout(function() {
+      var value = FlowRouter.getState('rand');
+      test.equal(value, rand);
+      // clear states before other tests
+      FlowRouter._states = {};
+      next();
+    }, 100);
+  }, 100);
 })
+
+
+Tinytest.addAsync('automatically set route states', function (test, next) {
+  var rand = Random.id();
+  var randValue = Random.id();
+  FlowRouter.route('/' + rand);
+  FlowRouter.go('/' + rand + '?foo=' + randValue);
+
+  setTimeout(function() {
+    var value = FlowRouter.getState('foo');
+    test.equal(value, randValue);
+    // clear states before other tests
+    FlowRouter._states = {};
+    next();
+  }, 100);
+});
