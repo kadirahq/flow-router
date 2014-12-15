@@ -37,7 +37,8 @@ FlowRouter.go = function (path) {
 
 FlowRouter.middleware = function (middlewareFn) {
   page(function (ctx, next) {
-    middlewareFn(ctx.pathname, next);
+    var context = _.pick(ctx, 'params', 'path');
+    middlewareFn(context, next);
   });
 }
 
