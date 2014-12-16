@@ -16,6 +16,7 @@ FlowRouter.route = function (path, options) {
     next();
     self._currentContext = context;
     self._current.set(path);
+    FlowRouter._tracker.invalidate();
   });
 
   return route;
