@@ -1,7 +1,7 @@
 
 FlowRouter = {
-  _current: new ReactiveVar,
-  _currentContext: null,
+  _current: {},
+  _currentTracker: new Tracker.Dependency(),
   _routeMap: {},
   _middleware: [],
   _states: {},
@@ -14,14 +14,17 @@ FlowRouter.route = function (path, options) {
 
   page(path, function (context, next) {
     next();
-    self._currentContext = context;
-    self._current.set(path);
+    self._current = {
+      path: path,
+      context: context,
+      params: context.params,
+      route: route
+    };
     FlowRouter._tracker.invalidate();
   });
 
   return route;
 }
-
 
 FlowRouter.go = function (path) {
   var idx = path.indexOf('?');
@@ -34,7 +37,6 @@ FlowRouter.go = function (path) {
 
   page(path);
 }
-
 
 FlowRouter.middleware = function (middlewareFn) {
   page(function (ctx, next) {
@@ -59,12 +61,16 @@ FlowRouter.getState = function (name) {
   return this._states[name];
 }
 
+FlowRouter.current = function() {
+  FlowRouter._currentTracker.depend();
+  return FlowRouter._current;
+};
 
 // run current route subs
 FlowRouter._tracker = Tracker.autorun(function () {
-  var path = FlowRouter._current.get();
-  var route = FlowRouter._routeMap[path];
-  var context = FlowRouter._currentContext;
+  var path = FlowRouter._current.path;
+  var route = FlowRouter._current.route;
+  var context = FlowRouter._current.context;
   if(route) {
     if(!_.isEmpty(FlowRouter._states)) {
       var query = qs.stringify(FlowRouter._states);
@@ -73,9 +79,9 @@ FlowRouter._tracker = Tracker.autorun(function () {
 
     route.subscriptions(context.params);
     route.render(context.params);
+    FlowRouter._currentTracker.changed();
   }
-})
-
+});
 
 // query string middleware
 page(function (ctx, next) {

@@ -17,7 +17,6 @@ FlowRoute.prototype.subscription = function(name) {
   return this._subsMap[name];
 }
 
-
 FlowRoute.prototype.middleware = function(middleware) {
   page(this.path, function (ctx, next) {
     middleware(ctx.pathname, next);
