@@ -28,4 +28,5 @@ Package.onTest(function(api) {
   api.addFiles('test/_utils/client.js', 'client');
   api.addFiles('test/common/define.js');
   api.addFiles('test/client/router.js', 'client');
+  api.addFiles('test/client/ready.js', 'client');
 });

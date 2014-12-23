@@ -92,9 +92,9 @@ Tinytest.addAsync('use global middleware', function (test, next) {
     }
   });
 
-  FlowRouter.middleware(function (path, next) {
+  FlowRouter.middleware(function (context, next) {
     if(done) return next();
-    test.equal(path, paths.pop())
+    test.equal(context.path, paths.pop())
     log.push(0);
     next();
   })
@@ -205,5 +205,45 @@ Tinytest.addAsync('automatically set route states', function (test, next) {
     // clear states before other tests
     FlowRouter._states = {};
     next();
+  }, 100);
+});
+
+Tinytest.addAsync('FlowRouter.current()', function (test, next) {
+  var rand = Random.id();
+  var rand2 = Random.id();
+  var rendered = 0;
+  var params = null;
+
+  var visitedPaths = [];
+  var tracker = Tracker.autorun(function() {
+    var current = FlowRouter.current();
+    if(current.path) {
+      visitedPaths.push(current.path);
+    } 
+  });
+
+  FlowRouter.route('/' + rand, {
+    render: function(_params) {
+
+    }
+  });
+
+  FlowRouter.route('/' + rand2, {
+    render: function(_params) {
+      
+    }
+  });
+
+  visitedPaths = [];
+  FlowRouter.go('/' + rand);
+  setTimeout(function() {
+    FlowRouter.go('/' + rand2);
+    setTimeout(function() {
+      test.equal(visitedPaths, [
+        '/' + rand,
+        '/' + rand2
+      ]);
+      next();
+    }, 100);
   }, 100);
 });

@@ -56,14 +56,40 @@ FlowRouter.setState = function (name, value) {
   FlowRouter._tracker.invalidate();
 }
 
-
 FlowRouter.getState = function (name) {
   return this._states[name];
-}
+};
 
 FlowRouter.current = function() {
   FlowRouter._currentTracker.depend();
   return FlowRouter._current;
+};
+
+FlowRouter.ready = function() {
+  var currentRouter = FlowRouter.current().route;
+  if(currentRouter) {
+
+    if(arguments.length == 0) {
+      var subscriptions = _.values(currentRouter.getAllSubscriptions());
+    } else {
+      var subscriptions = _.map(arguments, function(subName) {
+        return currentRouter.getSubscription(subName);
+      });
+    }
+
+    for(var lc = 0; lc<subscriptions.length; lc++) {
+      var sub = subscriptions[lc];
+      if(!sub) {
+        return false;
+      } else if(sub.ready() == false) {
+        return false;
+      }
+    }
+
+    return true;
+  } else {
+    return false;
+  }
 };
 
 // run current route subs
@@ -77,8 +103,18 @@ FlowRouter._tracker = Tracker.autorun(function () {
       history.replaceState({}, "", location.pathname + '?' + query);
     }
 
+    // FIXME: we need to create another logic to just to run the subscriptions
+    // then pick them and run them inside an autorun.
+    // Then user can't write reactive content inside the router's 
+    // subscriptions method. Now which is possible
     route.subscriptions(context.params);
-    route.render(context.params);
+
+    // otherwise, computations inside render will trigger to re-run 
+    // this computation. which we do not need.
+    Tracker.nonreactive(function() {
+      route.render(context.params);
+    });
+
     FlowRouter._currentTracker.changed();
   }
 });

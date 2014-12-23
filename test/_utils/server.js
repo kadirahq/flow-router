@@ -5,3 +5,9 @@ Meteor.publish('foo', function () {
 Meteor.publish('bar', function () {
   this.ready();
 })
+
+Meteor.publish('readyness', function (doIt) {
+  if(doIt) {
+    this.ready();
+  }
+})

@@ -12,9 +12,12 @@ FlowRoute.prototype.subscribe = function(name, sub, options) {
   this._subsMap[name] = sub;
 }
 
-
-FlowRoute.prototype.subscription = function(name) {
+FlowRoute.prototype.getSubscription = function(name) {
   return this._subsMap[name];
+}
+
+FlowRoute.prototype.getAllSubscriptions = function() {
+  return this._subsMap;
 }
 
 FlowRoute.prototype.middleware = function(middleware) {
