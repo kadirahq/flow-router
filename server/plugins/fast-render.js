@@ -1,14 +1,17 @@
 if(!Package['meteorhacks:fast-render']) return;
 
+
+// hack to run after eveything else on startup
 Meteor.startup(function () {
   Meteor.startup(function () {
     setupFastRender();
   })
 });
 
+
 function setupFastRender () {
-  _.each(FlowRouter._routeMap, function (route, routeName) {
-    FastRender.route(routeName, function (params, path) {
+  _.each(FlowRouter._routeMap, function (route, path) {
+    FastRender.route(path, function (params, path) {
       var self = this;
 
       // anyone using Meteor.subscribe for something else?

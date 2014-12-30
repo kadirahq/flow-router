@@ -1,4 +1,4 @@
-FlowRoute = function(path, options) {
+Route = function(router, path, options) {
   options = options || {};
 
   this.path = path;
@@ -8,7 +8,7 @@ FlowRoute = function(path, options) {
 }
 
 
-FlowRoute.prototype.subscribe = function(name, sub, options) {
+Route.prototype.subscribe = function(name, sub, options) {
   var options = _.extend({server: true}, options);
   if(options.server) {
     this._subsMap[name] = sub;
@@ -16,11 +16,11 @@ FlowRoute.prototype.subscribe = function(name, sub, options) {
 }
 
 
-FlowRoute.prototype.subscription = function(name) {
+Route.prototype.subscription = function(name) {
   return this._subsMap[name];
 }
 
 
-FlowRoute.prototype.middleware = function(middleware) {
+Route.prototype.middleware = function(middleware) {
   // TODO
 }
