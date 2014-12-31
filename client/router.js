@@ -125,7 +125,7 @@ FlowRouter._tracker = Tracker.autorun(function () {
     // otherwise, computations inside render will trigger to re-run 
     // this computation. which we do not need.
     Tracker.nonreactive(function() {
-      route.render(context.params);
+      route.action(context.params);
     });
 
     FlowRouter._currentTracker.changed();
