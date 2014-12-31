@@ -1,3 +1,6 @@
+// indicate it's okay (or not okay) to run the tracker
+// when doing subscriptions
+var safeToRun = false;
 
 FlowRouter = {
   _current: {},
@@ -20,7 +23,8 @@ FlowRouter.route = function (path, options) {
       params: context.params,
       route: route
     };
-    FlowRouter._tracker.invalidate();
+    
+    FlowRouter._invalidateTracker();
   });
 
   return route;
@@ -53,7 +57,7 @@ FlowRouter.setState = function (name, value) {
     this._states[name] = value;
   }
 
-  FlowRouter._tracker.invalidate();
+  FlowRouter._invalidateTracker();
 }
 
 FlowRouter.getState = function (name) {
@@ -92,22 +96,31 @@ FlowRouter.ready = function() {
   }
 };
 
-// run current route subs
+// We need to run subscriptions inside a Tracker
+// to stop subs when switching between routes
+// But we don't need to run this tracker with 
+// other reactive changes inside the .subscription method
+// We tackle this with the `safeToRun` variable
 FlowRouter._tracker = Tracker.autorun(function () {
   var path = FlowRouter._current.path;
   var route = FlowRouter._current.route;
   var context = FlowRouter._current.context;
   if(route) {
+    if(!safeToRun) {
+      var message = 
+        "You can't use reactive data sources like Session" + 
+        " inside the `.subscriptions` method!";
+      throw new Error(message);
+    }
+
     if(!_.isEmpty(FlowRouter._states)) {
       var query = qs.stringify(FlowRouter._states);
       history.replaceState({}, "", location.pathname + '?' + query);
     }
 
-    // FIXME: we need to create another logic to just to run the subscriptions
-    // then pick them and run them inside an autorun.
-    // Then user can't write reactive content inside the router's 
-    // subscriptions method. Now which is possible
-    route.subscriptions(context.params);
+    if(route.subscriptions) {
+      route.subscriptions(context.params);
+    }
 
     // otherwise, computations inside render will trigger to re-run 
     // this computation. which we do not need.
@@ -116,8 +129,14 @@ FlowRouter._tracker = Tracker.autorun(function () {
     });
 
     FlowRouter._currentTracker.changed();
+    safeToRun = false;
   }
 });
+
+FlowRouter._invalidateTracker = function() {
+  safeToRun = true;
+  FlowRouter._tracker.invalidate();
+};
 
 // query string middleware
 page(function (ctx, next) {
