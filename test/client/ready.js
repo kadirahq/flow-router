@@ -2,7 +2,7 @@ Tinytest.addAsync('FlowRouter.ready() - specific name', function (test, next) {
   var rand = Random.id();
 
   FlowRouter.route('/' + rand, {
-    render: Function.prototype,
+    action: Function.prototype,
     subscriptions: function () {
       this.subscribe('sub1', Meteor.subscribe('foo'));
     }
@@ -19,7 +19,7 @@ Tinytest.addAsync('FlowRouter.ready() - without the name', function (test, next)
   var rand = Random.id();
 
   FlowRouter.route('/' + rand, {
-    render: Function.prototype,
+    action: Function.prototype,
     subscriptions: function () {
       this.subscribe('sub1', Meteor.subscribe('foo'));
     }
@@ -36,7 +36,7 @@ Tinytest.addAsync('FlowRouter.ready() - multiples names', function (test, next) 
   var rand = Random.id();
 
   FlowRouter.route('/' + rand, {
-    render: Function.prototype,
+    action: Function.prototype,
     subscriptions: function () {
       this.subscribe('sub1', Meteor.subscribe('foo'));
       this.subscribe('sub2', Meteor.subscribe('foo'));
@@ -54,7 +54,7 @@ Tinytest.addAsync('FlowRouter.ready() - invalid subname', function (test, next) 
   var rand = Random.id();
 
   FlowRouter.route('/' + rand, {
-    render: Function.prototype,
+    action: Function.prototype,
     subscriptions: function () {
       this.subscribe('sub1', Meteor.subscribe('foo'));
     }
@@ -71,7 +71,7 @@ Tinytest.addAsync('FlowRouter.ready() - not ready one', function (test, next) {
   var rand = Random.id();
 
   FlowRouter.route('/' + rand, {
-    render: Function.prototype,
+    action: Function.prototype,
     subscriptions: function () {
       this.subscribe('sub1', Meteor.subscribe('readyness', true));
       this.subscribe('sub2', Meteor.subscribe('readyness', false));

@@ -2,7 +2,7 @@ FlowRoute = function(path, options) {
   options = options || {};
 
   this.path = path;
-  this.render = options.render || Function.prototype;
+  this.action = options.action || Function.prototype;
   this.subscriptions = options.subscriptions || Function.prototype;
   this._subsMap = {};
 }

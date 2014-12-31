@@ -4,7 +4,7 @@ Tinytest.addAsync('parse params and query string', function (test, next) {
   var params = null;
 
   FlowRouter.route('/' + rand + '/:foo', {
-    render: function(_params) {
+    action: function(_params) {
       rendered++;
       params = _params;
     }
@@ -28,7 +28,7 @@ Tinytest.addAsync('subscribe to route subs', function (test, next) {
   var rand = Random.id();
 
   FlowRouter.route('/' + rand, {
-    render: Function.prototype,
+    action: Function.prototype,
     subscriptions: function () {
       this.subscribe('foo', Meteor.subscribe('foo'));
     }
@@ -46,14 +46,14 @@ Tinytest.addAsync('unsubscribe to other subs', function (test, next) {
   var rand = Random.id(), rand2 = Random.id();
 
   FlowRouter.route('/' + rand, {
-    render: Function.prototype,
+    action: Function.prototype,
     subscriptions: function () {
       this.subscribe('foo', Meteor.subscribe('foo'));
     }
   });
 
   FlowRouter.route('/' + rand2, {
-    render: Function.prototype,
+    action: Function.prototype,
     subscriptions: function () {
       this.subscribe('bar', Meteor.subscribe('bar'));
     }
@@ -81,13 +81,13 @@ Tinytest.addAsync('use global middleware', function (test, next) {
   var done = false;
 
   FlowRouter.route('/' + rand, {
-    render: function(_params) {
+    action: function(_params) {
       log.push(1);
     }
   });
 
   FlowRouter.route('/' + rand2, {
-    render: function(_params) {
+    action: function(_params) {
       log.push(2);
     }
   });
@@ -118,7 +118,7 @@ Tinytest.addAsync('route specific middleware', function (test, next) {
   var log = [];
 
   FlowRouter.route('/' + rand, {
-    render: function(_params) {
+    action: function(_params) {
       log.push(1);
     }
   }).middleware(function (path, next) {
@@ -128,7 +128,7 @@ Tinytest.addAsync('route specific middleware', function (test, next) {
   });
 
   FlowRouter.route('/' + rand2, {
-    render: function(_params) {
+    action: function(_params) {
       log.push(2);
     }
   });
@@ -152,7 +152,7 @@ Tinytest.addAsync('set global state', function (test, next) {
   var rendered = 0;
 
   FlowRouter.route('/' + rand, {
-    render: function(_params) {
+    action: function(_params) {
       rendered++;
     }
   });
@@ -223,13 +223,13 @@ Tinytest.addAsync('FlowRouter.current()', function (test, next) {
   });
 
   FlowRouter.route('/' + rand, {
-    render: function(_params) {
+    action: function(_params) {
 
     }
   });
 
   FlowRouter.route('/' + rand2, {
-    render: function(_params) {
+    action: function(_params) {
       
     }
   });
