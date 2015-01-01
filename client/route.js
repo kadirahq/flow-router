@@ -1,28 +1,34 @@
-FlowRoute = function(path, options) {
+Route = function(router, path, options) {
   options = options || {};
 
   this.path = path;
   this.action = options.action || Function.prototype;
   this.subscriptions = options.subscriptions || Function.prototype;
   this._subsMap = {};
-}
+  this._states = {};
+  this._router = router;
+};
 
 
-FlowRoute.prototype.subscribe = function(name, sub, options) {
+Route.prototype.subscribe = function(name, sub, options) {
   this._subsMap[name] = sub;
-}
+};
 
-FlowRoute.prototype.getSubscription = function(name) {
+
+Route.prototype.getSubscription = function(name) {
   return this._subsMap[name];
-}
+};
 
-FlowRoute.prototype.getAllSubscriptions = function() {
+
+Route.prototype.getAllSubscriptions = function() {
   return this._subsMap;
-}
+};
 
-FlowRoute.prototype.middleware = function(middleware) {
-  page(this.path, function (ctx, next) {
-    middleware(ctx.pathname, next);
+
+Route.prototype.middleware = function(middlewareFn) {
+  this._router._page(this.path, function (ctx, next) {
+    middlewareFn(ctx.pathname, next);
   });
+
   return this;
-}
+};

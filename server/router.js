@@ -1,27 +1,59 @@
+Router = function () {
+  this._routeMap = {};
+}
 
-FlowRouter = {
-  _current: null,
-  _routeMap: {},
+
+Router.prototype.route = function(path, options) {
+  this._routeMap[path] = new Route(this, path, options);
+  return this._routeMap[path];
 };
 
-// @api
-FlowRouter.route = function (path, options) {
-  var self = this;
-  var route = self._routeMap[path] = new FlowRoute(path, options);
-  return route;
-}
+
+Router.prototype.go = function() {
+  // client only
+};
 
 
-FlowRouter.middleware = function (middlewareFn) {
-  // TODO
-}
+Router.prototype.current = function() {
+  // client only
+};
 
 
-FlowRouter.setState = function (name, value) {
-  // TODO
-}
+Router.prototype.middleware = function() {
+  // client only
+};
 
 
-FlowRouter.getState = function (name) {
-  // TODO
-}
+Router.prototype.getState = function() {
+  // client only
+};
+
+
+Router.prototype.getAllStates = function() {
+  // client only
+};
+
+
+Router.prototype.setState = function() {
+  // client only
+};
+
+
+Router.prototype.removeState = function() {
+  // client only
+};
+
+
+Router.prototype.clearStates = function() {
+  // client only
+};
+
+
+Router.prototype.ready = function() {
+  // client only
+};
+
+
+Router.prototype.initialize = function() {
+  // client only
+};
