@@ -196,3 +196,20 @@ Tinytest.addAsync('Client - Router - get current route', function (test, next) {
     }, 100);
   }, 100);
 });
+
+
+Tinytest.addAsync('Client - Router - subscribe to global subs', function (test, next) {
+  var rand = Random.id();
+  FlowRouter.route('/' + rand);
+
+  FlowRouter.subscriptions = function () {
+    this.subscribe('baz', Meteor.subscribe('baz'));
+  }
+
+  FlowRouter.go('/' + rand);
+  setTimeout(function() {
+    test.isTrue(!!GetSub('baz'));
+    FlowRouter.subscriptions = Function.prototype;
+    next();
+  }, 100);
+});

@@ -1,5 +1,6 @@
 Router = function () {
   this.globals = [];
+  this.subscriptions = Function.prototype;
 
   this._routeMap = {};
   this._tracker = null;
@@ -175,6 +176,7 @@ Router.prototype.initialize = function() {
     // But we don't need to run this tracker with
     // other reactive changes inside the .subscription method
     // We tackle this with the `safeToRun` variable
+    self.subscriptions.call(self._globalRoute, context.params);
     route.subscriptions(context.params);
 
     // otherwise, computations inside action will trigger to re-run
