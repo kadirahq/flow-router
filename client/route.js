@@ -1,5 +1,4 @@
 Route = function(router, path, options) {
-  var self = this;
   options = options || {};
 
   this.path = path;
