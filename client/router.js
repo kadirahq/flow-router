@@ -1,10 +1,11 @@
 Router = function () {
   this.globals = [];
+
   this._routeMap = {};
-  this._states = {};
   this._tracker = null;
   this._current = {};
   this._currentTracker = new Tracker.Dependency();
+  this._globalRoute = new Route(this);
 
   // indicate it's okay (or not okay) to run the tracker
   // when doing subscriptions
@@ -30,7 +31,7 @@ Router.prototype.route = function(path, options) {
 
     // pick states from url
     var states = self._qs.parse(context.querystring);
-    self._states = _.pick(states, self.globals);
+    self._globalRoute._states = _.pick(states, self.globals);
     self._current.route._states = _.omit(states, this.globals);
 
     self._invalidateTracker();
@@ -61,7 +62,7 @@ Router.prototype.middleware = function(middlewareFn) {
 
 Router.prototype.getState = function(name) {
   if(_.contains(this.globals, name)) {
-    return this._states[name];
+    return this._globalRoute._states[name];
   } else if(this._current.route) {
     return this._current.route._states[name];
   } else {
@@ -72,13 +73,13 @@ Router.prototype.getState = function(name) {
 
 Router.prototype.getAllStates = function() {
   var locals = this._current.route ? this._current.route._states : {};
-  return _.extend({}, locals, this._states);
+  return _.extend({}, locals, this._globalRoute._states);
 };
 
 
 Router.prototype.setState = function(name, value) {
   if(_.contains(this.globals, name)) {
-    this._states[name] = value;
+    this._globalRoute._states[name] = value;
     this._invalidateTracker();
   } else if(this._current.route) {
     this._current.route._states[name] = value;
@@ -91,7 +92,7 @@ Router.prototype.setState = function(name, value) {
 
 Router.prototype.removeState = function(name) {
   if(_.contains(this.globals, name)) {
-    delete this._states[name];
+    delete this._globalRoute._states[name];
     this._invalidateTracker();
   } else if(this._current.route) {
     delete this._current.route._states[name];
@@ -107,7 +108,7 @@ Router.prototype.clearStates = function() {
     this._current.route._states = {};
   }
 
-  this._states = {};
+  this._globalRoute._states = {};
   this._invalidateTracker();
 };
 
@@ -163,7 +164,7 @@ Router.prototype.initialize = function() {
       throw new Error(message);
     }
 
-    if(!_.isEmpty(self._states)) {
+    if(!_.isEmpty(self._globalRoute._states)) {
       var states = self.getAllStates();
       var query = self._qs.stringify(states);
       history.replaceState({}, '', location.pathname + '?' + query);

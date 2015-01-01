@@ -109,8 +109,8 @@ Tinytest.addAsync('Client - Router - set states', function (test, next) {
       var query = '?loc='+value+'&arr[0]='+value+'&obj[key]='+value;
       test.equal(rendered, 2);
       test.equal(location.search, query);
-      test.equal(FlowRouter._states.arr, [value]);
-      test.equal(FlowRouter._states.obj, {key: value});
+      test.equal(FlowRouter._globalRoute._states.arr, [value]);
+      test.equal(FlowRouter._globalRoute._states.obj, {key: value});
       test.equal(FlowRouter._current.route._states.loc, value);
       // clear states before other tests
       FlowRouter.clearStates();
@@ -148,7 +148,7 @@ Tinytest.addAsync('Client - Router - states from url', function (test, next) {
   FlowRouter.go('/' + rand + '?foo=' + value + '&bar=' + value);
 
   setTimeout(function() {
-    test.equal(FlowRouter._states.foo, value);
+    test.equal(FlowRouter._globalRoute._states.foo, value);
     test.equal(FlowRouter._current.route._states.bar, value);
     // clear states before other tests
     FlowRouter.clearStates();
