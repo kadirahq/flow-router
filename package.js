@@ -20,6 +20,7 @@ Package.onUse(function(api) {
   api.addFiles('client/_init.js', 'client');
   api.addFiles('server/router.js', 'server');
   api.addFiles('server/route.js', 'server');
+  api.addFiles('server/_init.js', 'server');
 
   api.addFiles('server/plugins/fast-render.js', 'server');
 
