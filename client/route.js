@@ -1,4 +1,5 @@
 Route = function(router, path, options) {
+  var self = this;
   options = options || {};
 
   this.path = path;
@@ -7,6 +8,7 @@ Route = function(router, path, options) {
   this._subsMap = {};
   this._states = {};
   this._router = router;
+  this._middleware = [];
 };
 
 
@@ -26,9 +28,11 @@ Route.prototype.getAllSubscriptions = function() {
 
 
 Route.prototype.middleware = function(middlewareFn) {
-  this._router._page(this.path, function (ctx, next) {
+  var mw = this._router._createCallback(this.path, function (ctx, next) {
     middlewareFn(ctx.pathname, next);
   });
 
+  this._middleware.push(mw);
+  this._router._updateCallbacks();
   return this;
 };

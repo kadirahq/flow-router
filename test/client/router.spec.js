@@ -17,7 +17,7 @@ Tinytest.addAsync('Client - Router - define and go to route', function (test, ne
     test.equal(rendered, 1);
     setTimeout(next, 100);
   }, 100);
-})
+});
 
 
 Tinytest.addAsync('Client - Router - parse params and query', function (test, next) {
@@ -64,9 +64,9 @@ Tinytest.addAsync('Client - Router - add global middleware', function (test, nex
     }
   });
 
-  FlowRouter.middleware(function (context, next) {
+  FlowRouter.middleware(function (path, next) {
     if(done) return next();
-    test.equal(context.path, paths.pop())
+    test.equal(path, paths.pop())
     log.push(0);
     next();
   })
