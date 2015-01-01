@@ -13,8 +13,8 @@ Package.onUse(function(api) {
 
   api.use('meteorhacks:fast-render@2.0.0', ['client', 'server'], {weak: true});
 
-  api.addFiles('client/assets/page.js', 'client');
-  api.addFiles('client/assets/query.js', 'client');
+  api.addFiles('client/vendor/page.js', 'client');
+  api.addFiles('client/vendor/query.js', 'client');
   api.addFiles('client/router.js', 'client');
   api.addFiles('client/route.js', 'client');
   api.addFiles('client/_init.js', 'client');
