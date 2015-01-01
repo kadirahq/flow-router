@@ -68,14 +68,14 @@ Tinytest.addAsync('Client - Route - add route middleware', function (test, next)
     }
   });
 
-  FlowRouter.go('/' + rand);
-
   setTimeout(function() {
-    FlowRouter.go('/' + rand2);
-
+    FlowRouter.go('/' + rand);
     setTimeout(function() {
-      test.equal(log, [0, 1, 2]);
-      next();
+      FlowRouter.go('/' + rand2);
+      setTimeout(function() {
+        test.equal(log, [0, 1, 2]);
+        next();
+      }, 100);
     }, 100);
   }, 100);
 });

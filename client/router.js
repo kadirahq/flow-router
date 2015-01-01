@@ -8,6 +8,9 @@ Router = function () {
   this._currentTracker = new Tracker.Dependency();
   this._globalRoute = new Route(this);
 
+  this._middleware = [];
+  this._updateCallbacks();
+
   // indicate it's okay (or not okay) to run the tracker
   // when doing subscriptions
   this.safeToRun = false;
@@ -19,10 +22,7 @@ Router.prototype.route = function(path, options) {
   var route = new Route(this, path, options);
   this._routeMap[path] = route;
 
-  this._page(path, function (context, next) {
-    // middleware
-    next();
-
+  route._handler = this._createCallback(path, function (context, next) {
     self._current = {
       path: path,
       context: context,
@@ -37,6 +37,8 @@ Router.prototype.route = function(path, options) {
 
     self._invalidateTracker();
   });
+
+  this._updateCallbacks();
 
   return route;
 };
@@ -54,10 +56,13 @@ Router.prototype.current = function() {
 
 
 Router.prototype.middleware = function(middlewareFn) {
-  this._page(function (ctx, next) {
-    var context = _.pick(ctx, 'params', 'path');
-    middlewareFn(context, next);
+  var mw = this._createCallback('*', function (ctx, next) {
+    middlewareFn(ctx.pathname, next);
   });
+
+  this._middleware.push(mw);
+  this._updateCallbacks();
+  return this;
 };
 
 
@@ -139,18 +144,38 @@ Router.prototype.ready = function() {
 };
 
 
+Router.prototype.notfound = function(options) {
+  var self = this;
+  var route = new Route(this, '*', options);
+
+  route._handler = this._createCallback('*', function (context, next) {
+    self._current = {
+      path: '*',
+      context: context,
+      params: context.params,
+      route: route
+    };
+
+    self._invalidateTracker();
+  });
+
+  this._notfound = route;
+  this._updateCallbacks();
+};
+
+
 Router.prototype.initialize = function() {
   var self = this;
 
-  // add query string middleware
-  this._page(function (ctx, next) {
-    // wait for `location` to update
+  this._middleware.push(this._createCallback('*', function (ctx, next) {
     setTimeout(function() {
       var str = location.search.slice(1);
       ctx.params.query = self._qs.parse(str);
       next();
     }, 0);
-  });
+  }));
+
+  this._updateCallbacks();
 
   // main autorun function
   this._tracker = Tracker.autorun(function () {
@@ -165,8 +190,8 @@ Router.prototype.initialize = function() {
       throw new Error(message);
     }
 
-    if(!_.isEmpty(self._globalRoute._states)) {
-      var states = self.getAllStates();
+    var states = self.getAllStates();
+    if(!_.isEmpty(states)) {
       var query = self._qs.stringify(states);
       history.replaceState({}, '', location.pathname + '?' + query);
     }
@@ -198,6 +223,38 @@ Router.prototype._invalidateTracker = function() {
   this.safeToRun = true;
   this._tracker.invalidate();
 };
+
+
+Router.prototype._createCallback = function(path, handler) {
+  var route = new this._page.Route(path);
+  return route.middleware(handler);
+};
+
+
+Router.prototype._updateCallbacks = _.debounce(function () {
+  var callbacks = [];
+
+  // add route middleware
+  _.each(this._routeMap, function (route) {
+    callbacks = callbacks.concat(route._middleware);
+  });
+
+  // add global middleware
+  callbacks = callbacks.concat(this._middleware);
+
+  // add route handlers
+  _.each(this._routeMap, function (route) {
+    callbacks.push(route._handler);
+  });
+
+  // add default 'not found' handler
+  if(this._notfound) {
+    callbacks.push(this._notfound._handler);
+  }
+
+  // set pagejs callbacks array
+  this._page.callbacks = callbacks;
+}, 0);
 
 
 Router.prototype._page = window.page;
