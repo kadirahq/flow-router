@@ -156,7 +156,7 @@ Router.prototype.initialize = function() {
     var route = self._current.route;
     var context = self._current.context;
 
-    if(!safeToRun) {
+    if(!self.safeToRun) {
       var message =
         "You can't use reactive data sources like Session" +
         " inside the `.subscriptions` method!";
