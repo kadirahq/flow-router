@@ -231,7 +231,7 @@ Router.prototype._createCallback = function(path, handler) {
 };
 
 
-Router.prototype._updateCallbacks = function() {
+Router.prototype._updateCallbacks = _.debounce(function () {
   var callbacks = [];
 
   // add route middleware
@@ -254,7 +254,7 @@ Router.prototype._updateCallbacks = function() {
 
   // set pagejs callbacks array
   this._page.callbacks = callbacks;
-};
+}, 0);
 
 
 Router.prototype._page = window.page;
