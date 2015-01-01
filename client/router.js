@@ -144,6 +144,26 @@ Router.prototype.ready = function() {
 };
 
 
+Router.prototype.notfound = function(options) {
+  var self = this;
+  var route = new Route(this, '*', options);
+
+  route._handler = this._createCallback('*', function (context, next) {
+    self._current = {
+      path: '*',
+      context: context,
+      params: context.params,
+      route: route
+    };
+
+    self._invalidateTracker();
+  });
+
+  this._notfound = route;
+  this._updateCallbacks();
+};
+
+
 Router.prototype.initialize = function() {
   var self = this;
 
@@ -205,15 +225,6 @@ Router.prototype._invalidateTracker = function() {
 };
 
 
-Router.prototype.notfound = function(handlerFn) {
-  this._notfound = this._createCallback('*', function (context, next) {
-    handlerFn(context.params);
-  });
-
-  this._updateCallbacks();
-};
-
-
 Router.prototype._createCallback = function(path, handler) {
   var route = new this._page.Route(path);
   return route.middleware(handler);
@@ -236,8 +247,10 @@ Router.prototype._updateCallbacks = function() {
     callbacks.push(route._handler);
   });
 
-  // add default 404 middleware
-  callbacks.push(this._notfound);
+  // add default 'not found' handler
+  if(this._notfound) {
+    callbacks.push(this._notfound._handler);
+  }
 
   // set pagejs callbacks array
   this._page.callbacks = callbacks;

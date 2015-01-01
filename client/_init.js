@@ -3,8 +3,11 @@ FlowRouter = new Router;
 FlowRouter.Router = Router;
 FlowRouter.Route = Route;
 
-FlowRouter.notfound(function (params) {
-  console.error('# 404', params);
+FlowRouter.notfound({
+  action: function (params) {
+    var path = params[0];
+    throw new Error('FlowRouter: Route not found ' + path);
+  }
 });
 
 // Initialize FlowRouter
