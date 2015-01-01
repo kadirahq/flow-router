@@ -176,7 +176,7 @@ Router.prototype.initialize = function() {
     // We tackle this with the `safeToRun` variable
     route.subscriptions(context.params);
 
-    // otherwise, computations inside render will trigger to re-run
+    // otherwise, computations inside action will trigger to re-run
     // this computation. which we do not need.
     Tracker.nonreactive(function() {
       route.action(context.params);

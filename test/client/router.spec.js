@@ -6,7 +6,7 @@ Tinytest.addAsync('Client - Router - define and go to route', function (test, ne
   var rendered = 0;
 
   FlowRouter.route('/' + rand, {
-    render: function(_params) {
+    action: function(_params) {
       rendered++;
     }
   });
@@ -26,7 +26,7 @@ Tinytest.addAsync('Client - Router - parse params and query', function (test, ne
   var params = null;
 
   FlowRouter.route('/' + rand + '/:foo', {
-    render: function(_params) {
+    action: function(_params) {
       rendered++;
       params = _params;
     }
@@ -53,13 +53,13 @@ Tinytest.addAsync('Client - Router - add global middleware', function (test, nex
   var done = false;
 
   FlowRouter.route('/' + rand, {
-    render: function(_params) {
+    action: function(_params) {
       log.push(1);
     }
   });
 
   FlowRouter.route('/' + rand2, {
-    render: function(_params) {
+    action: function(_params) {
       log.push(2);
     }
   });
@@ -93,7 +93,7 @@ Tinytest.addAsync('Client - Router - set states', function (test, next) {
   FlowRouter.globals = ['arr', 'obj'];
 
   FlowRouter.route('/' + rand, {
-    render: function(_params) {
+    action: function(_params) {
       rendered++;
     }
   });
@@ -172,13 +172,13 @@ Tinytest.addAsync('Client - Router - get current route', function (test, next) {
   });
 
   FlowRouter.route('/' + rand, {
-    render: function(_params) {
+    action: function(_params) {
 
     }
   });
 
   FlowRouter.route('/' + rand2, {
-    render: function(_params) {
+    action: function(_params) {
 
     }
   });

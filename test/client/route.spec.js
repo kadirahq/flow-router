@@ -5,7 +5,6 @@ Tinytest.addAsync('Client - Route - subscribe to route subs', function (test, ne
   var rand = Random.id();
 
   FlowRouter.route('/' + rand, {
-    render: Function.prototype,
     subscriptions: function () {
       this.subscribe('foo', Meteor.subscribe('foo'));
     }
@@ -23,14 +22,12 @@ Tinytest.addAsync('Client - Route - unsubscribe to other subs', function (test, 
   var rand = Random.id(), rand2 = Random.id();
 
   FlowRouter.route('/' + rand, {
-    render: Function.prototype,
     subscriptions: function () {
       this.subscribe('foo', Meteor.subscribe('foo'));
     }
   });
 
   FlowRouter.route('/' + rand2, {
-    render: Function.prototype,
     subscriptions: function () {
       this.subscribe('bar', Meteor.subscribe('bar'));
     }
@@ -56,7 +53,7 @@ Tinytest.addAsync('Client - Route - add route middleware', function (test, next)
   var log = [];
 
   FlowRouter.route('/' + rand, {
-    render: function(_params) {
+    action: function(_params) {
       log.push(1);
     }
   }).middleware(function (path, next) {
@@ -66,7 +63,7 @@ Tinytest.addAsync('Client - Route - add route middleware', function (test, next)
   });
 
   FlowRouter.route('/' + rand2, {
-    render: function(_params) {
+    action: function(_params) {
       log.push(2);
     }
   });
