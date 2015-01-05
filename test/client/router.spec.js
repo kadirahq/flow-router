@@ -1,6 +1,4 @@
 Router = FlowRouter.Router;
-
-
 Tinytest.addAsync('Client - Router - define and go to route', function (test, next) {
   var rand = Random.id();
   var rendered = 0;
@@ -202,7 +200,8 @@ Tinytest.addAsync('Client - Router - subscribe to global subs', function (test, 
   var rand = Random.id();
   FlowRouter.route('/' + rand);
 
-  FlowRouter.subscriptions = function () {
+  FlowRouter.subscriptions = function (path) {
+    test.equal(path, '/' + rand);
     this.subscribe('baz', Meteor.subscribe('baz'));
   }
 

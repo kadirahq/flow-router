@@ -181,6 +181,7 @@ Router.prototype.initialize = function() {
   this._tracker = Tracker.autorun(function () {
     if(!self._current.route) return;
     var route = self._current.route;
+    var path = self._current.path;
     var context = self._current.context;
 
     if(!self.safeToRun) {
@@ -201,7 +202,7 @@ Router.prototype.initialize = function() {
     // But we don't need to run this tracker with
     // other reactive changes inside the .subscription method
     // We tackle this with the `safeToRun` variable
-    self.subscriptions.call(self._globalRoute, context.params);
+    self.subscriptions.call(self._globalRoute, path);
     if(route.subscriptions) {
       route.subscriptions(context.params);
     }

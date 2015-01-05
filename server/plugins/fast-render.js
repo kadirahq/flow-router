@@ -8,7 +8,6 @@ Meteor.startup(function () {
   })
 });
 
-
 function setupFastRender () {
   _.each(FlowRouter._routeMap, function (route, path) {
     FastRender.route(path, function (params, path) {
@@ -21,7 +20,10 @@ function setupFastRender () {
       };
 
       route._subsMap = {};
-      route.subscriptions(params);
+      FlowRouter.subscriptions.call(route, path);
+      if(route.subscriptions) {
+        route.subscriptions(params);
+      }
       _.each(route._subsMap, function (args) {
         self.subscribe.apply(self, args);
       });

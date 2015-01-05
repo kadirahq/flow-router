@@ -1,5 +1,6 @@
 Router = function () {
   this._routeMap = {};
+  this.subscriptions = Function.prototype;
 }
 
 
