@@ -202,7 +202,9 @@ Router.prototype.initialize = function() {
     // other reactive changes inside the .subscription method
     // We tackle this with the `safeToRun` variable
     self.subscriptions.call(self._globalRoute, context.params);
-    route.subscriptions(context.params);
+    if(route.subscriptions) {
+      route.subscriptions(context.params);
+    }
 
     // otherwise, computations inside action will trigger to re-run
     // this computation. which we do not need.
