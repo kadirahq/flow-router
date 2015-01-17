@@ -82,6 +82,40 @@ Tinytest.addAsync('Client - Router - add global middleware', function (test, nex
   }, 100);
 });
 
+Tinytest.addAsync('Client - Router - redirect using middleware', function (test, next) {
+  var rand = Random.id(), rand2 = Random.id();
+  var log = [];
+  var paths = ['/' + rand2, '/' + rand];
+  var done = false;
+
+  FlowRouter.route(paths[0], {
+    action: function(_params) {
+      log.push(1);
+    }
+  });
+
+  FlowRouter.route(paths[1], {
+    action: function(_params) {
+      log.push(2);
+    }
+  });
+
+  FlowRouter.middleware(function (path, next) {
+    if(path == paths[0]) {
+      next(paths[1]);
+    } else {
+      next();
+    }
+  });
+
+  FlowRouter.go(paths[0]);
+
+  setTimeout(function() {
+    test.equal(log, [2]);
+    done = true;
+    next();
+  }, 100);
+});
 
 Tinytest.addAsync('Client - Router - set states', function (test, next) {
   var rand = Random.id();

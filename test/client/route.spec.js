@@ -6,6 +6,7 @@ Tinytest.addAsync('Client - Route - subscribe to route subs', function (test, ne
 
   FlowRouter.route('/' + rand, {
     subscriptions: function () {
+      console.log("goooo");
       this.subscribe('foo', Meteor.subscribe('foo'));
     }
   });
@@ -53,13 +54,14 @@ Tinytest.addAsync('Client - Route - add route middleware', function (test, next)
   var log = [];
 
   FlowRouter.route('/' + rand, {
+    middlewares: [function(path, next) {
+      test.equal(path, '/' + rand)
+      log.push(0);
+      next();
+    }],
     action: function(_params) {
       log.push(1);
     }
-  }).middleware(function (path, next) {
-    test.equal(path, '/' + rand)
-    log.push(0);
-    next();
   });
 
   FlowRouter.route('/' + rand2, {
