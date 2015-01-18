@@ -58,12 +58,19 @@ Router.prototype.current = function() {
 Router.prototype.middleware = function(middlewareFn) {
   var self = this;
   var mw = function(ctx, next) {
-    middlewareFn(ctx.pathname, function(path) {
+    // make sure middlewars run after Meteor has been initialized
+    // this is very important for specially for fast render and Meteor.user()
+    // availability
+    Meteor.startup(function() {
+      middlewareFn(ctx.pathname, processNext);
+    });
+
+    function processNext(path) {
       if(path) {
         return self._page.redirect(path);
       }
       next();
-    });
+    }
   };
 
   this._middleware.push(mw);
@@ -77,7 +84,7 @@ Router.prototype.getState = function(name) {
   } else if(this._current.route) {
     return this._current.route._states[name];
   } else {
-    // nothing to return
+    return null;
   }
 };
 
