@@ -6,7 +6,6 @@ Tinytest.addAsync('Client - Route - subscribe to route subs', function (test, ne
 
   FlowRouter.route('/' + rand, {
     subscriptions: function () {
-      console.log("goooo");
       this.subscribe('foo', Meteor.subscribe('foo'));
     }
   });

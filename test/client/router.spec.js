@@ -230,6 +230,29 @@ Tinytest.addAsync('Client - Router - get current route', function (test, next) {
 });
 
 
+Tinytest.addAsync('Client - Router - get current route path', function (test, next) {
+  var value = Random.id();
+  var randomValue = Random.id();
+  var routePath = "/" + randomValue + '/:_id';
+  var path = "/" + randomValue + "/" + value;
+
+  var detectedValue = null;
+
+  FlowRouter.route(routePath, {
+    action: function(params) {
+      detectedValue = params._id;
+    }
+  });
+
+  FlowRouter.go(path);
+
+  Meteor.setTimeout(function() {
+    test.equal(detectedValue, value);
+    test.equal(FlowRouter.current().path, path);
+    next();
+  }, 50);
+});
+
 Tinytest.addAsync('Client - Router - subscribe to global subs', function (test, next) {
   var rand = Random.id();
   FlowRouter.route('/' + rand);
