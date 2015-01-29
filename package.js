@@ -1,7 +1,7 @@
 Package.describe({
   name: 'meteorhacks:flow-router',
   summary: 'Router for Flow Architecture',
-  version: '0.0.14',
+  version: '0.0.15',
   git: 'https://github.com/meteorhacks/flow-router.git'
 });
 
