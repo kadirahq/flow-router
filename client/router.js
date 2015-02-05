@@ -22,7 +22,7 @@ Router.prototype.route = function(path, options) {
 
   route._handler = function (context, next) {
     self._current = {
-      path: context.pathname,
+      path: context.path,
       context: context,
       params: context.params,
       route: route
