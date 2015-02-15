@@ -10,6 +10,7 @@ Package.onUse(function(api) {
 
   api.use('underscore');
   api.use('tracker');
+  api.use('reactive-dict');
 
   api.use('meteorhacks:fast-render@2.0.0', ['client', 'server'], {weak: true});
 

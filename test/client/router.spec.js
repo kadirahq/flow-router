@@ -197,7 +197,7 @@ Tinytest.addAsync('Client - Router - get current route', function (test, next) {
 
   var visitedPaths = [];
   var tracker = Tracker.autorun(function() {
-    var current = FlowRouter.current();
+    var current = FlowRouter.reactiveCurrent();
     if(current.path) {
       visitedPaths.push(current.path);
     }
@@ -266,6 +266,88 @@ Tinytest.addAsync('Client - Router - subscribe to global subs', function (test, 
   setTimeout(function() {
     test.isTrue(!!GetSub('baz'));
     FlowRouter.subscriptions = Function.prototype;
+    next();
+  }, 100);
+});
+
+Tinytest.addAsync('Client - Router - getParam - reactive params', function (test, next) {
+  var v1 = Random.id();
+  var v2 = Random.id();
+
+  FlowRouter._current.params = {
+    "one": v1,
+    "two": v2
+  };
+  FlowRouter._setParams();
+
+  var ranFor = 0;
+  var c = Tracker.autorun(function() {
+    var value = FlowRouter.getParam("one");
+    test.equal(value, v1);
+    ranFor++;
+  });
+
+  FlowRouter._current.params.two = Random.id();
+  FlowRouter._setParams();
+
+  setTimeout(function() {
+    test.equal(ranFor, 1);
+    Meteor.defer(c.stop.bind(c));
+    next();
+  }, 100);
+});
+
+Tinytest.addAsync('Client - Router - getParam - registration', function (test, next) {
+  var v1 = Random.id();
+  var v2 = Random.id();
+
+  var ranFor = 0;
+  var values = [];
+
+  FlowRouter._current.params = {}
+  FlowRouter._setParams();
+
+  var c = Tracker.autorun(function() {
+    var value = FlowRouter.getParam("one");
+    values.push(value);
+    ranFor++;
+  });
+
+  FlowRouter._current.params = {one: v1};
+  FlowRouter._setParams();
+
+  setTimeout(function() {
+    test.equal(ranFor, 2);
+    test.equal(values, [undefined, v1]);
+    Meteor.defer(c.stop.bind(c));
+    next();
+  }, 100);
+});
+
+Tinytest.addAsync('Client - Router - getParam - removal', function (test, next) {
+  var v1 = Random.id();
+  var v2 = Random.id();
+
+  FlowRouter._current.params = {
+    "one": v1
+  };
+  FlowRouter._setParams();
+
+  var ranFor = 0;
+  var values = [];
+  var c = Tracker.autorun(function() {
+    var value = FlowRouter.getParam("one");
+    values.push(value);
+    ranFor++;
+  });
+
+  FlowRouter._current.params = {};
+  FlowRouter._setParams();
+
+  setTimeout(function() {
+    test.equal(ranFor, 2);
+    test.equal(values, [v1, undefined]);
+    Meteor.defer(c.stop.bind(c));
     next();
   }, 100);
 });

@@ -4,6 +4,7 @@ Router = function () {
 
   this._tracker = this._buildTracker();
   this._current = {};
+  this._params = new ReactiveDict();
   this._currentTracker = new Tracker.Dependency();
   this._globalRoute = new Route(this);
 
@@ -50,9 +51,41 @@ Router.prototype.redirect = function(path) {
   this._page.redirect(path);
 };
 
+// .current is not reactive
+// This is by design. use .getParam() instead
+// If you really need a reactive current support, use .reactiveCurrent()
 Router.prototype.current = function() {
-  this._currentTracker.depend();
   return this._current;
+};
+
+Router.prototype.reactiveCurrent = function() {
+  this._currentTracker.depend();
+  return this.current();
+};
+
+Router.prototype.getParam = function(key) {
+  return this._params.get(key);
+};
+
+Router.prototype._setParams = function() {
+  var self = this;
+  var params = this._current.params;
+
+  var currentKeys = _.keys(params);
+  var oldKeys = _.keys(self._params.keyDeps);
+
+  // set new values
+  //  params is an array. So, _.each(params) does not works
+  //  to iterate params
+  _.each(currentKeys, function(key) {
+    self._params.set(key, params[key]);
+  });
+
+  // remove keys which does not exisits here
+  var removedKeys = _.difference(oldKeys, currentKeys);
+  _.each(removedKeys, function(key) {
+    self._params.set(key, undefined);
+  });
 };
 
 Router.prototype.middleware = function(middlewareFn) {
@@ -88,12 +121,10 @@ Router.prototype.getState = function(name) {
   }
 };
 
-
 Router.prototype.getAllStates = function() {
   var locals = this._current.route ? this._current.route._states : {};
   return _.extend({}, locals, this._globalRoute._states);
 };
-
 
 Router.prototype.setState = function(name, value) {
   if(_.contains(this.globals, name)) {
@@ -107,7 +138,6 @@ Router.prototype.setState = function(name, value) {
   }
 };
 
-
 Router.prototype.removeState = function(name) {
   if(_.contains(this.globals, name)) {
     delete this._globalRoute._states[name];
@@ -120,7 +150,6 @@ Router.prototype.removeState = function(name) {
   }
 };
 
-
 Router.prototype.clearStates = function() {
   if(this._current.route) {
     this._current.route._states = {};
@@ -129,7 +158,6 @@ Router.prototype.clearStates = function() {
   this._globalRoute._states = {};
   this._invalidateTracker();
 };
-
 
 Router.prototype.ready = function() {
   var currentRoute = this.current().route;
@@ -155,7 +183,6 @@ Router.prototype.ready = function() {
   return true;
 };
 
-
 Router.prototype.notfound = function(options) {
   var self = this;
   var route = new Route(this, '*', options);
@@ -174,7 +201,6 @@ Router.prototype.notfound = function(options) {
   this._notfound = route;
   this._updateCallbacks();
 };
-
 
 Router.prototype.initialize = function() {
   var self = this;
@@ -229,6 +255,7 @@ Router.prototype._buildTracker = function() {
       route.callAction(context);
     });
 
+    self._setParams();
     self._currentTracker.changed();
     self.safeToRun = false;
   });
