@@ -17,6 +17,26 @@ Tinytest.addAsync('Client - Router - define and go to route', function (test, ne
   }, 100);
 });
 
+Tinytest.addAsync('Client - Router - define and go to route with fields',
+function (test, next) {
+  var rand = Random.id();
+  var pathDef = "/" + rand + "/:key";
+  var rendered = 0;
+
+  FlowRouter.route(pathDef, {
+    action: function(params) {
+      test.equal(params.key, "abc");
+      rendered++;
+    }
+  });
+
+  FlowRouter.go(pathDef, {key: "abc"});
+
+  setTimeout(function() {
+    test.equal(rendered, 1);
+    setTimeout(next, 100);
+  }, 100);
+});
 
 Tinytest.addAsync('Client - Router - parse params and query', function (test, next) {
   var rand = Random.id();
@@ -350,4 +370,33 @@ Tinytest.addAsync('Client - Router - getParam - removal', function (test, next) 
     Meteor.defer(c.stop.bind(c));
     next();
   }, 100);
+});
+
+Tinytest.add('Client - Router - path - generic', function (test) {
+  var pathDef = "/blog/:blogId/some/:name";
+  var fields = {
+    blogId: "1001",
+    name: "superb"
+  };
+  var expectedPath = "/blog/1001/some/superb";
+
+  var path = FlowRouter.path(pathDef, fields);
+  test.equal(path, expectedPath)
+});
+
+Tinytest.add('Client - Router - path - missing fields', function (test) {
+  var pathDef = "/blog/:blogId/some/:name";
+  var fields = {
+    blogId: "1001",
+  };
+  var expectedPath = "/blog/1001/some/";
+
+  var path = FlowRouter.path(pathDef, fields);
+  test.equal(path, expectedPath)
+});
+
+Tinytest.add('Client - Router - path - no fields', function (test) {
+  var pathDef = "/blog/blogId/some/name";
+  var path = FlowRouter.path(pathDef);
+  test.equal(path, pathDef)
 });

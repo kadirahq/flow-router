@@ -43,7 +43,19 @@ Router.prototype.route = function(path, options) {
   return route;
 };
 
-Router.prototype.go = function(path) {
+Router.prototype.path = function(pathDef, fields) {
+  fields = fields || {};
+  var regExp = /(:[\w]+)+/g;
+  var path = pathDef.replace(regExp, function(key) {
+    // remove the : from the key
+    key = key.substring(1);
+    return fields[key] || "";
+  });
+  return path;
+};
+
+Router.prototype.go = function(pathDef, fields) {
+  var path = this.path(pathDef, fields);
   this._page(path);
 };
 
