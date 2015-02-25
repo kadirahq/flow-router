@@ -554,3 +554,21 @@ Tinytest.add('Client - Router - setQueryParams - no route selected', function (t
   test.isFalse(success);
   FlowRouter._current.route = originalRoute;
 });
+
+Tinytest.addAsync('Client - Router - notfound', function (test, done) {
+  var data = [];
+  FlowRouter.notfound = {
+    subscriptions: function() {
+      data.push("subscriptions");
+    },
+    action: function() {
+      data.push("action");
+    }
+  };
+
+  FlowRouter.go("/" + Random.id());
+  setTimeout(function() {
+    test.equal(data, ["subscriptions", "action"]);
+    done();
+  }, 50);
+});

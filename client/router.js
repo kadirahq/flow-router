@@ -12,6 +12,7 @@ Router = function () {
 
   this._middleware = [];
   this._routes = [];
+  this._notfoundRoute = this._notfoundRoute.bind(this);
   this._updateCallbacks();
 
   // indicate it's okay (or not okay) to run the tracker
@@ -195,23 +196,21 @@ Router.prototype.ready = function() {
   return true;
 };
 
-Router.prototype.notfound = function(options) {
-  var self = this;
-  var route = new Route(this, '*', options);
-
-  route._handler = function (context, next) {
-    self._current = {
-      path: '*',
-      context: context,
-      params: context.params,
-      route: route
-    };
-
-    self._invalidateTracker();
+Router.prototype._notfoundRoute = function(context) {
+  this._current = {
+    path: context.path,
+    context: context,
+    params: [],
+    queryParams: {},
   };
 
-  this._notfound = route;
-  this._updateCallbacks();
+  if(!this.notfound) {
+    console.error("There is no route for the path:", context.path);
+    return;
+  }
+
+  this._current.route = new Route(this, '*', this.notfound);
+  this._invalidateTracker();
 };
 
 Router.prototype.initialize = function() {
@@ -288,6 +287,8 @@ Router.prototype._updateCallbacks = function () {
   _.each(self._routes, function(route) {
     self._page(route.path, route._handler);
   });
+
+  self._page('*', this._notfoundRoute);
 };
 
 Router.prototype._page = window.page;
