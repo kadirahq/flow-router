@@ -5,6 +5,8 @@ Router = function () {
   this._tracker = this._buildTracker();
   this._current = {};
   this._params = new ReactiveDict();
+  this._queryParams = new ReactiveDict();
+
   this._currentTracker = new Tracker.Dependency();
   this._globalRoute = new Route(this);
 
@@ -26,13 +28,9 @@ Router.prototype.route = function(path, options) {
       path: context.path,
       context: context,
       params: context.params,
+      queryParams: self._qs.parse(context.querystring),
       route: route
     };
-
-    // pick states from url
-    var states = self._qs.parse(context.querystring);
-    self._globalRoute._states = _.pick(states, self.globals);
-    self._current.route._states = _.omit(states, this.globals);
 
     self._invalidateTracker();
   };
@@ -43,12 +41,63 @@ Router.prototype.route = function(path, options) {
   return route;
 };
 
-Router.prototype.go = function(path) {
+Router.prototype.path = function(pathDef, fields, queryParams) {
+  fields = fields || {};
+  var regExp = /(:[\w\(\)\\\+\*\.]+)+/g;
+  var path = pathDef.replace(regExp, function(key) {
+    var firstRegexpChar = key.indexOf("(");
+    // get the content behind : and (\\d+/)
+    key = key.substring(1, (firstRegexpChar > 0)? firstRegexpChar: undefined);
+    // remove +?*
+    key = key.replace(/[\+\*\?]+/g, "");
+
+    return fields[key] || "";
+  });
+
+  var strQueryParams = this._qs.stringify(queryParams || {});
+  if(strQueryParams) {
+    path += "?" + strQueryParams;
+  }
+
+  return path;
+};
+
+Router.prototype.go = function(pathDef, fields, queryParams) {
+  var path = this.path(pathDef, fields, queryParams);
   this._page(path);
 };
 
 Router.prototype.redirect = function(path) {
   this._page.redirect(path);
+};
+
+Router.prototype.setParams = function(newParams) {
+  if(!this._current.route) {return false;}
+
+  var pathDef = this._current.route.path;
+  var existingParams = this._current.params;
+  var params = {};
+  _.each(_.keys(existingParams), function(key) {
+    params[key] = existingParams[key];
+  });
+
+  params = _.extend(params, newParams);
+  var queryParams = this._current.queryParams;
+
+  this.go(pathDef, params, queryParams);
+  return true;
+};
+
+Router.prototype.setQueryParams = function(newParams) {
+  if(!this._current.route) {return false;}
+
+  var queryParams = _.clone(this._current.queryParams);
+  _.extend(queryParams, newParams);
+
+  var pathDef = this._current.route.path;
+  var params = this._current.params;
+  this.go(pathDef, params, queryParams);
+  return true;
 };
 
 // .current is not reactive
@@ -67,24 +116,35 @@ Router.prototype.getParam = function(key) {
   return this._params.get(key);
 };
 
-Router.prototype._setParams = function() {
-  var self = this;
-  var params = this._current.params;
+Router.prototype.getQueryParam = function(key) {
+  return this._queryParams.get(key);
+};
 
-  var currentKeys = _.keys(params);
-  var oldKeys = _.keys(self._params.keyDeps);
+Router.prototype._registerParams = function() {
+  var params = this._current.params;
+  this._updateReactiveDict(this._params, params);
+};
+
+Router.prototype._registerQueryParams = function() {
+  var queryParams = this._current.queryParams;
+  this._updateReactiveDict(this._queryParams, queryParams);
+};
+
+Router.prototype._updateReactiveDict = function(dict, newValues) {
+  var currentKeys = _.keys(newValues);
+  var oldKeys = _.keys(dict.keyDeps);
 
   // set new values
   //  params is an array. So, _.each(params) does not works
   //  to iterate params
   _.each(currentKeys, function(key) {
-    self._params.set(key, params[key]);
+    dict.set(key, newValues[key]);
   });
 
   // remove keys which does not exisits here
   var removedKeys = _.difference(oldKeys, currentKeys);
   _.each(removedKeys, function(key) {
-    self._params.set(key, undefined);
+    dict.set(key, undefined);
   });
 };
 
@@ -109,54 +169,6 @@ Router.prototype.middleware = function(middlewareFn) {
   this._middleware.push(mw);
   this._updateCallbacks();
   return this;
-};
-
-Router.prototype.getState = function(name) {
-  if(_.contains(this.globals, name)) {
-    return this._globalRoute._states[name];
-  } else if(this._current.route) {
-    return this._current.route._states[name];
-  } else {
-    return null;
-  }
-};
-
-Router.prototype.getAllStates = function() {
-  var locals = this._current.route ? this._current.route._states : {};
-  return _.extend({}, locals, this._globalRoute._states);
-};
-
-Router.prototype.setState = function(name, value) {
-  if(_.contains(this.globals, name)) {
-    this._globalRoute._states[name] = value;
-    this._invalidateTracker();
-  } else if(this._current.route) {
-    this._current.route._states[name] = value;
-    this._invalidateTracker();
-  } else {
-    // nothing to set
-  }
-};
-
-Router.prototype.removeState = function(name) {
-  if(_.contains(this.globals, name)) {
-    delete this._globalRoute._states[name];
-    this._invalidateTracker();
-  } else if(this._current.route) {
-    delete this._current.route._states[name];
-    this._invalidateTracker();
-  } else {
-    // nothing to remove
-  }
-};
-
-Router.prototype.clearStates = function() {
-  if(this._current.route) {
-    this._current.route._states = {};
-  }
-
-  this._globalRoute._states = {};
-  this._invalidateTracker();
 };
 
 Router.prototype.ready = function() {
@@ -235,27 +247,23 @@ Router.prototype._buildTracker = function() {
       throw new Error(message);
     }
 
-    var states = self.getAllStates();
-    if(!_.isEmpty(states)) {
-      var query = self._qs.stringify(states);
-      history.replaceState({}, '', location.pathname + '?' + query);
-    }
-
     // We need to run subscriptions inside a Tracker
     // to stop subs when switching between routes
     // But we don't need to run this tracker with
     // other reactive changes inside the .subscription method
     // We tackle this with the `safeToRun` variable
     self.subscriptions.call(self._globalRoute, path);
-    route.callSubscriptions(context);
+    route.callSubscriptions(self._current);
 
     // otherwise, computations inside action will trigger to re-run
     // this computation. which we do not need.
     Tracker.nonreactive(function() {
-      route.callAction(context);
+      route.callAction(self._current);
     });
 
-    self._setParams();
+    self._registerParams();
+    self._registerQueryParams();
+
     self._currentTracker.changed();
     self.safeToRun = false;
   });

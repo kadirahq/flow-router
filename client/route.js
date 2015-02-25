@@ -6,7 +6,6 @@ Route = function(router, path, options) {
   this._subscriptions = options.subscriptions || Function.prototype;
   this._middlewares = options.middlewares || [];
   this._subsMap = {};
-  this._states = {};
   this._router = router;
 };
 
@@ -47,13 +46,13 @@ Route.prototype._processMiddlewares = function(context, after) {
   }
 };
 
-Route.prototype.callAction = function(context) {
+Route.prototype.callAction = function(current) {
   var self = this;
-  self._processMiddlewares(context, function() {
-    self._action(context.params);
+  self._processMiddlewares(current.context, function() {
+    self._action(current.params, current.queryParams);
   });
 };
 
-Route.prototype.callSubscriptions = function(context) {
-  this._subscriptions(context.params);
+Route.prototype.callSubscriptions = function(current) {
+  this._subscriptions(current.params);
 };
