@@ -50,19 +50,14 @@ Tinytest.addAsync('Client - Router - parse params and query', function (test, ne
     }
   });
 
-  FlowRouter.go('/' + rand + '/bar?baz=bat');
+  FlowRouter.go('/' + rand + '/bar');
 
   setTimeout(function() {
     test.equal(rendered, 1);
     test.equal(params.foo, 'bar');
-    test.equal(params.query, {'baz': 'bat'});
-
-    // clear states before other tests
-    FlowRouter.clearStates();
     setTimeout(next, 100);
   }, 100);
 });
-
 
 Tinytest.addAsync('Client - Router - add global middleware', function (test, next) {
   var rand = Random.id(), rand2 = Random.id();
@@ -134,77 +129,6 @@ Tinytest.addAsync('Client - Router - redirect using middleware', function (test,
     test.equal(log, [2]);
     done = true;
     next();
-  }, 100);
-});
-
-Tinytest.addAsync('Client - Router - set states', function (test, next) {
-  var rand = Random.id();
-  var value = Random.id();
-  var rendered = 0;
-
-  FlowRouter.globals = ['arr', 'obj'];
-
-  FlowRouter.route('/' + rand, {
-    action: function(_params) {
-      rendered++;
-    }
-  });
-
-  FlowRouter.go('/' + rand);
-
-  setTimeout(function() {
-    FlowRouter.setState('loc', value);
-    FlowRouter.setState('arr', [value]);
-    FlowRouter.setState('obj', {key: value});
-
-    setTimeout(function() {
-      var query = '?loc='+value+'&arr[0]='+value+'&obj[key]='+value;
-      test.equal(rendered, 2);
-      test.equal(location.search, query);
-      test.equal(FlowRouter._globalRoute._states.arr, [value]);
-      test.equal(FlowRouter._globalRoute._states.obj, {key: value});
-      test.equal(FlowRouter._current.route._states.loc, value);
-      // clear states before other tests
-      FlowRouter.clearStates();
-      setTimeout(next, 100);
-    }, 100);
-  }, 100);
-})
-
-
-Tinytest.addAsync('Client - Router - get states', function (test, next) {
-  var rand = Random.id();
-  FlowRouter.go('/');
-  FlowRouter.globals = ['glo'];
-
-  setTimeout(function() {
-    FlowRouter.setState('glo', rand);
-    FlowRouter.setState('loc', rand);
-
-    setTimeout(function() {
-      test.equal(FlowRouter.getState('glo'), rand);
-      test.equal(FlowRouter.getState('loc'), rand);
-      // clear states before other tests
-      FlowRouter.clearStates();
-      setTimeout(next, 100);
-    }, 100);
-  }, 100);
-})
-
-
-Tinytest.addAsync('Client - Router - states from url', function (test, next) {
-  var rand = Random.id();
-  var value = Random.id();
-  FlowRouter.globals = ['foo'];
-  FlowRouter.route('/' + rand);
-  FlowRouter.go('/' + rand + '?foo=' + value + '&bar=' + value);
-
-  setTimeout(function() {
-    test.equal(FlowRouter._globalRoute._states.foo, value);
-    test.equal(FlowRouter._current.route._states.bar, value);
-    // clear states before other tests
-    FlowRouter.clearStates();
-    setTimeout(next, 100);
   }, 100);
 });
 
@@ -298,7 +222,7 @@ Tinytest.addAsync('Client - Router - getParam - reactive params', function (test
     "one": v1,
     "two": v2
   };
-  FlowRouter._setParams();
+  FlowRouter._registerParams();
 
   var ranFor = 0;
   var c = Tracker.autorun(function() {
@@ -308,7 +232,7 @@ Tinytest.addAsync('Client - Router - getParam - reactive params', function (test
   });
 
   FlowRouter._current.params.two = Random.id();
-  FlowRouter._setParams();
+  FlowRouter._registerParams();
 
   setTimeout(function() {
     test.equal(ranFor, 1);
@@ -325,7 +249,7 @@ Tinytest.addAsync('Client - Router - getParam - registration', function (test, n
   var values = [];
 
   FlowRouter._current.params = {}
-  FlowRouter._setParams();
+  FlowRouter._registerParams();
 
   var c = Tracker.autorun(function() {
     var value = FlowRouter.getParam("one");
@@ -334,7 +258,7 @@ Tinytest.addAsync('Client - Router - getParam - registration', function (test, n
   });
 
   FlowRouter._current.params = {one: v1};
-  FlowRouter._setParams();
+  FlowRouter._registerParams();
 
   setTimeout(function() {
     test.equal(ranFor, 2);
@@ -351,7 +275,7 @@ Tinytest.addAsync('Client - Router - getParam - removal', function (test, next) 
   FlowRouter._current.params = {
     "one": v1
   };
-  FlowRouter._setParams();
+  FlowRouter._registerParams();
 
   var ranFor = 0;
   var values = [];
@@ -362,11 +286,64 @@ Tinytest.addAsync('Client - Router - getParam - removal', function (test, next) 
   });
 
   FlowRouter._current.params = {};
-  FlowRouter._setParams();
+  FlowRouter._registerParams();
 
   setTimeout(function() {
     test.equal(ranFor, 2);
     test.equal(values, [v1, undefined]);
+    Meteor.defer(c.stop.bind(c));
+    next();
+  }, 100);
+});
+
+Tinytest.addAsync('Client - Router - getQueryParam - do not change', function (test, next) {
+  var v1 = Random.id();
+  var v2 = Random.id();
+
+  FlowRouter._current.queryParams = {
+    "one": v1,
+    "two": v2
+  };
+  FlowRouter._registerQueryParams();
+
+  var ranFor = 0;
+  var c = Tracker.autorun(function() {
+    var value = FlowRouter.getQueryParam("one");
+    test.equal(value, v1);
+    ranFor++;
+  });
+
+  FlowRouter._current.queryParams.two = Random.id();
+  FlowRouter._registerQueryParams();
+
+  setTimeout(function() {
+    test.equal(ranFor, 1);
+    Meteor.defer(c.stop.bind(c));
+    next();
+  }, 100);
+});
+
+Tinytest.addAsync('Client - Router - getQueryParam - change', function (test, next) {
+  var v1 = Random.id();
+  var v2 = Random.id();
+
+  FlowRouter._current.queryParams = {
+    "one": v1,
+    "two": v2
+  };
+  FlowRouter._registerQueryParams();
+
+  var ranFor = 0;
+  var c = Tracker.autorun(function() {
+    var value = FlowRouter.getQueryParam("one");
+    ranFor++;
+  });
+
+  FlowRouter._current.queryParams.one = Random.id();
+  FlowRouter._registerQueryParams();
+
+  setTimeout(function() {
+    test.equal(ranFor, 2);
     Meteor.defer(c.stop.bind(c));
     next();
   }, 100);
@@ -384,6 +361,38 @@ Tinytest.add('Client - Router - path - generic', function (test) {
   test.equal(path, expectedPath)
 });
 
+Tinytest.add('Client - Router - path - queryParams', function (test) {
+  var pathDef = "/blog/:blogId/some/:name";
+  var fields = {
+    blogId: "1001",
+    name: "superb"
+  };
+
+  var queryParams = {
+    aa: "100",
+    bb: "200"
+  }
+
+  var expectedPath = "/blog/1001/some/superb?aa=100&bb=200";
+
+  var path = FlowRouter.path(pathDef, fields, queryParams);
+  test.equal(path, expectedPath)
+});
+
+Tinytest.add('Client - Router - path - just queryParams', function (test) {
+  var pathDef = "/blog/abc";
+  var queryParams = {
+    aa: "100",
+    bb: "200"
+  }
+
+  var expectedPath = "/blog/abc?aa=100&bb=200";
+
+  var path = FlowRouter.path(pathDef, null, queryParams);
+  test.equal(path, expectedPath)
+});
+
+
 Tinytest.add('Client - Router - path - missing fields', function (test) {
   var pathDef = "/blog/:blogId/some/:name";
   var fields = {
@@ -399,4 +408,149 @@ Tinytest.add('Client - Router - path - no fields', function (test) {
   var pathDef = "/blog/blogId/some/name";
   var path = FlowRouter.path(pathDef);
   test.equal(path, pathDef)
+});
+
+Tinytest.add('Client - Router - path - complex route', function (test) {
+  var pathDef = "/blog/:blogId/some/:name(\\d*)+";
+  var fields = {
+    blogId: "1001",
+    name: 20
+  };
+  var expectedPath = "/blog/1001/some/20";
+
+  var path = FlowRouter.path(pathDef, fields);
+  test.equal(path, expectedPath)
+});
+
+Tinytest.addAsync('Client - Router - setParams - generic', function (test, done) {
+  var randomKey = Random.id();
+  var pathDef = "/" + randomKey + "/:cat/:id";
+  var paramsList = [];
+  FlowRouter.route(pathDef, {
+    action: function(params) {
+      paramsList.push(params);
+    }
+  });
+
+  FlowRouter.go(pathDef, {cat: "meteor", id: "200"});
+  setTimeout(function() {
+    // return done();
+    var success = FlowRouter.setParams({id: "700"});
+    test.isTrue(success);
+    setTimeout(validate, 50);
+  }, 50);
+
+  function validate() {
+    test.equal(paramsList.length, 2);
+    test.equal(_.pick(paramsList[0], "id", "cat"), {cat: "meteor", id: "200"});
+    test.equal(_.pick(paramsList[1], "id", "cat"), {cat: "meteor", id: "700"});
+    done();
+  }
+});
+
+Tinytest.addAsync('Client - Router - setParams - preserve query strings', function (test, done) {
+  var randomKey = Random.id();
+  var pathDef = "/" + randomKey + "/:cat/:id";
+  var paramsList = [];
+  var queryParamsList = [];
+
+  FlowRouter.route(pathDef, {
+    action: function(params, queryParams) {
+      paramsList.push(params);
+      queryParamsList.push(queryParams);
+    }
+  });
+
+  FlowRouter.go(pathDef, {cat: "meteor", id: "200"}, {aa: "20"});
+  setTimeout(function() {
+    // return done();
+    var success = FlowRouter.setParams({id: "700"});
+    test.isTrue(success);
+    setTimeout(validate, 50);
+  }, 50);
+
+  function validate() {
+    test.equal(paramsList.length, 2);
+    test.equal(queryParamsList.length, 2);
+
+    test.equal(_.pick(paramsList[0], "id", "cat"), {cat: "meteor", id: "200"});
+    test.equal(_.pick(paramsList[1], "id", "cat"), {cat: "meteor", id: "700"});
+    test.equal(queryParamsList, [{aa: "20"}, {aa: "20"}]);
+    done();
+  }
+});
+
+Tinytest.add('Client - Router - setParams - no route selected', function (test) {
+  var originalRoute = FlowRouter._current.route;
+  FlowRouter._current.route = undefined;
+  var success = FlowRouter.setParams({id: "800"});
+  test.isFalse(success);
+  FlowRouter._current.route = originalRoute;
+});
+
+Tinytest.addAsync('Client - Router - setQueryParams - generic', function (test, done) {
+  var randomKey = Random.id();
+  var pathDef = "/" + randomKey + "";
+  var queryParamsList = [];
+  FlowRouter.route(pathDef, {
+    action: function(params, queryParams) {
+      queryParamsList.push(queryParams);
+    }
+  });
+
+  FlowRouter.go(pathDef, {}, {cat: "meteor", id: "200"});
+  setTimeout(function() {
+    // return done();
+    var success = FlowRouter.setQueryParams({id: "700"});
+    test.isTrue(success);
+    setTimeout(validate, 50);
+  }, 50);
+
+  function validate() {
+    test.equal(queryParamsList.length, 2);
+    test.equal(_.pick(queryParamsList[0], "id", "cat"), {cat: "meteor", id: "200"});
+    test.equal(_.pick(queryParamsList[1], "id", "cat"), {cat: "meteor", id: "700"});
+    done();
+  }
+});
+
+Tinytest.addAsync('Client - Router - setQueryParams - preserve params', function (test, done) {
+  var randomKey = Random.id();
+  var pathDef = "/" + randomKey + "/:abc";
+  var queryParamsList = [];
+  var paramsList = [];
+  FlowRouter.route(pathDef, {
+    action: function(params, queryParams) {
+      paramsList.push(params);
+      queryParamsList.push(queryParams);
+    }
+  });
+
+  FlowRouter.go(pathDef, {abc: "20"}, {cat: "meteor", id: "200"});
+  setTimeout(function() {
+    // return done();
+    var success = FlowRouter.setQueryParams({id: "700"});
+    test.isTrue(success);
+    setTimeout(validate, 50);
+  }, 50);
+
+  function validate() {
+    test.equal(queryParamsList.length, 2);
+    test.equal(queryParamsList, [
+      {cat: "meteor", id: "200"}, {cat: "meteor", id: "700"}
+    ]);
+
+    test.equal(paramsList.length, 2);
+    test.equal(_.pick(paramsList[0], "abc"), {abc: "20"});
+    test.equal(_.pick(paramsList[1], "abc"), {abc: "20"});
+    done();
+  }
+});
+
+Tinytest.add('Client - Router - setQueryParams - no route selected', function (test) {
+  var originalRoute = FlowRouter._current.route;
+  FlowRouter._current.route = undefined;
+  var success = FlowRouter.setQueryParams({id: "800"});
+  test.isFalse(success);
+  FlowRouter._current.route = originalRoute;
 });
