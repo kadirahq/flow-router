@@ -236,7 +236,7 @@ Tinytest.addAsync('Client - Router - getParam - reactive params', function (test
 
   setTimeout(function() {
     test.equal(ranFor, 1);
-    Meteor.defer(c.stop.bind(c));
+    Meteor.defer(bind(c, "stop"));
     next();
   }, 100);
 });
@@ -263,7 +263,7 @@ Tinytest.addAsync('Client - Router - getParam - registration', function (test, n
   setTimeout(function() {
     test.equal(ranFor, 2);
     test.equal(values, [undefined, v1]);
-    Meteor.defer(c.stop.bind(c));
+    Meteor.defer(bind(c, "stop"));
     next();
   }, 100);
 });
@@ -291,7 +291,7 @@ Tinytest.addAsync('Client - Router - getParam - removal', function (test, next) 
   setTimeout(function() {
     test.equal(ranFor, 2);
     test.equal(values, [v1, undefined]);
-    Meteor.defer(c.stop.bind(c));
+    Meteor.defer(bind(c, "stop"));
     next();
   }, 100);
 });
@@ -318,7 +318,7 @@ Tinytest.addAsync('Client - Router - getQueryParam - do not change', function (t
 
   setTimeout(function() {
     test.equal(ranFor, 1);
-    Meteor.defer(c.stop.bind(c));
+    Meteor.defer(bind(c, "stop"));
     next();
   }, 100);
 });
@@ -344,7 +344,7 @@ Tinytest.addAsync('Client - Router - getQueryParam - change', function (test, ne
 
   setTimeout(function() {
     test.equal(ranFor, 2);
-    Meteor.defer(c.stop.bind(c));
+    Meteor.defer(bind(c, "stop"));
     next();
   }, 100);
 });
@@ -572,3 +572,9 @@ Tinytest.addAsync('Client - Router - notfound', function (test, done) {
     done();
   }, 50);
 });
+
+function bind(obj, method) {
+  return function() {
+    obj[method].apply(obj, arguments);
+  }
+}
