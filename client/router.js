@@ -12,7 +12,6 @@ Router = function () {
 
   this._middleware = [];
   this._routes = [];
-  this._notfoundRoute = this._notfoundRoute.bind(this);
   this._updateCallbacks();
 
   // indicate it's okay (or not okay) to run the tracker
@@ -288,7 +287,9 @@ Router.prototype._updateCallbacks = function () {
     self._page(route.path, route._handler);
   });
 
-  self._page('*', this._notfoundRoute);
+  self._page('*', function(context) {
+    self._notfoundRoute(context);
+  });
 };
 
 Router.prototype._page = window.page;
