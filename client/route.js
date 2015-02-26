@@ -54,5 +54,5 @@ Route.prototype.callAction = function(current) {
 };
 
 Route.prototype.callSubscriptions = function(current) {
-  this._subscriptions(current.params);
+  this._subscriptions(current.params, current.queryParams);
 };
