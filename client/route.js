@@ -10,7 +10,7 @@ Route = function(router, path, options) {
 };
 
 
-Route.prototype.subscribe = function(name, sub, options) {
+Route.prototype.register = function(name, sub, options) {
   this._subsMap[name] = sub;
 };
 

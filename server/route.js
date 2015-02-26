@@ -8,7 +8,7 @@ Route = function(router, path, options) {
 }
 
 
-Route.prototype.subscribe = function(name, sub, options) {
+Route.prototype.register = function(name, sub, options) {
   var options = _.extend({server: true}, options);
   if(options.server) {
     this._subsMap[name] = sub;

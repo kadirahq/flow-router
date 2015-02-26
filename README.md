@@ -30,7 +30,7 @@ Let's write our first route:
 FlowRouter.route('/blog/:postId', {
     subscriptions: function(params) {
         console.log("subscribing and name the subscription as 'myPost'");
-        this.subscribe('myPost', Meteor.subscribe('blogPost', params.postId));
+        this.register('myPost', Meteor.subscribe('blogPost', params.postId));
     },
     action: function(params) {
         console.log("Yeah! We are on the post:", params.postId);
@@ -94,7 +94,7 @@ Inside the route, Flow Router only register subscriptions. It does not wait for 
 ~~~js
 FlowRouter.route('/blog/:postId', {
     subscriptions: function(params, queryParams) {
-        this.subscribe('myPost', Meteor.subscribe('blogPost', params.postId));
+        this.register('myPost', Meteor.subscribe('blogPost', params.postId));
     }
 });
 ~~~
@@ -103,7 +103,7 @@ We can also have global subscriptions like this:
 
 ~~~js
 FlowRouter.subscriptions = function() {
-  this.subscribe('myCourses', Meteor.subscribe('courses'));
+  this.register('myCourses', Meteor.subscribe('courses'));
 };
 ~~~
 
@@ -131,11 +131,11 @@ You can selectively add Fast Render support for some specific subscriptions like
 FlowRouter.route('/blog/:postId', {
     subscriptions: function(params, queryParams) {
         // has the fast render support
-        this.subscribe('myPost', Meteor.subscribe('blogPost', params.postId));
+        this.register('myPost', Meteor.subscribe('blogPost', params.postId));
 
         // does not have the fast render support
         if(Meteor.isClient) {
-            this.subscribe('data', Meteor.subscribe('bootstrap-data');
+            this.register('data', Meteor.subscribe('bootstrap-data');
         }
     }
 });

@@ -6,7 +6,7 @@ Tinytest.addAsync('Client - Route - subscribe to route subs', function (test, ne
 
   FlowRouter.route('/' + rand, {
     subscriptions: function () {
-      this.subscribe('foo', Meteor.subscribe('foo'));
+      this.register('foo', Meteor.subscribe('foo'));
     }
   });
 
@@ -23,13 +23,13 @@ Tinytest.addAsync('Client - Route - unsubscribe to other subs', function (test, 
 
   FlowRouter.route('/' + rand, {
     subscriptions: function () {
-      this.subscribe('foo', Meteor.subscribe('foo'));
+      this.register('foo', Meteor.subscribe('foo'));
     }
   });
 
   FlowRouter.route('/' + rand2, {
     subscriptions: function () {
-      this.subscribe('bar', Meteor.subscribe('bar'));
+      this.register('bar', Meteor.subscribe('bar'));
     }
   });
 
