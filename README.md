@@ -2,7 +2,7 @@
 
 Carefully Designed Client Side Router for Meteor. 
 
-Flow Router is a minilamitic router which only does routing and handling subscriptions. You can't have anykind of reactive code inside the router. But it exposes few reactive apis to dynamically change your app based on the state of the router.
+Flow Router is a minilamitic router which only does routing and handling subscriptions. You can't have anykind of reactive code inside routes. But it exposes few reactive apis to dynamically change your app based on the state of the router.
 
 ## TOC
 
@@ -29,7 +29,7 @@ Let's write our first route:
 ~~~js
 FlowRouter.route('/blog/:postId', {
     subscriptions: function(params) {
-        console.log("subscribing and name the subscription as 'myPost'");
+        console.log("subscribe and register this subscription as 'myPost'");
         this.register('myPost', Meteor.subscribe('blogPost', params.postId));
     },
     action: function(params) {
@@ -48,13 +48,13 @@ Then you can see some messages printed on the console.
 
 ## Routes Definition
 
-Flow Routes are very simple and it's based on the syntax of [path-to-js](https://github.com/pillarjs/path-to-regexp). Which is used in express and iron-router.
+Flow Router routes are very simple and it's based on the syntax of [path-to-regexp](https://github.com/pillarjs/path-to-regexp). Which is used in both express and iron-router.
 
 Here's the synatx for a simple route:
 
 ~~~js
 FlowRouter.route('/blog/:postId', {
-    // an array of middlewares (we'll discuess this later on)
+    // an array of middlewares (we'll discuess about this later on)
     middlewares: [],
 
     // define your subscriptions
@@ -76,20 +76,20 @@ So, this route will be activated when you visit a url like below:
 FlowRouter.go('/blog/my-post?comments=on&color=dark')
 ~~~
 
-After you visit the route this will be printed on the console:
+After you've visit the route, this will be printed on the console:
 
 ~~~
 Params: {postId: "my-post"}
 Query Params: {comments: "on", color: "dark"}
 ~~~
 
-Non of the part of the router, which are "action", "subscriptions" and "middlewares" only invoke once.
+For a single interaction, router only runs once. That means, after you've visit a route, first it will call `middlewares`, then `subscriptions` and finally `action`. After that happens, there is no way any of those methods to be called again for that route visit.
 
-You can add router inside anywhere in the `client` directory. But we recommend to add it on `lib` redirectory. Then fast-render can detect subscriptions and send them for you. (We'll talk about that later).
+You can define routes anywhere in the `client` directory. But, we recommend to add it on `lib` redirectory. Then `fast-render` can detect subscriptions and send them for you. (We'll talk about this is a moment).
 
 ## Subscription Management 
 
-Inside the route, Flow Router only register subscriptions. It does not wait for subscription getting completed. This is how to register a subscription.
+Inside the route, Flow Router only register subscriptions. It does not wait for subscriptions getting completed. This is how to register a subscription.
 
 ~~~js
 FlowRouter.route('/blog/:postId', {
@@ -99,7 +99,7 @@ FlowRouter.route('/blog/:postId', {
 });
 ~~~
 
-We can also have global subscriptions like this:
+We can also regiser global subscriptions like this:
 
 ~~~js
 FlowRouter.subscriptions = function() {
@@ -109,31 +109,31 @@ FlowRouter.subscriptions = function() {
 
 All these global subscriptions runs on every route. So, make your special attention for names when registering subscriptions.
 
-After you've register subscriptions, you can reactively check for the status of subscriptions like this:
+After you've register subscriptions, you can reactively check for the status of those subscriptions like this:
 
 ~~~js
 Tracker.autorun(function() {
-    console.log("Read myPost:", FlowRouter.ready("myPost"));
-    console.log("Read all subscriptions:", FlowRouter.ready());
+    console.log("Is myPost ready?:", FlowRouter.ready("myPost"));
+    console.log("Does all subscriptions ready?:", FlowRouter.ready());
 });
 ~~~
 
 So, you can use `FlowRouter.ready` inside template helpers to show the loading status and act accordingly.
 
 #### Fast Render
-Flow Router has the built in support for Fast Render. But, in order to activate that, you need to add `meteorhacks:fast-render` to your app. 
+Flow Router has the built in support for [Fast Render](https://github.com/meteorhacks/fast-render). But, in order to activate that, you need to add `meteorhacks:fast-render` to your app. 
 
-If you are using Fast Render, make sure to put `router.js` inside a place where it can be seen by both client and the server.
+If you are using Fast Render, make sure to put `router.js` inside a place where it can be seen by both client and the server. That's why we suggested to put it on the `lib/router.js`.
 
 You can selectively add Fast Render support for some specific subscriptions like this:
 
 ~~~js
 FlowRouter.route('/blog/:postId', {
     subscriptions: function(params, queryParams) {
-        // has the fast render support
+        // has the Fast Render support
         this.register('myPost', Meteor.subscribe('blogPost', params.postId));
 
-        // does not have the fast render support
+        // don't have the Fast Render support
         if(Meteor.isClient) {
             this.register('data', Meteor.subscribe('bootstrap-data');
         }
@@ -143,11 +143,11 @@ FlowRouter.route('/blog/:postId', {
 
 #### Subscription Caching
 
-You can also you [Subs Manager](https://github.com/meteorhacks/subs-manager) for caching subscriptions on the client. We haven't done anything special to make it work. It should work as it works with other routers.
+You can also use [Subs Manager](https://github.com/meteorhacks/subs-manager) for caching subscriptions on the client. We haven't done anything special to make it work. It should work as it works with other routers.
 
 ## Rendering and Layout Management
 
-Flow Router does not handle rendering or layout management. For that, we can use [Flow Layout](https://github.com/meteorhacks/flow-layout).
+Flow Router does not handle rendering or layout management. For that, you can use [Flow Layout](https://github.com/meteorhacks/flow-layout).
 
 Then you can invoke the layout manager inside the `action` method in the router.
 
@@ -202,7 +202,7 @@ function trackingMiddleware(path, next) {
 
 ## Not Found Routes
 
-You can handle Not Found routes like this. You can also register subscriptions in the not found route. But, you don't have the fast-render support.
+You can handle Not Found routes like this. You can also register subscriptions in the Not Found route. But, you don't have the fast-render support.
 
 ~~~js
 FlowRouter.notfound = {
@@ -217,7 +217,7 @@ FlowRouter.notfound = {
 
 ## API
 
-We've some utility API to help you to navigate the router and get information from the router.
+Flow Router has some utility APIs to help you navigate the router and get information from the router.
 
 #### FlowRouter.getParam(paramName);
 
@@ -257,11 +257,11 @@ var path = FlowRouter.path(pathDef, params, queryString);
 console.log(path); // prints "/blog/meteor/abc?show=yes&color=black"
 ~~~
 
-If there is not params and queryString, this will simply send the pathDef as it is.
+If there is no params and queryString, this will simply returns the pathDef as it is.
 
 #### FlowRouter.go(pathDef, params, queryString);
 
-This will get a path via `FlowRouter.path` based on the arguments and re-route to that path.
+This will get the path via `FlowRouter.path` based on the arguments and re-route to that path.
 
 You can call `FlowRouter.go` like this as well:
 
@@ -288,7 +288,7 @@ Just like `FlowRouter.setParams`, but for quertString params.
 
 #### FlowRouter.current()
 
-Get the current state of the router. This API is not reactive. You don't need to use this most of the time. You can use reactive APIs like `FlowRouter.getParam()` and `FlowRouter.getQueryParams()` instead.
+Get the current state of the router. **This API is not reactive**. You **don't** need to use this API most of the time. You can use reactive APIs like `FlowRouter.getParam()` and `FlowRouter.getQueryParams()` instead.
 
 > We have make this as non rective function to reduce the unnecessory re-renders in your UI.
 
@@ -311,4 +311,4 @@ console.log(current);
 
 #### FlowRouter.reactiveCurrent()
 
-Sometimes we need to watch for the current route reactively. Then you can use this. But, avoid using this inside template helpers. 
+Sometimes we need to watch for the current route reactively. Then you can use this. But, avoid using this inside template helpers.
