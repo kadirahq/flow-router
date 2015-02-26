@@ -6,13 +6,13 @@ Flow Router is a minilamitic router which only does routing and handling subscri
 
 ## TOC
 
-* Getting Started
-* Routes
-* Subscription Management
-* Rendering
-* Middlewares
-* Not Found Routes
-* API
+* [Getting Started](#getting-started)
+* [Routes Definition](#routes-definition)
+* [Subscription Management](#subscription-management)
+* [Rendering and Layout Management](#rendering-and-layout-management)
+* [Middlewares](#middlewares)
+* [Not Found Routes](#not-found-routes)
+* [API](#api)
 
 ## Getting Started
 
@@ -46,7 +46,7 @@ FlowRouter.go('/blog/my-post-id');
 
 Then you can see some messages printed on the console.
 
-## Routes
+## Routes Definition
 
 Flow Routes are very simple and it's based on the syntax of [path-to-js](https://github.com/pillarjs/path-to-regexp). Which is used in express and iron-router.
 
