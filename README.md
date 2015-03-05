@@ -284,13 +284,13 @@ FlowRouter.setParams({appId: "new-id"});
 
 #### FlowRouter.setQueryParams(newQueryParams)
 
-Just like `FlowRouter.setParams`, but for quertString params.
+Just like `FlowRouter.setParams`, but for queryString params.
 
 #### FlowRouter.current()
 
 Get the current state of the router. **This API is not reactive**. You **don't** need to use this API most of the time. You can use reactive APIs like `FlowRouter.getParam()` and `FlowRouter.getQueryParams()` instead.
 
-> We have make this as non rective function to reduce the unnecessory re-renders in your UI.
+> We have make this as non reactive function to reduce the unnecessary re-renders in your UI.
 
 This gives an object like this:
 
