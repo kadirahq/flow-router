@@ -1,7 +1,7 @@
 Router = function () {
   this._routeMap = {};
   this.subscriptions = Function.prototype;
-}
+};
 
 
 Router.prototype.route = function(path, options) {
