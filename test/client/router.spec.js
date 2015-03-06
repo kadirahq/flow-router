@@ -82,7 +82,7 @@ Tinytest.addAsync('Client - Router - add global middleware', function (test, nex
     test.equal(path, paths.pop())
     log.push(0);
     next();
-  })
+  });
 
   FlowRouter.go('/' + rand);
 

@@ -1,11 +1,13 @@
-if(!Package['meteorhacks:fast-render']) return;
+if(!Package['meteorhacks:fast-render']) {
+  return;
+}
 
 
 // hack to run after eveything else on startup
 Meteor.startup(function () {
   Meteor.startup(function () {
     setupFastRender();
-  })
+  });
 });
 
 function setupFastRender () {

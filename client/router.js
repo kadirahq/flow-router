@@ -17,7 +17,7 @@ Router = function () {
   // indicate it's okay (or not okay) to run the tracker
   // when doing subscriptions
   this.safeToRun = false;
-}
+};
 
 Router.prototype.route = function(path, options) {
   var self = this;
@@ -173,12 +173,15 @@ Router.prototype.middleware = function(middlewareFn) {
 
 Router.prototype.ready = function() {
   var currentRoute = this.current().route;
-  if(!currentRoute) return false;
+  if(!currentRoute) {
+    return false;
+  }
 
-  if(arguments.length == 0) {
-    var subscriptions = _.values(currentRoute.getAllSubscriptions());
+  var subscriptions;
+  if(arguments.length === 0) {
+    subscriptions = _.values(currentRoute.getAllSubscriptions());
   } else {
-    var subscriptions = _.map(arguments, function(subName) {
+    subscriptions = _.map(arguments, function(subName) {
       return currentRoute.getSubscription(subName);
     });
   }
@@ -187,7 +190,7 @@ Router.prototype.ready = function() {
     var sub = subscriptions[lc];
     if(!sub) {
       return false;
-    } else if(sub.ready() == false) {
+    } else if(sub.ready() === false) {
       return false;
     }
   }
@@ -208,7 +211,7 @@ Router.prototype._notfoundRoute = function(context) {
     return;
   }
 
-  this._current.route = new Route(this, '*', this.notfound);
+  this._current.route = new Route(this, "*", this.notfound);
   this._invalidateTracker();
 };
 
@@ -233,10 +236,12 @@ Router.prototype._buildTracker = function() {
 
   // main autorun function
   var tracker = Tracker.autorun(function () {
-    if(!self._current || !self._current.route) return;
+    if(!self._current || !self._current.route) {
+      return;
+    }
+
     var route = self._current.route;
     var path = self._current.path;
-    var context = self._current.context;
 
     if(!self.safeToRun) {
       var message =
@@ -287,7 +292,7 @@ Router.prototype._updateCallbacks = function () {
     self._page(route.path, route._handler);
   });
 
-  self._page('*', function(context) {
+  self._page("*", function(context) {
     self._notfoundRoute(context);
   });
 };

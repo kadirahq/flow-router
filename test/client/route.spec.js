@@ -54,7 +54,7 @@ Tinytest.addAsync('Client - Route - add route middleware', function (test, next)
 
   FlowRouter.route('/' + rand, {
     middlewares: [function(path, next) {
-      test.equal(path, '/' + rand)
+      test.equal(path, '/' + rand);
       log.push(0);
       next();
     }],
