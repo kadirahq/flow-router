@@ -204,7 +204,7 @@ Tinytest.addAsync('Client - Router - subscribe to global subs', function (test, 
   FlowRouter.subscriptions = function (path) {
     test.equal(path, '/' + rand);
     this.register('baz', Meteor.subscribe('baz'));
-  }
+  };
 
   FlowRouter.go('/' + rand);
   setTimeout(function() {
@@ -345,6 +345,192 @@ Tinytest.addAsync('Client - Router - getQueryParam - change', function (test, ne
   setTimeout(function() {
     test.equal(ranFor, 2);
     Meteor.defer(bind(c, "stop"));
+    next();
+  }, 100);
+});
+
+Tinytest.addAsync('Client - Router - ready - with no args - all subscriptions ready', function (test, next) {
+  var rand = Random.id();
+  FlowRouter.route('/' + rand, {
+    subscriptions: function(params) {
+      this.register('bar', Meteor.subscribe('bar'));
+      this.register('foo', Meteor.subscribe('foo'));
+    }
+  });
+
+  FlowRouter.subscriptions = function () {
+    this.register('baz', Meteor.subscribe('baz'));
+  };
+
+  FlowRouter.go('/' + rand);
+  setTimeout(function() {
+    test.isTrue(!!FlowRouter.ready());
+    FlowRouter.subscriptions = Function.prototype;
+    next();
+  }, 100);
+});
+
+Tinytest.addAsync('Client - Router - ready - with no args - all subscriptions does not ready', function (test, next) {
+  var rand = Random.id();
+  FlowRouter.route('/' + rand, {
+    subscriptions: function(params) {
+      this.register('fooNotReady', Meteor.subscribe('fooNotReady'));
+    }
+  });
+
+  FlowRouter.subscriptions = function () {
+    this.register('bazNotReady', Meteor.subscribe('bazNotReady'));
+  };
+
+  FlowRouter.go('/' + rand);
+  setTimeout(function() {
+    test.isTrue(!FlowRouter.ready());
+    FlowRouter.subscriptions = Function.prototype;
+    next();
+  }, 100);
+});
+
+Tinytest.addAsync('Client - Router - ready - with no args - global subscriptions does not ready', function (test, next) {
+  var rand = Random.id();
+  FlowRouter.route('/' + rand, {
+    subscriptions: function(params) {
+      this.register('bar', Meteor.subscribe('bar'));
+      this.register('foo', Meteor.subscribe('foo'));
+    }
+  });
+
+  FlowRouter.subscriptions = function () {
+    this.register('bazNotReady', Meteor.subscribe('bazNotReady'));
+  };
+
+  FlowRouter.go('/' + rand);
+  setTimeout(function() {
+    test.isTrue(!FlowRouter.ready());
+    FlowRouter.subscriptions = Function.prototype;
+    next();
+  }, 100);
+});
+
+Tinytest.addAsync('Client - Router - ready - with no args - current subscriptions does not ready', function (test, next) {
+  var rand = Random.id();
+  FlowRouter.route('/' + rand, {
+    subscriptions: function(params) {
+      this.register('bar', Meteor.subscribe('bar'));
+      this.register('fooNotReady', Meteor.subscribe('fooNotReady'));
+    }
+  });
+
+  FlowRouter.subscriptions = function () {
+    this.register('baz', Meteor.subscribe('baz'));
+  };
+
+  FlowRouter.go('/' + rand);
+  setTimeout(function() {
+    test.isTrue(!FlowRouter.ready());
+    FlowRouter.subscriptions = Function.prototype;
+    next();
+  }, 100);
+});
+
+Tinytest.addAsync('Client - Router - ready - with args - all subscriptions ready', function (test, next) {
+  var rand = Random.id();
+  FlowRouter.route('/' + rand, {
+    subscriptions: function(params) {
+      this.register('bar', Meteor.subscribe('bar'));
+      this.register('foo', Meteor.subscribe('foo'));
+    }
+  });
+
+  FlowRouter.subscriptions = function () {
+    this.register('baz', Meteor.subscribe('baz'));
+  };
+
+  FlowRouter.go('/' + rand);
+  setTimeout(function() {
+    test.isTrue(!!FlowRouter.ready('foo', 'baz'));
+    FlowRouter.subscriptions = Function.prototype;
+    next();
+  }, 100);
+});
+
+Tinytest.addAsync('Client - Router - ready - with args - all subscriptions does not ready', function (test, next) {
+  var rand = Random.id();
+  FlowRouter.route('/' + rand, {
+    subscriptions: function(params) {
+      this.register('fooNotReady', Meteor.subscribe('fooNotReady'));
+    }
+  });
+
+  FlowRouter.subscriptions = function () {
+    this.register('bazNotReady', Meteor.subscribe('bazNotReady'));
+  };
+
+  FlowRouter.go('/' + rand);
+  setTimeout(function() {
+    test.isTrue(!FlowRouter.ready('fooNotReady', 'bazNotReady'));
+    FlowRouter.subscriptions = Function.prototype;
+    next();
+  }, 100);
+});
+
+Tinytest.addAsync('Client - Router - ready - with args - global subscriptions does not ready', function (test, next) {
+  var rand = Random.id();
+  FlowRouter.route('/' + rand, {
+    subscriptions: function(params) {
+      this.register('bar', Meteor.subscribe('bar'));
+      this.register('foo', Meteor.subscribe('foo'));
+    }
+  });
+
+  FlowRouter.subscriptions = function () {
+    this.register('bazNotReady', Meteor.subscribe('bazNotReady'));
+  };
+
+  FlowRouter.go('/' + rand);
+  setTimeout(function() {
+    test.isTrue(!FlowRouter.ready('foo', 'bazNotReady'));
+    FlowRouter.subscriptions = Function.prototype;
+    next();
+  }, 100);
+});
+
+Tinytest.addAsync('Client - Router - ready - with args - current subscriptions does not ready', function (test, next) {
+  var rand = Random.id();
+  FlowRouter.route('/' + rand, {
+    subscriptions: function(params) {
+      this.register('bar', Meteor.subscribe('bar'));
+      this.register('fooNotReady', Meteor.subscribe('fooNotReady'));
+    }
+  });
+
+  FlowRouter.subscriptions = function () {
+    this.register('baz', Meteor.subscribe('baz'));
+  };
+
+  FlowRouter.go('/' + rand);
+  setTimeout(function() {
+    test.isTrue(!FlowRouter.ready('fooNotReady', 'baz'));
+    FlowRouter.subscriptions = Function.prototype;
+    next();
+  }, 100);
+});
+
+Tinytest.addAsync('Client - Router - ready - with args - subscribe with wrong name', function (test, next) {
+  var rand = Random.id();
+  FlowRouter.route('/' + rand, {
+    subscriptions: function(params) {
+      this.register('bar', Meteor.subscribe('bar'));
+    }
+  });
+
+  FlowRouter.subscriptions = function () {
+    this.register('baz', Meteor.subscribe('baz'));
+  };
+
+  FlowRouter.go('/' + rand);
+  setTimeout(function() {
+    test.isTrue(!FlowRouter.ready('baz', 'xxx', 'baz'));
+    FlowRouter.subscriptions = Function.prototype;
     next();
   }, 100);
 });

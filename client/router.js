@@ -173,29 +173,25 @@ Router.prototype.middleware = function(middlewareFn) {
 
 Router.prototype.ready = function() {
   var currentRoute = this.current().route;
+  var globalRoute = this._globalRoute;
+
   if(!currentRoute) {
     return false;
   }
 
   var subscriptions;
   if(arguments.length === 0) {
-    subscriptions = _.values(currentRoute.getAllSubscriptions());
+    subscriptions = _.values(globalRoute.getAllSubscriptions());
+    subscriptions.concat(_.values(currentRoute.getAllSubscriptions()));
   } else {
     subscriptions = _.map(arguments, function(subName) {
-      return currentRoute.getSubscription(subName);
+      return globalRoute.getSubscription(subName) || currentRoute.getSubscription(subName);
     });
   }
 
-  for(var lc = 0; lc<subscriptions.length; lc++) {
-    var sub = subscriptions[lc];
-    if(!sub) {
-      return false;
-    } else if(sub.ready() === false) {
-      return false;
-    }
-  }
-
-  return true;
+  return _.every(subscriptions, function(sub) {
+    return sub && sub.ready();
+  });
 };
 
 Router.prototype._notfoundRoute = function(context) {
