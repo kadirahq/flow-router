@@ -175,6 +175,10 @@ Router.prototype.ready = function() {
   var currentRoute = this.current().route;
   var globalRoute = this._globalRoute;
 
+  // we need to depend for every route change and
+  // rerun subscriptions to check the ready state
+  this._currentTracker.depend();
+
   if(!currentRoute) {
     return false;
   }
@@ -189,9 +193,11 @@ Router.prototype.ready = function() {
     });
   }
 
-  return _.every(subscriptions, function(sub) {
+  var isReady =  _.every(subscriptions, function(sub) {
     return sub && sub.ready();
   });
+
+  return isReady;
 };
 
 Router.prototype._notfoundRoute = function(context) {
