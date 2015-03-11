@@ -2,7 +2,7 @@
 
 Carefully Designed Client Side Router for Meteor. 
 
-Flow Router is a minilamitic router which only does routing and handling subscriptions. You can't have anykind of reactive code inside routes. But it exposes few reactive apis to dynamically change your app based on the state of the router.
+Flow Router is a minilamitic router which only does routing and handling subscriptions. You can't have any kind of reactive code inside routes. But it exposes few reactive apis to dynamically change your app based on the state of the router.
 
 ## TOC
 
@@ -48,7 +48,7 @@ Then you can see some messages printed on the console.
 
 ## Routes Definition
 
-Flow Router routes are very simple and it's based on the syntax of [path-to-regexp](https://github.com/pillarjs/path-to-regexp). Which is used in both express and iron-router.
+Flow Router routes are very simple and based on the syntax of [path-to-regexp](https://github.com/pillarjs/path-to-regexp) which is used in both express and iron-router.
 
 Here's the synatx for a simple route:
 
@@ -99,7 +99,7 @@ FlowRouter.route('/blog/:postId', {
 });
 ~~~
 
-We can also regiser global subscriptions like this:
+We can also register global subscriptions like this:
 
 ~~~js
 FlowRouter.subscriptions = function() {
@@ -257,7 +257,7 @@ var path = FlowRouter.path(pathDef, params, queryParams);
 console.log(path); // prints "/blog/meteor/abc?show=yes&color=black"
 ~~~
 
-If there is no params and queryParams, this will simply returns the pathDef as it is.
+If there are no params or queryParams, this will simply return the pathDef as it is.
 
 #### FlowRouter.go(pathDef, params, queryParams);
 
