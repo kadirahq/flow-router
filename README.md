@@ -13,6 +13,7 @@ Flow Router is a minilamitic router which only does routing and handling subscri
 * [Middlewares](#middlewares)
 * [Not Found Routes](#not-found-routes)
 * [API](#api)
+* [Difference with Iron Router](#difference-with-iron-router)
 
 ## Getting Started
 
@@ -312,3 +313,89 @@ console.log(current);
 #### FlowRouter.reactiveCurrent()
 
 Sometimes we need to watch for the current route reactively. Then you can use this. But, avoid using this inside template helpers.
+
+## Difference with Iron Router
+
+Flow Router and Iron Router are two different routers. Iron Router tries to be a full featured solution. It tries to do everything including routing, subscriptions, rendering and layout management.
+
+But, Flow Router is a minimalistic router which does one thing (which is routing) in a better way with UI performance in mind. It also has a few set of clean and clear APIs.
+
+Let's learn more about the difference.
+
+### Flow Router Doesn't Do Rendering 
+
+Flow Router does not do rendering itself. Instead it allows some other ways to invoke rendering. For an example, you can use [Flow Layout](https://github.com/meteorhacks/flow-layout) inside the action of the route to render your templates with Blaze's Dynamic Templates.
+
+So, Flow Router decoupled rendering from the router. Which allows you to use any rendering framework with it. It could be either blaze, react, polymer or something yet to come. 
+
+### Subscriptions Registration, But Not Waiting For Them
+
+With Flow Router, you can only register subscriptions. It never waits for subscriptions to be complete. So, there is no concept like Iron Router **waitOn**.
+
+Instead Flow Router provides an [reactive API](#subscription-management) to check the state of subscriptions. You can use that to handle waitOn in the template layer. 
+
+### Prohibit Using Reactive Content Inside The Router
+
+In Iron Router you can use reactive content inside the router. As a result of that, Any hook or method in IR can re-run in unpredictable manner. 
+
+Because of that, we don't allow to use reactive content inside Flow Router. Even if you used there is no effect and they never cause router to re-run again. 
+
+We think, that's the way to go. Router is just a user action. We can work with reactive content in the rendering layer. 
+
+### router.current() is evil
+
+`Router.current()` is evil. Why? Let's look at following example. Imagine we've a route like this in our app:
+
+~~~
+/apps/:appId/:section
+~~~
+
+Now let's say, we need to get `appId` from the URL. Then we will do, something like this in Iron Router.
+
+~~~js
+Templates['foo'].helpers({
+    "someData": function() {
+        var appId = Router.current().params.appId;
+        return doSomething(appId);
+    }
+});
+~~~
+
+Okay. Let's say we changed `:section` in the route. Oh then above helper also gets rerun. Even if we add a query param to the URL, it gets rerun. That's because `Router.current()` looks for changes in the route(or URL). But in any of above cases, `appId` didn't get changed.
+
+Because of this, a lot parts of our app gets re run and re-rendered. This creates unpredictable rendering behavior in our app.
+
+Flow Router simply fix this issue by providing follow `Router.getParam()` API. See how to use it: 
+
+~~~js
+Templates['foo'].helpers({
+    "someData": function() {
+        var appId = FlowRouter.getParam('appId');
+        return doSomething(appId);
+    }
+});
+~~~
+
+### Built in Fast Render Support
+
+Flow Router has built in [Fast Render](https://github.com/meteorhacks/fast-render) support. Just add Fast Render to your app and it'll work. Nothing to change in the router.
+
+For more information check [docs](#fast-render).
+
+### No Server Side Routing
+
+Flow Router is a client side router and it does not do sever side routing at all. But it run some parts in the router on server. Specially `subscriptions` to enabled Fast Render support. 
+
+We may also run the actions and middlewares in the server sometimes later to support server side rendering. Even still, Flow Router is not a sever side router.
+
+#### Why Is That?
+Meteor is not a traditional framework where you can send HTML directly from the server. Meteor needs to send a special set of HTML to the client initially. So, you can't directly send something to the client your self.
+
+Also, in the server we need look for different things compared with the client. For example:
+
+* In server we've to deal with headers.
+* In server we've  methods like `GET`, `POST`, etc. 
+* In server we've Cookies
+
+So, it's better to use a different router for sever which is specially made for that. For that, you use [`meteorhacks:picker`](https://github.com/meteorhacks/picker) which support connect and express middlewares. It has a very easy to use route syntax.
+
