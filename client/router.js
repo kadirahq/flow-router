@@ -191,7 +191,7 @@ Router.prototype.subsReady = function() {
   var subscriptions;
   if(arguments.length === 0) {
     subscriptions = _.values(globalRoute.getAllSubscriptions());
-    subscriptions.concat(_.values(currentRoute.getAllSubscriptions()));
+    subscriptions = subscriptions.concat(_.values(currentRoute.getAllSubscriptions()));
   } else {
     subscriptions = _.map(arguments, function(subName) {
       return globalRoute.getSubscription(subName) || currentRoute.getSubscription(subName);
@@ -262,6 +262,7 @@ Router.prototype._buildTracker = function() {
     // But we don't need to run this tracker with
     // other reactive changes inside the .subscription method
     // We tackle this with the `safeToRun` variable
+    self._globalRoute.clearSubscriptions();
     self.subscriptions.call(self._globalRoute, path);
     route.callSubscriptions(self._current);
 

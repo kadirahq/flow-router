@@ -9,6 +9,9 @@ Route = function(router, path, options) {
   this._router = router;
 };
 
+Route.prototype.clearSubscriptions = function() {
+  this._subsMap = {};
+};
 
 Route.prototype.register = function(name, sub, options) {
   this._subsMap[name] = sub;
@@ -54,5 +57,6 @@ Route.prototype.callAction = function(current) {
 };
 
 Route.prototype.callSubscriptions = function(current) {
+  this.clearSubscriptions();
   this._subscriptions(current.params, current.queryParams);
 };

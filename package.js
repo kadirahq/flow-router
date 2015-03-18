@@ -1,7 +1,7 @@
 Package.describe({
   name: 'meteorhacks:flow-router',
   summary: 'Carefully Designed Client Side Router for Meteor',
-  version: '1.0.2',
+  version: '1.1.0',
   git: 'https://github.com/meteorhacks/flow-router.git'
 });
 
@@ -37,8 +37,8 @@ Package.onTest(function(api) {
   api.addFiles('test/server/_helpers.js', 'server');
 
   api.addFiles('test/client/loader.spec.js', 'client');
-  api.addFiles('test/client/router.test.js', 'client');
   api.addFiles('test/client/router.spec.js', 'client');
+  api.addFiles('test/client/router.subs_ready.spec.js', 'client');
   api.addFiles('test/client/route.test.js', 'client');
   api.addFiles('test/client/route.spec.js', 'client');
 });
