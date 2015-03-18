@@ -349,7 +349,7 @@ Tinytest.addAsync('Client - Router - getQueryParam - change', function (test, ne
   }, 100);
 });
 
-Tinytest.addAsync('Client - Router - ready - with no args - all subscriptions ready', function (test, next) {
+Tinytest.addAsync('Client - Router - subsReady - with no args - all subscriptions ready', function (test, next) {
   var rand = Random.id();
   FlowRouter.route('/' + rand, {
     subscriptions: function(params) {
@@ -364,13 +364,13 @@ Tinytest.addAsync('Client - Router - ready - with no args - all subscriptions re
 
   FlowRouter.go('/' + rand);
   setTimeout(function() {
-    test.isTrue(!!FlowRouter.ready());
+    test.isTrue(!!FlowRouter.subsReady());
     FlowRouter.subscriptions = Function.prototype;
     next();
   }, 100);
 });
 
-Tinytest.addAsync('Client - Router - ready - with no args - all subscriptions does not ready', function (test, next) {
+Tinytest.addAsync('Client - Router - subsReady - with no args - all subscriptions does not ready', function (test, next) {
   var rand = Random.id();
   FlowRouter.route('/' + rand, {
     subscriptions: function(params) {
@@ -384,13 +384,13 @@ Tinytest.addAsync('Client - Router - ready - with no args - all subscriptions do
 
   FlowRouter.go('/' + rand);
   setTimeout(function() {
-    test.isTrue(!FlowRouter.ready());
+    test.isTrue(!FlowRouter.subsReady());
     FlowRouter.subscriptions = Function.prototype;
     next();
   }, 100);
 });
 
-Tinytest.addAsync('Client - Router - ready - with no args - global subscriptions does not ready', function (test, next) {
+Tinytest.addAsync('Client - Router - subsReady - with no args - global subscriptions does not ready', function (test, next) {
   var rand = Random.id();
   FlowRouter.route('/' + rand, {
     subscriptions: function(params) {
@@ -405,13 +405,13 @@ Tinytest.addAsync('Client - Router - ready - with no args - global subscriptions
 
   FlowRouter.go('/' + rand);
   setTimeout(function() {
-    test.isTrue(!FlowRouter.ready());
+    test.isTrue(!FlowRouter.subsReady());
     FlowRouter.subscriptions = Function.prototype;
     next();
   }, 100);
 });
 
-Tinytest.addAsync('Client - Router - ready - with no args - current subscriptions does not ready', function (test, next) {
+Tinytest.addAsync('Client - Router - subsReady - with no args - current subscriptions does not ready', function (test, next) {
   var rand = Random.id();
   FlowRouter.route('/' + rand, {
     subscriptions: function(params) {
@@ -426,13 +426,116 @@ Tinytest.addAsync('Client - Router - ready - with no args - current subscription
 
   FlowRouter.go('/' + rand);
   setTimeout(function() {
-    test.isTrue(!FlowRouter.ready());
+    test.isTrue(!FlowRouter.subsReady());
     FlowRouter.subscriptions = Function.prototype;
     next();
   }, 100);
 });
 
-Tinytest.addAsync('Client - Router - ready - with args - all subscriptions ready', function (test, next) {
+Tinytest.addAsync('Client - Router - subsReady - with args - all subscriptions ready', function (test, next) {
+  var rand = Random.id();
+  FlowRouter.route('/' + rand, {
+    subscriptions: function(params) {
+      this.register('bar', Meteor.subscribe('bar'));
+      this.register('foo', Meteor.subscribe('foo'));
+    }
+  });
+
+  FlowRouter.subscriptions = function () {
+    this.register('baz', Meteor.subscribe('baz'));
+  };
+
+  FlowRouter.go('/' + rand);
+  setTimeout(function() {
+    test.isTrue(!!FlowRouter.subsReady('foo', 'baz'));
+    FlowRouter.subscriptions = Function.prototype;
+    next();
+  }, 100);
+});
+
+Tinytest.addAsync('Client - Router - subsReady - with args - all subscriptions does not ready', function (test, next) {
+  var rand = Random.id();
+  FlowRouter.route('/' + rand, {
+    subscriptions: function(params) {
+      this.register('fooNotReady', Meteor.subscribe('fooNotReady'));
+    }
+  });
+
+  FlowRouter.subscriptions = function () {
+    this.register('bazNotReady', Meteor.subscribe('bazNotReady'));
+  };
+
+  FlowRouter.go('/' + rand);
+  setTimeout(function() {
+    test.isTrue(!FlowRouter.subsReady('fooNotReady', 'bazNotReady'));
+    FlowRouter.subscriptions = Function.prototype;
+    next();
+  }, 100);
+});
+
+Tinytest.addAsync('Client - Router - subsReady - with args - global subscriptions does not ready', function (test, next) {
+  var rand = Random.id();
+  FlowRouter.route('/' + rand, {
+    subscriptions: function(params) {
+      this.register('bar', Meteor.subscribe('bar'));
+      this.register('foo', Meteor.subscribe('foo'));
+    }
+  });
+
+  FlowRouter.subscriptions = function () {
+    this.register('bazNotReady', Meteor.subscribe('bazNotReady'));
+  };
+
+  FlowRouter.go('/' + rand);
+  setTimeout(function() {
+    test.isTrue(!FlowRouter.subsReady('foo', 'bazNotReady'));
+    FlowRouter.subscriptions = Function.prototype;
+    next();
+  }, 100);
+});
+
+Tinytest.addAsync('Client - Router - subsReady - with args - current subscriptions does not ready', function (test, next) {
+  var rand = Random.id();
+  FlowRouter.route('/' + rand, {
+    subscriptions: function(params) {
+      this.register('bar', Meteor.subscribe('bar'));
+      this.register('fooNotReady', Meteor.subscribe('fooNotReady'));
+    }
+  });
+
+  FlowRouter.subscriptions = function () {
+    this.register('baz', Meteor.subscribe('baz'));
+  };
+
+  FlowRouter.go('/' + rand);
+  setTimeout(function() {
+    test.isTrue(!FlowRouter.subsReady('fooNotReady', 'baz'));
+    FlowRouter.subscriptions = Function.prototype;
+    next();
+  }, 100);
+});
+
+Tinytest.addAsync('Client - Router - subsReady - with args - subscribe with wrong name', function (test, next) {
+  var rand = Random.id();
+  FlowRouter.route('/' + rand, {
+    subscriptions: function(params) {
+      this.register('bar', Meteor.subscribe('bar'));
+    }
+  });
+
+  FlowRouter.subscriptions = function () {
+    this.register('baz', Meteor.subscribe('baz'));
+  };
+
+  FlowRouter.go('/' + rand);
+  setTimeout(function() {
+    test.isTrue(!FlowRouter.subsReady('baz', 'xxx', 'baz'));
+    FlowRouter.subscriptions = Function.prototype;
+    next();
+  }, 100);
+});
+
+Tinytest.addAsync('Client - Router - ready - deperearted, but still supports', function (test, next) {
   var rand = Random.id();
   FlowRouter.route('/' + rand, {
     subscriptions: function(params) {
@@ -448,88 +551,6 @@ Tinytest.addAsync('Client - Router - ready - with args - all subscriptions ready
   FlowRouter.go('/' + rand);
   setTimeout(function() {
     test.isTrue(!!FlowRouter.ready('foo', 'baz'));
-    FlowRouter.subscriptions = Function.prototype;
-    next();
-  }, 100);
-});
-
-Tinytest.addAsync('Client - Router - ready - with args - all subscriptions does not ready', function (test, next) {
-  var rand = Random.id();
-  FlowRouter.route('/' + rand, {
-    subscriptions: function(params) {
-      this.register('fooNotReady', Meteor.subscribe('fooNotReady'));
-    }
-  });
-
-  FlowRouter.subscriptions = function () {
-    this.register('bazNotReady', Meteor.subscribe('bazNotReady'));
-  };
-
-  FlowRouter.go('/' + rand);
-  setTimeout(function() {
-    test.isTrue(!FlowRouter.ready('fooNotReady', 'bazNotReady'));
-    FlowRouter.subscriptions = Function.prototype;
-    next();
-  }, 100);
-});
-
-Tinytest.addAsync('Client - Router - ready - with args - global subscriptions does not ready', function (test, next) {
-  var rand = Random.id();
-  FlowRouter.route('/' + rand, {
-    subscriptions: function(params) {
-      this.register('bar', Meteor.subscribe('bar'));
-      this.register('foo', Meteor.subscribe('foo'));
-    }
-  });
-
-  FlowRouter.subscriptions = function () {
-    this.register('bazNotReady', Meteor.subscribe('bazNotReady'));
-  };
-
-  FlowRouter.go('/' + rand);
-  setTimeout(function() {
-    test.isTrue(!FlowRouter.ready('foo', 'bazNotReady'));
-    FlowRouter.subscriptions = Function.prototype;
-    next();
-  }, 100);
-});
-
-Tinytest.addAsync('Client - Router - ready - with args - current subscriptions does not ready', function (test, next) {
-  var rand = Random.id();
-  FlowRouter.route('/' + rand, {
-    subscriptions: function(params) {
-      this.register('bar', Meteor.subscribe('bar'));
-      this.register('fooNotReady', Meteor.subscribe('fooNotReady'));
-    }
-  });
-
-  FlowRouter.subscriptions = function () {
-    this.register('baz', Meteor.subscribe('baz'));
-  };
-
-  FlowRouter.go('/' + rand);
-  setTimeout(function() {
-    test.isTrue(!FlowRouter.ready('fooNotReady', 'baz'));
-    FlowRouter.subscriptions = Function.prototype;
-    next();
-  }, 100);
-});
-
-Tinytest.addAsync('Client - Router - ready - with args - subscribe with wrong name', function (test, next) {
-  var rand = Random.id();
-  FlowRouter.route('/' + rand, {
-    subscriptions: function(params) {
-      this.register('bar', Meteor.subscribe('bar'));
-    }
-  });
-
-  FlowRouter.subscriptions = function () {
-    this.register('baz', Meteor.subscribe('baz'));
-  };
-
-  FlowRouter.go('/' + rand);
-  setTimeout(function() {
-    test.isTrue(!FlowRouter.ready('baz', 'xxx', 'baz'));
     FlowRouter.subscriptions = Function.prototype;
     next();
   }, 100);

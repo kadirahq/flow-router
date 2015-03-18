@@ -172,6 +172,11 @@ Router.prototype.middleware = function(middlewareFn) {
 };
 
 Router.prototype.ready = function() {
+  console.warn("'FlowRouter.ready()' is deprecated. Use 'FlowRouter.subsReady()' instead");
+  return this.subsReady.apply(this, arguments);
+};
+
+Router.prototype.subsReady = function() {
   var currentRoute = this.current().route;
   var globalRoute = this._globalRoute;
 
