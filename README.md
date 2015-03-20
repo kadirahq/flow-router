@@ -121,6 +121,12 @@ Tracker.autorun(function() {
 
 So, you can use `FlowRouter.ready` inside template helpers to show the loading status and act accordingly.
 
+> Arunoda has discussed more about Subscription Management in Flow Router in [this](https://meteorhacks.com/flow-router-and-subscription-management.html#subscription-management) blog post about [Flow Router and Subscription Management](https://meteorhacks.com/flow-router-and-subscription-management.html).
+
+> He's showing how to build an app like this:
+
+>![FlowRouter's Subscription Management](https://cldup.com/esLzM8cjEL.gif)
+
 #### Fast Render
 Flow Router has the built in support for [Fast Render](https://github.com/meteorhacks/fast-render). But, in order to activate that, you need to add `meteorhacks:fast-render` to your app. 
 
