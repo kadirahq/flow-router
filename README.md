@@ -318,7 +318,7 @@ console.log(current);
 
 #### FlowRouter.reactiveCurrent()
 
-Sometimes we need to watch for the current route reactively. Then you can use this. But, avoid using this inside template helpers.
+Sometimes we need to watch for the current route reactively. Then you can use this. But, avoid using this as possible as you can.
 
 ## Difference with Iron Router
 
