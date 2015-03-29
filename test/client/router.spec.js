@@ -422,6 +422,29 @@ Tinytest.add('Client - Router - path - complex route', function (test) {
   test.equal(path, expectedPath)
 });
 
+Tinytest.add('Client - Router - path - optional last param missing', function (test) {
+  var pathDef = "/blog/:blogId/some/:name?";
+  var fields = {
+    blogId: "1001"
+  };
+  var expectedPath = "/blog/1001/some/";
+
+  var path = FlowRouter.path(pathDef, fields);
+  test.equal(path, expectedPath)
+});
+
+Tinytest.add('Client - Router - path - optional last param exists', function (test) {
+  var pathDef = "/blog/:blogId/some/:name?";
+  var fields = {
+    blogId: "1001",
+    name: 20
+  };
+  var expectedPath = "/blog/1001/some/20";
+
+  var path = FlowRouter.path(pathDef, fields);
+  test.equal(path, expectedPath)
+});
+
 Tinytest.addAsync('Client - Router - setParams - generic', function (test, done) {
   var randomKey = Random.id();
   var pathDef = "/" + randomKey + "/:cat/:id";
