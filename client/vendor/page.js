@@ -135,7 +135,7 @@
     if (!dispatch) return;
     var url = (hashbang && ~location.hash.indexOf('#!'))
       ? location.hash.substr(2) + location.search
-      : location.pathname + location.search + location.hash;
+      : location.href.replace(location.origin, "");
     page.replace(url, null, true, dispatch);
   };
 
@@ -308,7 +308,6 @@
    */
 
   function Context(path, state) {
-    path = decodeURLEncodedURIComponent(path);
     if ('/' === path[0] && 0 !== path.indexOf(base)) path = base + path;
     var i = path.indexOf('?');
 
