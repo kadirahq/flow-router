@@ -12,7 +12,7 @@ Router = function () {
 
   this._middleware = [];
   this._routes = [];
-  this._pathsMap = {};
+  this._routesMap = {};
   this._updateCallbacks();
 
   // indicate it's okay (or not okay) to run the tracker
@@ -38,7 +38,7 @@ Router.prototype.route = function(path, options) {
 
   this._routes.push(route);
   if (options.name) {
-    this._pathsMap[options.name] = path;
+    this._routesMap[options.name] = route;
   }
 
   this._updateCallbacks();
@@ -47,8 +47,8 @@ Router.prototype.route = function(path, options) {
 };
 
 Router.prototype.path = function(pathDef, fields, queryParams) {
-  if (this._pathsMap[pathDef]) {
-    pathDef = this._pathsMap[pathDef];
+  if (this._routesMap[pathDef]) {
+    pathDef = this._routesMap[pathDef].path;
   }
 
   fields = fields || {};
