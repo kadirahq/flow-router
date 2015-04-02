@@ -79,7 +79,7 @@ Tinytest.addAsync('Client - Router - add global middleware', function (test, nex
 
   FlowRouter.middleware(function (path, next) {
     if(done) return next();
-    test.equal(path, paths.pop())
+    test.equal(path, paths.pop());
     log.push(0);
     next();
   });
@@ -248,7 +248,7 @@ Tinytest.addAsync('Client - Router - getParam - registration', function (test, n
   var ranFor = 0;
   var values = [];
 
-  FlowRouter._current.params = {}
+  FlowRouter._current.params = {};
   FlowRouter._registerParams();
 
   var c = Tracker.autorun(function() {
@@ -358,7 +358,7 @@ Tinytest.add('Client - Router - path - generic', function (test) {
   var expectedPath = "/blog/1001/some/superb";
 
   var path = FlowRouter.path(pathDef, fields);
-  test.equal(path, expectedPath)
+  test.equal(path, expectedPath);
 });
 
 Tinytest.add('Client - Router - path - queryParams', function (test) {
@@ -371,12 +371,12 @@ Tinytest.add('Client - Router - path - queryParams', function (test) {
   var queryParams = {
     aa: "100",
     bb: "200"
-  }
+  };
 
   var expectedPath = "/blog/1001/some/superb?aa=100&bb=200";
 
   var path = FlowRouter.path(pathDef, fields, queryParams);
-  test.equal(path, expectedPath)
+  test.equal(path, expectedPath);
 });
 
 Tinytest.add('Client - Router - path - just queryParams', function (test) {
@@ -384,12 +384,12 @@ Tinytest.add('Client - Router - path - just queryParams', function (test) {
   var queryParams = {
     aa: "100",
     bb: "200"
-  }
+  };
 
   var expectedPath = "/blog/abc?aa=100&bb=200";
 
   var path = FlowRouter.path(pathDef, null, queryParams);
-  test.equal(path, expectedPath)
+  test.equal(path, expectedPath);
 });
 
 
@@ -401,13 +401,13 @@ Tinytest.add('Client - Router - path - missing fields', function (test) {
   var expectedPath = "/blog/1001/some/";
 
   var path = FlowRouter.path(pathDef, fields);
-  test.equal(path, expectedPath)
+  test.equal(path, expectedPath);
 });
 
 Tinytest.add('Client - Router - path - no fields', function (test) {
   var pathDef = "/blog/blogId/some/name";
   var path = FlowRouter.path(pathDef);
-  test.equal(path, pathDef)
+  test.equal(path, pathDef);
 });
 
 Tinytest.add('Client - Router - path - complex route', function (test) {
@@ -419,7 +419,7 @@ Tinytest.add('Client - Router - path - complex route', function (test) {
   var expectedPath = "/blog/1001/some/20";
 
   var path = FlowRouter.path(pathDef, fields);
-  test.equal(path, expectedPath)
+  test.equal(path, expectedPath);
 });
 
 Tinytest.add('Client - Router - path - optional last param missing', function (test) {
@@ -430,7 +430,7 @@ Tinytest.add('Client - Router - path - optional last param missing', function (t
   var expectedPath = "/blog/1001/some/";
 
   var path = FlowRouter.path(pathDef, fields);
-  test.equal(path, expectedPath)
+  test.equal(path, expectedPath);
 });
 
 Tinytest.add('Client - Router - path - optional last param exists', function (test) {
@@ -442,7 +442,7 @@ Tinytest.add('Client - Router - path - optional last param exists', function (te
   var expectedPath = "/blog/1001/some/20";
 
   var path = FlowRouter.path(pathDef, fields);
-  test.equal(path, expectedPath)
+  test.equal(path, expectedPath);
 });
 
 Tinytest.addAsync('Client - Router - setParams - generic', function (test, done) {
@@ -599,5 +599,5 @@ Tinytest.addAsync('Client - Router - notfound', function (test, done) {
 function bind(obj, method) {
   return function() {
     obj[method].apply(obj, arguments);
-  }
+  };
 }

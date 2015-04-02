@@ -21,6 +21,7 @@ Router = function () {
 };
 
 Router.prototype.route = function(path, options) {
+  options = options || {};
   var self = this;
   var route = new Route(this, path, options);
 
