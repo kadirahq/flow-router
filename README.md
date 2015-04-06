@@ -2,7 +2,7 @@
 
 Carefully Designed Client Side Router for Meteor. 
 
-Flow Router is a minilamitic router which only does routing and handling subscriptions. You can't have any kind of reactive code inside routes. But it exposes few reactive apis to dynamically change your app based on the state of the router.
+Flow Router is a minimalistic router which only does routing and subscription handling. You can't have any kind of reactive code inside routes, but there is a reactive API to dynamically change your app based on the state of the router.
 
 ## TOC
 
@@ -17,7 +17,7 @@ Flow Router is a minilamitic router which only does routing and handling subscri
 
 ## Getting Started
 
-Add Flow Router into your app:
+Add Flow Router to your app:
 
 ~~~shell
 meteor add meteorhacks:flow-router
@@ -39,19 +39,19 @@ FlowRouter.route('/blog/:postId', {
 });
 ~~~
 
-Then visit `/blog/my-post-id` from the browser or invoke following command from the browser console:
+Then visit `/blog/my-post-id` from the browser or invoke the following command from the browser console:
 
 ~~~js
 FlowRouter.go('/blog/my-post-id');
 ~~~
 
-Then you can see some messages printed on the console.
+Then you can see some messages printed in the console.
 
 ## Routes Definition
 
 Flow Router routes are very simple and based on the syntax of [path-to-regexp](https://github.com/pillarjs/path-to-regexp) which is used in both express and iron-router.
 
-Here's the synatx for a simple route:
+Here's the syntax for a simple route:
 
 ~~~js
 FlowRouter.route('/blog/:postId', {
@@ -77,7 +77,7 @@ So, this route will be activated when you visit a url like below:
 FlowRouter.go('/blog/my-post?comments=on&color=dark')
 ~~~
 
-After you've visit the route, this will be printed on the console:
+After you've visit the route, this will be printed in the console:
 
 ~~~
 Params: {postId: "my-post"}
@@ -90,7 +90,7 @@ You can define routes anywhere in the `client` directory. But, we recommend to a
 
 ## Subscription Management 
 
-Inside the route, Flow Router only register subscriptions. It does not wait for subscriptions getting completed. This is how to register a subscription.
+Inside the route, Flow Router only registers subscriptions. It does not wait for the ready message before running the action. This is how to register a subscription.
 
 ~~~js
 FlowRouter.route('/blog/:postId', {
@@ -128,19 +128,20 @@ So, you can use `FlowRouter.ready` inside template helpers to show the loading s
 >![FlowRouter's Subscription Management](https://cldup.com/esLzM8cjEL.gif)
 
 #### Fast Render
-Flow Router has the built in support for [Fast Render](https://github.com/meteorhacks/fast-render). But, in order to activate that, you need to add `meteorhacks:fast-render` to your app. 
+Flow Router has built in support for [Fast Render](https://github.com/meteorhacks/fast-render). 
 
-If you are using Fast Render, make sure to put `router.js` inside a place where it can be seen by both client and the server. That's why we suggested to put it on the `lib/router.js`.
+- `meteor add meteorhacks:fast-render`
+- Put `router.js` in a shared location. We suggest `lib/router.js`.
 
-You can selectively add Fast Render support for some specific subscriptions like this:
+You can selectively exclude Fast Render support by wrapping the subscription registration in an isClient block:
 
 ~~~js
 FlowRouter.route('/blog/:postId', {
     subscriptions: function(params, queryParams) {
-        // has the Fast Render support
+        // using Fast Render
         this.register('myPost', Meteor.subscribe('blogPost', params.postId));
 
-        // don't have the Fast Render support
+        // not using Fast Render
         if(Meteor.isClient) {
             this.register('data', Meteor.subscribe('bootstrap-data');
         }
@@ -174,7 +175,7 @@ Sometimes, you need to do invoke some tasks just before entering into the route.
 * Analytics
 * Initialzation tasks
 
-This is how we can implement the simple redirection logic with middleware. It will simply redirect user to the sign-in page if he is not a logged in user.
+This is how we can implement simple redirection logic with middleware. It will redirect a user to the sign-in page if not logged in.
 
 ~~~js
 
@@ -209,10 +210,11 @@ function trackingMiddleware(path, next) {
 
 ## Not Found Routes
 
-You can handle Not Found routes like this. You can also register subscriptions in the Not Found route. But, you don't have the fast-render support.
+You can configure Not Found routes like this.
 
 ~~~js
 FlowRouter.notfound = {
+    // Subscriptions registered here don't have Fast Render support.
     subscriptions: function() {
       
     },
@@ -228,8 +230,7 @@ Flow Router has some utility APIs to help you navigate the router and get inform
 
 #### FlowRouter.getParam(paramName);
 
-This is a reactive function which you can use to get a param from the URL.
-Eg:-
+Reactive function which you can use to get a param from the URL.
 
 ~~~js
 // route def: /apps/:appId
@@ -241,7 +242,7 @@ console.log(appId); // prints "this-is-my-app"
 
 #### FlowRouter.getQueryParam(queryStringKey);
 
-This is a reactive function which you can use to get a value from the queryString.
+Reactive function which you can use to get a value from the queryString.
 
 ~~~js
 // route def: /apps/:appId
@@ -253,7 +254,7 @@ console.log(color); // prints "red"
 
 #### FlowRouter.path(pathDef, params, queryParams)
 
-Generate a path from a path definition. Both params and queryParams are optional. For an example:
+Generate a path from a path definition. Both params and queryParams are optional.
 
 ~~~js
 var pathDef = "/blog/:cat/:id";
@@ -272,13 +273,13 @@ This will get the path via `FlowRouter.path` based on the arguments and re-route
 
 You can call `FlowRouter.go` like this as well:
 
-~~~js
+~~~jswait
 FlowRouter.go("/blog");
 ~~~
 
 #### FlowRouter.setParams(newParams)
 
-This will change the current params with the newParams and re-route to the new path. Let's look at this example:
+This will change the current params with the newParams and re-route to the new path.
 
 ~~~js
 // route def: /apps/:appId
@@ -297,7 +298,7 @@ Just like `FlowRouter.setParams`, but for queryString params.
 
 Get the current state of the router. **This API is not reactive**. You **don't** need to use this API most of the time. You can use reactive APIs like `FlowRouter.getParam()` and `FlowRouter.getQueryParams()` instead.
 
-> We have make this as non reactive function to reduce the unnecessary re-renders in your UI.
+> We have made this non reactive to reduce the unnecessary re-renders in your UI.
 
 This gives an object like this:
 
@@ -318,33 +319,27 @@ console.log(current);
 
 #### FlowRouter.reactiveCurrent()
 
-Sometimes we need to watch for the current route reactively. Then you can use this. But, avoid using this as possible as you can.
+Sometimes we need to watch for the current route reactively. Avoid using this if possible.
 
 ## Difference with Iron Router
 
 Flow Router and Iron Router are two different routers. Iron Router tries to be a full featured solution. It tries to do everything including routing, subscriptions, rendering and layout management.
 
-But, Flow Router is a minimalistic router which does one thing (which is routing) in a better way with UI performance in mind. It also has a few set of clean and clear APIs.
+Flow Router is a minimalistic solution focused on routing with UI performance in mind. It exposes APIs for related functionality
 
-Let's learn more about the difference.
+Let's learn more about the differences
 
-### Flow Router Doesn't Do Rendering 
+### Rendering 
 
-Flow Router does not do rendering itself. Instead it allows some other ways to invoke rendering. For an example, you can use [Flow Layout](https://github.com/meteorhacks/flow-layout) inside the action of the route to render your templates with Blaze's Dynamic Templates.
+Flow Router doesn't handle rendering. By decoupling rendering from the router it's possible to use any rendering framework, such as [Flow Layout](https://github.com/meteorhacks/flow-layout) to render with Blaze's Dynamic Templates, React, or Polymer. Rendering calls are made in the the route's action. 
 
-So, Flow Router decoupled rendering from the router. Which allows you to use any rendering framework with it. It could be either blaze, react, polymer or something yet to come. 
+### Subscriptions
 
-### Subscriptions Registration, But Not Waiting For Them
+With Flow Router, you can register subscriptions, but there is no concept like Iron Router's **waitOn**. Instead Flow Router provides a [reactive API](#subscription-management) to check the state of subscriptions. You can use that to achieve similar functionality in the template layer. 
 
-With Flow Router, you can only register subscriptions. It never waits for subscriptions to be complete. So, there is no concept like Iron Router **waitOn**.
+### Reactive Content
 
-Instead Flow Router provides an [reactive API](#subscription-management) to check the state of subscriptions. You can use that to handle waitOn in the template layer. 
-
-### Prohibit Using Reactive Content Inside The Router
-
-In Iron Router you can use reactive content inside the router. As a result of that, Any hook or method in IR can re-run in unpredictable manner. 
-
-Because of that, we don't allow to use reactive content inside Flow Router. Even if you used there is no effect and they never cause router to re-run again. 
+In Iron Router you can use reactive content inside the router, but any hook or method can re-run in unpredictable manner. Flow Router limits reactive data sources to a single run when it is first called.
 
 We think, that's the way to go. Router is just a user action. We can work with reactive content in the rendering layer. 
 
@@ -388,13 +383,11 @@ Flow Router has built in [Fast Render](https://github.com/meteorhacks/fast-rende
 
 For more information check [docs](#fast-render).
 
-### No Server Side Routing
+### Server Side Routing
 
-Flow Router is a client side router and it does not do sever side routing at all. But it run some parts in the router on server. Specially `subscriptions` to enabled Fast Render support. 
+Flow Router is a client side router and it does not do sever side routing at all. `subscriptions` are only run on the server to enabled Fast Render support.
 
-We may also run the actions and middlewares in the server sometimes later to support server side rendering. Even still, Flow Router is not a sever side router.
-
-#### Why Is That?
+#### Why not?
 Meteor is not a traditional framework where you can send HTML directly from the server. Meteor needs to send a special set of HTML to the client initially. So, you can't directly send something to the client your self.
 
 Also, in the server we need look for different things compared with the client. For example:
@@ -403,5 +396,4 @@ Also, in the server we need look for different things compared with the client. 
 * In server we've  methods like `GET`, `POST`, etc. 
 * In server we've Cookies
 
-So, it's better to use a different router for sever which is specially made for that. For that, you use [`meteorhacks:picker`](https://github.com/meteorhacks/picker) which support connect and express middlewares. It has a very easy to use route syntax.
-
+Although we may decide to enable server side rendering by running the actions and middlewares on the server, it's better to use a dedicated server-side router. [`meteorhacks:picker`](https://github.com/meteorhacks/picker) supports connect and express middlewares and has a very easy to use route syntax.
