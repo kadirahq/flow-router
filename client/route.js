@@ -2,6 +2,10 @@ Route = function(router, path, options) {
   options = options || {};
 
   this.path = path;
+  if (options.name) {
+    this.name = options.name;
+  }
+
   this._action = options.action || Function.prototype;
   this._subscriptions = options.subscriptions || Function.prototype;
   this._middlewares = options.middlewares || [];

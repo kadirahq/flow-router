@@ -12,6 +12,7 @@ Router = function () {
 
   this._middleware = [];
   this._routes = [];
+  this._routesMap = {};
   this._updateCallbacks();
 
   // indicate it's okay (or not okay) to run the tracker
@@ -20,6 +21,7 @@ Router = function () {
 };
 
 Router.prototype.route = function(path, options) {
+  options = options || {};
   var self = this;
   var route = new Route(this, path, options);
 
@@ -36,12 +38,20 @@ Router.prototype.route = function(path, options) {
   };
 
   this._routes.push(route);
+  if (options.name) {
+    this._routesMap[options.name] = route;
+  }
+
   this._updateCallbacks();
 
   return route;
 };
 
 Router.prototype.path = function(pathDef, fields, queryParams) {
+  if (this._routesMap[pathDef]) {
+    pathDef = this._routesMap[pathDef].path;
+  }
+
   fields = fields || {};
   var regExp = /(:[\w\(\)\\\+\*\.\?]+)+/g;
   var path = pathDef.replace(regExp, function(key) {
