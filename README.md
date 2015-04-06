@@ -67,7 +67,9 @@ FlowRouter.route('/blog/:postId', {
     action: function(params, queryParams) {
         console.log("Params:", params)
         console.log("Query Params:", queryParams)
-    }
+    },
+
+    name: "<name for the route>" // optional
 });
 ~~~
 
@@ -265,6 +267,25 @@ console.log(path); // prints "/blog/meteor/abc?show=yes&color=black"
 ~~~
 
 If there are no params or queryParams, this will simply return the pathDef as it is.
+
+##### Using Route name instead of the pathDef
+
+You can also use route's name instead of the pathDef. Then, flow router will pick the pathDef from the given route. See following example:
+
+~~~js
+FlowRouter.route("/blog/:cat/:id", {
+    name: "blogPostRoute",
+    action: function(params) {
+        //...
+    }
+})
+
+var params = {cat: "meteor", id: "abc"};
+var queryParams = {show: "yes", color: "black"};
+
+var path = FlowRouter.path("blogPostRoute", params, queryParams);
+console.log(path); // prints "/blog/meteor/abc?show=yes&color=black"
+~~~
 
 #### FlowRouter.go(pathDef, params, queryParams);
 
