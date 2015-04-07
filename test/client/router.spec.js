@@ -1,4 +1,12 @@
 Router = FlowRouter.Router;
+
+Tinytest.add('Client - Router - validate path definition', function (test, next) {
+  // path must start with '/'
+  test.throws(function() {
+    FlowRouter.route(Random.id());
+  });
+});
+
 Tinytest.addAsync('Client - Router - define and go to route', function (test, next) {
   var rand = Random.id();
   var rendered = 0;
