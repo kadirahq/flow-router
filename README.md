@@ -88,7 +88,7 @@ Query Params: {comments: "on", color: "dark"}
 
 For a single interaction, router only runs once. That means, after you've visit a route, first it will call `middlewares`, then `subscriptions` and finally `action`. After that happens, there is no way any of those methods to be called again for that route visit.
 
-You can define routes anywhere in the `client` directory. But, we recommend to add it on `lib` redirectory. Then `fast-render` can detect subscriptions and send them for you. (We'll talk about this is a moment).
+You can define routes anywhere in the `client` directory. But, we recommend to add it on `lib` redirectory. Then `fast-render` can detect subscriptions and send them for you. (We'll talk about this in a moment).
 
 ## Subscription Management 
 
@@ -116,12 +116,12 @@ After you've register subscriptions, you can reactively check for the status of 
 
 ~~~js
 Tracker.autorun(function() {
-    console.log("Is myPost ready?:", FlowRouter.ready("myPost"));
-    console.log("Does all subscriptions ready?:", FlowRouter.ready());
+    console.log("Is myPost ready?:", FlowRouter.subsReady("myPost"));
+    console.log("Does all subscriptions ready?:", FlowRouter.subsReady());
 });
 ~~~
 
-So, you can use `FlowRouter.ready` inside template helpers to show the loading status and act accordingly.
+So, you can use `FlowRouter.subsReady` inside template helpers to show the loading status and act accordingly.
 
 > Arunoda has discussed more about Subscription Management in Flow Router in [this](https://meteorhacks.com/flow-router-and-subscription-management.html#subscription-management) blog post about [Flow Router and Subscription Management](https://meteorhacks.com/flow-router-and-subscription-management.html).
 
