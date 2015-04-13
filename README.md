@@ -317,7 +317,7 @@ Just like `FlowRouter.setParams`, but for queryString params.
 
 #### FlowRouter.current()
 
-Get the current state of the router. **This API is not reactive**. You **don't** need to use this API most of the time. You can use reactive APIs like `FlowRouter.getParam()` and `FlowRouter.getQueryParams()` instead.
+Get the current state of the router. **This API is not reactive**. You **don't** need to use this API most of the time. You can use reactive APIs like `FlowRouter.getParam()` and `FlowRouter.getQueryParam()` instead.
 
 > We have made this non reactive to reduce the unnecessary re-renders in your UI.
 
