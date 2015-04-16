@@ -17,9 +17,11 @@ Package.onUse(function(api) {
   api.addFiles('client/vendor/page.js', 'client');
   api.addFiles('client/vendor/query.js', 'client');
   api.addFiles('client/router.js', 'client');
+  api.addFiles('client/group.js', 'client');
   api.addFiles('client/route.js', 'client');
   api.addFiles('client/_init.js', 'client');
   api.addFiles('server/router.js', 'server');
+  api.addFiles('server/group.js', 'server');
   api.addFiles('server/route.js', 'server');
   api.addFiles('server/_init.js', 'server');
 
@@ -42,4 +44,6 @@ Package.onTest(function(api) {
   api.addFiles('test/client/router.naming.spec.js', 'client');
   api.addFiles('test/client/route.test.js', 'client');
   api.addFiles('test/client/route.spec.js', 'client');
+
+  api.addFiles('test/client/group.spec.js', 'client');
 });

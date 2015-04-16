@@ -1,4 +1,4 @@
-Route = function(router, path, options) {
+Route = function(router, path, options, group) {
   options = options || {};
 
   this.path = path;
@@ -11,6 +11,8 @@ Route = function(router, path, options) {
   this._middlewares = options.middlewares || [];
   this._subsMap = {};
   this._router = router;
+
+  this.group = group;
 };
 
 Route.prototype.clearSubscriptions = function() {
@@ -62,5 +64,9 @@ Route.prototype.callAction = function(current) {
 
 Route.prototype.callSubscriptions = function(current) {
   this.clearSubscriptions();
+  if (this.group) {
+    this.group.callSubscriptions(current);
+  }
+
   this._subscriptions(current.params, current.queryParams);
 };
