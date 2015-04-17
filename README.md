@@ -88,7 +88,67 @@ Query Params: {comments: "on", color: "dark"}
 
 For a single interaction, router only runs once. That means, after you've visit a route, first it will call `middlewares`, then `subscriptions` and finally `action`. After that happens, there is no way any of those methods to be called again for that route visit.
 
-You can define routes anywhere in the `client` directory. But, we recommend to add it on `lib` redirectory. Then `fast-render` can detect subscriptions and send them for you. (We'll talk about this is a moment).
+You can define routes anywhere in the `client` directory. But, we recommend to add it on `lib` directory. Then `fast-render` can detect subscriptions and send them for you. (We'll talk about this is a moment).
+
+### Group Routes
+
+You can also group routes as well. With that, we can group some common functionalities. Here's an example:
+
+~~~js
+var adminRoutes = FlowRouter.group({
+  prefix: '/admin',
+  subscriptions: function() {
+    this.register('adminSettings', Meteor.publish('settings', {admin: true}));
+  },
+  middlewares: [
+    function(path, next) {
+      console.log('running group middleware');
+      next();
+    }
+  ]
+});
+
+// handling /admin route
+adminRoutes.route('/', {
+  action: function() {
+    FlowLayout.render('componentLayout', {content: 'admin'});
+  },
+  middlewares: [
+    function(path, next) {
+      console.log('running /admin middleware');
+      next();
+    }
+  ]
+});
+
+// handling /admin/posts
+adminRoutes.route('/posts', {
+  action: function() {
+    FlowLayout.render('componentLayout', {content: 'posts'});
+  }
+});
+~~~
+
+**All the options for the `FlowRouter.group()` are optional.**
+
+You can even have nested group routes as shown below:
+
+~~~js
+var adminRoutes = FlowRouter.group({
+    prefix: "/admin"
+});
+
+var superAdminRoutes = FlowRouter.group({
+    prefix: "/super"
+});
+
+// handling /admin/super/post
+superAdminRoutes.route('/post', {
+    action: function() {
+
+    }
+});
+~~~
 
 ## Subscription Management 
 
