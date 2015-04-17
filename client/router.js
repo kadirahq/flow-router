@@ -14,7 +14,7 @@ Router = function () {
   this._routes = [];
   this._routesMap = {};
   this._updateCallbacks();
-
+  this.notFound = this.notfound = null;
   // indicate it's okay (or not okay) to run the tracker
   // when doing subscriptions
   this.safeToRun = false;
@@ -231,13 +231,15 @@ Router.prototype._notfoundRoute = function(context) {
     params: [],
     queryParams: {},
   };
-
-  if(!this.notfound) {
+  
+  // XXX this.notfound kept for backwards compatibility
+  this.notFound = this.notFound || this.notfound;
+  if(! this.notFound) {
     console.error("There is no route for the path:", context.path);
     return;
   }
-
-  this._current.route = new Route(this, "*", this.notfound);
+  
+  this._current.route = new Route(this, "*", this.notFound);
   this._invalidateTracker();
 };
 
