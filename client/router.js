@@ -234,7 +234,7 @@ Router.prototype._notfoundRoute = function(context) {
   
   // XXX this.notfound kept for backwards compatibility
   this.notFound = this.notFound || this.notfound;
-  if(! this.notFound) {
+  if(!this.notFound) {
     console.error("There is no route for the path:", context.path);
     return;
   }
