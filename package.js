@@ -1,7 +1,7 @@
 Package.describe({
   name: 'meteorhacks:flow-router',
   summary: 'Carefully Designed Client Side Router for Meteor',
-  version: '1.2.0',
+  version: '1.3.0',
   git: 'https://github.com/meteorhacks/flow-router.git'
 });
 
