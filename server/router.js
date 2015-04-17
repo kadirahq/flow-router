@@ -1,12 +1,16 @@
 Router = function () {
-  this._routeMap = {};
+  this._routesMap = {};
   this.subscriptions = Function.prototype;
 };
 
 
 Router.prototype.route = function(path, options) {
-  this._routeMap[path] = new Route(this, path, options);
-  return this._routeMap[path];
+  this._routesMap[path] = new Route(this, path, options);
+  return this._routesMap[path];
+};
+
+Router.prototype.group = function(path, options) {
+  return new Group(this, options);
 };
 
 

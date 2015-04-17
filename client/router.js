@@ -20,10 +20,15 @@ Router = function () {
   this.safeToRun = false;
 };
 
-Router.prototype.route = function(path, options) {
+Router.prototype.route = function(path, options, group) {
+  if (!/^\/.*/.test(path)) {
+    var message = "route's path must start with '/'";
+    throw new Error(message);
+  }
+
   options = options || {};
   var self = this;
-  var route = new Route(this, path, options);
+  var route = new Route(this, path, options, group);
 
   route._handler = function (context, next) {
     self._current = {
@@ -45,6 +50,10 @@ Router.prototype.route = function(path, options) {
   this._updateCallbacks();
 
   return route;
+};
+
+Router.prototype.group = function(options) {
+  return new Group(this, options);
 };
 
 Router.prototype.path = function(pathDef, fields, queryParams) {
