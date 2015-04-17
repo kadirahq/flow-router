@@ -275,7 +275,7 @@ function trackingMiddleware(path, next) {
 You can configure Not Found routes like this.
 
 ~~~js
-FlowRouter.notfound = {
+FlowRouter.notFound = {
     // Subscriptions registered here don't have Fast Render support.
     subscriptions: function() {
       
