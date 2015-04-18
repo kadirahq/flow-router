@@ -83,7 +83,10 @@ Router.prototype.path = function(pathDef, fields, queryParams) {
 
 Router.prototype.go = function(pathDef, fields, queryParams) {
   var path = this.path(pathDef, fields, queryParams);
-  this._page(path);
+
+  if (this._current.path !== path) {
+    this._page(path);
+  }
 };
 
 Router.prototype.redirect = function(path) {
