@@ -9,10 +9,7 @@ Route = function(router, path, options) {
 
 
 Route.prototype.register = function(name, sub, options) {
-  options = _.extend({server: true}, options);
-  if(options.server) {
-    this._subsMap[name] = sub;
-  }
+  this._subsMap[name] = sub;
 };
 
 
@@ -22,5 +19,5 @@ Route.prototype.subscription = function(name) {
 
 
 Route.prototype.middleware = function(middleware) {
-  // TODO
+ 
 };

@@ -12,7 +12,7 @@ Package.onUse(function(api) {
   api.use('tracker');
   api.use('reactive-dict');
 
-  api.use('meteorhacks:fast-render@2.0.0', ['client', 'server'], {weak: true});
+  api.use('meteorhacks:fast-render@2.3.2', ['client', 'server'], {weak: true});
 
   api.addFiles('client/vendor/page.js', 'client');
   api.addFiles('client/vendor/query.js', 'client');
@@ -25,15 +25,21 @@ Package.onUse(function(api) {
   api.addFiles('server/route.js', 'server');
   api.addFiles('server/_init.js', 'server');
 
-  api.addFiles('server/plugins/fast-render.js', 'server');
+  api.addFiles('server/plugins/fast_render.js', 'server');
 
   api.export('FlowRouter');
 });
 
 Package.onTest(function(api) {
   api.use('tinytest');
+  api.use('mongo');
+  api.use('http');
   api.use('meteorhacks:flow-router');
   api.use('practicalmeteor:sinon');
+  api.use('meteorhacks:fast-render');
+  api.use('meteorhacks:inject-data');
+
+  api.addFiles('test/common/fast_render_route.js', ['client', 'server']);
 
   api.addFiles('test/client/_helpers.js', 'client');
   api.addFiles('test/server/_helpers.js', 'server');
@@ -44,6 +50,7 @@ Package.onTest(function(api) {
   api.addFiles('test/client/router.naming.spec.js', 'client');
   api.addFiles('test/client/route.test.js', 'client');
   api.addFiles('test/client/route.spec.js', 'client');
-
   api.addFiles('test/client/group.spec.js', 'client');
+
+  api.addFiles('test/server/plugins/fast_render.js', 'server');
 });

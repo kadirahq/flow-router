@@ -2,6 +2,7 @@ if(!Package['meteorhacks:fast-render']) {
   return;
 }
 
+FastRender = Package['meteorhacks:fast-render'].FastRender;
 
 // hack to run after eveything else on startup
 Meteor.startup(function () {
@@ -11,7 +12,7 @@ Meteor.startup(function () {
 });
 
 function setupFastRender () {
-  _.each(FlowRouter._routeMap, function (route, path) {
+  _.each(FlowRouter._routesMap, function (route, path) {
     FastRender.route(path, function (params, path) {
       var self = this;
 
