@@ -98,7 +98,7 @@ You can also group routes as well. With that, we can group some common functiona
 var adminRoutes = FlowRouter.group({
   prefix: '/admin',
   subscriptions: function() {
-    this.register('adminSettings', Meteor.publish('settings', {admin: true}));
+    this.register('adminSettings', Meteor.subscribe('settings', {admin: true}));
   },
   middlewares: [
     function(path, next) {
