@@ -116,6 +116,12 @@ Router.prototype.setQueryParams = function(newParams) {
   var queryParams = _.clone(this._current.queryParams);
   _.extend(queryParams, newParams);
 
+  for (var k in queryParams) {
+    if (queryParams[k] === null || queryParams[k] === undefined) {
+      delete queryParams[k];
+    }
+  }
+
   var pathDef = this._current.route.path;
   var params = this._current.params;
   this.go(pathDef, params, queryParams);
