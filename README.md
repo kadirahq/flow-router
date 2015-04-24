@@ -375,6 +375,12 @@ FlowRouter.setParams({appId: "new-id"});
 
 Just like `FlowRouter.setParams`, but for queryString params.
 
+To remove a query param set it to `null` like below:
+
+~~~js
+FlowRouter.setQueryParams({paramToRemove: null});
+~~~
+
 #### FlowRouter.current()
 
 Get the current state of the router. **This API is not reactive**. You **don't** need to use this API most of the time. You can use reactive APIs like `FlowRouter.getParam()` and `FlowRouter.getQueryParam()` instead.
