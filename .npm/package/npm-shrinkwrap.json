@@ -1,0 +1,20 @@
+{
+  "dependencies": {
+    "page": {
+      "version": "1.6.3",
+      "dependencies": {
+        "path-to-regexp": {
+          "version": "1.0.3",
+          "dependencies": {
+            "isarray": {
+              "version": "0.0.1"
+            }
+          }
+        }
+      }
+    },
+    "qs": {
+      "version": "2.4.1"
+    }
+  }
+}

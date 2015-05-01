@@ -5,6 +5,11 @@ Package.describe({
   git: 'https://github.com/meteorhacks/flow-router.git'
 });
 
+Npm.depends({
+  'page':'1.6.3',
+    'qs':'2.4.1'
+});
+
 Package.onUse(function(api) {
   api.versionsFrom('1.0');
 
@@ -13,9 +18,9 @@ Package.onUse(function(api) {
   api.use('reactive-dict');
 
   api.use('meteorhacks:fast-render@2.3.2', ['client', 'server'], {weak: true});
+  api.use('cosmos:browserify', 'client');
 
-  api.addFiles('client/vendor/page.js', 'client');
-  api.addFiles('client/vendor/query.js', 'client');
+  api.addFiles('browserify.js', 'client');
   api.addFiles('client/router.js', 'client');
   api.addFiles('client/group.js', 'client');
   api.addFiles('client/route.js', 'client');
