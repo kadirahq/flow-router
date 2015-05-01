@@ -2,7 +2,7 @@
 
 Carefully Designed Client Side Router for Meteor. 
 
-Flow Router is a minimalistic router which only does routing and subscription handling. You can't have any kind of reactive code inside routes, but there is a reactive API to dynamically change your app based on the state of the router.
+Flow Router is a minimalistic router which only handles routing and subscriptions. You can't have any kind of reactive code inside routes, but there is a reactive API to dynamically change your app based on the state of the router.
 
 ## TOC
 
@@ -88,7 +88,7 @@ Query Params: {comments: "on", color: "dark"}
 
 For a single interaction, router only runs once. That means, after you've visit a route, first it will call `middlewares`, then `subscriptions` and finally `action`. After that happens, there is no way any of those methods to be called again for that route visit.
 
-You can define routes anywhere in the `client` directory. But, we recommend to add it on `lib` directory. Then `fast-render` can detect subscriptions and send them for you. (We'll talk about this is a moment).
+You can define routes anywhere in the `client` directory. But, we recommend to add it on `lib` directory. Then `fast-render` can detect subscriptions and send them for you (we'll talk about this is a moment).
 
 ### Group Routes
 
@@ -129,7 +129,7 @@ adminRoutes.route('/posts', {
 });
 ~~~
 
-**All the options for the `FlowRouter.group()` are optional.**
+**All of the options for the `FlowRouter.group()` are optional.**
 
 You can even have nested group routes as shown below:
 
@@ -170,9 +170,9 @@ FlowRouter.subscriptions = function() {
 };
 ~~~
 
-All these global subscriptions runs on every route. So, make your special attention for names when registering subscriptions.
+All these global subscriptions run on every route. So, make special attention to names when registering subscriptions.
 
-After you've register subscriptions, you can reactively check for the status of those subscriptions like this:
+After you've registered your subscriptions, you can reactively check for the status of those subscriptions like this:
 
 ~~~js
 Tracker.autorun(function() {
@@ -237,7 +237,7 @@ Sometimes, you need to do invoke some tasks just before entering into the route.
 * Analytics
 * Initialzation tasks
 
-This is how we can implement simple redirection logic with middleware. It will redirect a user to the sign-in page if not logged in.
+This is how we can implement simple redirection logic with middleware. It will redirect a user to the sign-in page if they are not logged in.
 
 ~~~js
 
@@ -412,9 +412,9 @@ Sometimes we need to watch for the current route reactively. Avoid using this if
 
 Flow Router and Iron Router are two different routers. Iron Router tries to be a full featured solution. It tries to do everything including routing, subscriptions, rendering and layout management.
 
-Flow Router is a minimalistic solution focused on routing with UI performance in mind. It exposes APIs for related functionality
+Flow Router is a minimalistic solution focused on routing with UI performance in mind. It exposes APIs for related functionality.
 
-Let's learn more about the differences
+Let's learn more about the differences:
 
 ### Rendering 
 
@@ -453,7 +453,7 @@ Okay. Let's say we changed `:section` in the route. Oh then above helper also ge
 
 Because of this, a lot parts of our app gets re run and re-rendered. This creates unpredictable rendering behavior in our app.
 
-Flow Router simply fix this issue by providing follow `Router.getParam()` API. See how to use it: 
+Flow Router fixes this issue simply by providing the `Router.getParam()` API. See how to use it: 
 
 ~~~js
 Templates['foo'].helpers({
@@ -472,7 +472,7 @@ For more information check [docs](#fast-render).
 
 ### Server Side Routing
 
-Flow Router is a client side router and it does not do sever side routing at all. `subscriptions` are only run on the server to enabled Fast Render support.
+Flow Router is a client side router and it does not support sever side routing at all. `subscriptions` are only run on the server to enabled Fast Render support.
 
 #### Why not?
 Meteor is not a traditional framework where you can send HTML directly from the server. Meteor needs to send a special set of HTML to the client initially. So, you can't directly send something to the client your self.
