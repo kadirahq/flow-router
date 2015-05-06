@@ -240,14 +240,14 @@ Router.prototype._notfoundRoute = function(context) {
     params: [],
     queryParams: {},
   };
-  
+
   // XXX this.notfound kept for backwards compatibility
   this.notFound = this.notFound || this.notfound;
   if(!this.notFound) {
     console.error("There is no route for the path:", context.path);
     return;
   }
-  
+
   this._current.route = new Route(this, "*", this.notFound);
   this._invalidateTracker();
 };
@@ -335,7 +335,5 @@ Router.prototype._updateCallbacks = function () {
   });
 };
 
-Router.prototype._page = window.page;
-delete window.page;
-
+Router.prototype._page = page;
 Router.prototype._qs = qs;
