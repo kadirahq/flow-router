@@ -4,6 +4,7 @@ Router = function () {
 
   this._tracker = this._buildTracker();
   this._current = {};
+  this._routeName = new ReactiveVar();
   this._params = new ReactiveDict();
   this._queryParams = new ReactiveDict();
 
@@ -140,12 +141,20 @@ Router.prototype.reactiveCurrent = function() {
   return this.current();
 };
 
+Router.prototype.getRouteName = function() {
+  return this._routeName.get();
+};
+
 Router.prototype.getParam = function(key) {
   return this._params.get(key);
 };
 
 Router.prototype.getQueryParam = function(key) {
   return this._queryParams.get(key);
+};
+
+Router.prototype._registerRouteName = function() {
+  this._routeName.set(this._current.route.name);
 };
 
 Router.prototype._registerParams = function() {
@@ -302,6 +311,7 @@ Router.prototype._buildTracker = function() {
       route.callAction(self._current);
     });
 
+    self._registerRouteName();
     self._registerParams();
     self._registerQueryParams();
 
