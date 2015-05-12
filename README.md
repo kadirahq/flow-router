@@ -138,7 +138,7 @@ var adminRoutes = FlowRouter.group({
     prefix: "/admin"
 });
 
-var superAdminRoutes = FlowRouter.group({
+var superAdminRoutes = adminRoutes.group({
     prefix: "/super"
 });
 
