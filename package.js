@@ -16,6 +16,7 @@ Package.onUse(function(api) {
   api.use('underscore');
   api.use('tracker');
   api.use('reactive-dict');
+  api.use('reactive-var');
 
   api.use('meteorhacks:fast-render@2.3.2', ['client', 'server'], {weak: true});
   api.use('cosmos:browserify@0.1.3', 'client');
