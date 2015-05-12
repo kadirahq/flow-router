@@ -296,14 +296,15 @@ Router.prototype._buildTracker = function() {
     self.subscriptions.call(self._globalRoute, path);
     route.callSubscriptions(self._current);
 
+    // call before the action so these are available via FlowRouter API
+    self._registerParams();
+    self._registerQueryParams();
+
     // otherwise, computations inside action will trigger to re-run
     // this computation. which we do not need.
     Tracker.nonreactive(function() {
       route.callAction(self._current);
     });
-
-    self._registerParams();
-    self._registerQueryParams();
 
     self._currentTracker.changed();
     self.safeToRun = false;
