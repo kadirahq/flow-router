@@ -381,6 +381,17 @@ To remove a query param set it to `null` like below:
 FlowRouter.setQueryParams({paramToRemove: null});
 ~~~
 
+#### FlowRouter.getRouteName()
+
+To get the name of the route reactively.
+
+~~~js
+Tracker.autorun(function() {
+  var routeName = FlowRouter.getRouteName();
+  console.log("Current route name is: ", routeName);
+});
+~~~
+
 #### FlowRouter.current()
 
 Get the current state of the router. **This API is not reactive**. You **don't** need to use this API most of the time. You can use reactive APIs like `FlowRouter.getParam()` and `FlowRouter.getQueryParam()` instead.
