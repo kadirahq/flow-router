@@ -290,6 +290,18 @@ FlowRouter.notFound = {
 
 Flow Router has some utility APIs to help you navigate the router and get information from the router.
 
+#### FlowRouter.getHash();
+
+Reactive function which you can use to get the hash from the URL.
+
+~~~js
+// route def: /apps/:appId
+// url: /apps/this-is-my-app#tab2
+
+var tabId = FlowRouter.getHash();
+console.log(tabId); // prints "tab2"
+~~~
+
 #### FlowRouter.getParam(paramName);
 
 Reactive function which you can use to get a param from the URL.
@@ -356,6 +368,19 @@ You can call `FlowRouter.go` like this as well:
 
 ~~~jswait
 FlowRouter.go("/blog");
+~~~
+
+#### FlowRouter.setHash(newHash)
+
+This will change the current hash with the hash and re-route to the new path.
+
+~~~js
+// route def: /apps/:appId
+// url: /apps/this-is-my-app?show=yes&color=red#foo
+
+FlowRouter.setHash("bar");
+// Then the user will be redirected to the following path
+//      /apps/new-id?show=yes&color=red#bar
 ~~~
 
 #### FlowRouter.setParams(newParams)

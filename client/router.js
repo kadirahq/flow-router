@@ -5,6 +5,7 @@ Router = function () {
   this._tracker = this._buildTracker();
   this._current = {};
   this._routeName = new ReactiveVar();
+  this._hash = new ReactiveVar();
   this._params = new ReactiveDict();
   this._queryParams = new ReactiveDict();
 
@@ -35,6 +36,7 @@ Router.prototype.route = function(path, options, group) {
     self._current = {
       path: context.path,
       context: context,
+      hash: context.hash,
       params: context.params,
       queryParams: self._qs.parse(context.querystring),
       route: route
@@ -57,7 +59,7 @@ Router.prototype.group = function(options) {
   return new Group(this, options);
 };
 
-Router.prototype.path = function(pathDef, fields, queryParams) {
+Router.prototype.path = function(pathDef, fields, queryParams, hash) {
   if (this._routesMap[pathDef]) {
     pathDef = this._routesMap[pathDef].path;
   }
@@ -79,11 +81,15 @@ Router.prototype.path = function(pathDef, fields, queryParams) {
     path += "?" + strQueryParams;
   }
 
+  if(hash) {
+    path += "#" + hash;
+  }
+
   return path;
 };
 
-Router.prototype.go = function(pathDef, fields, queryParams) {
-  var path = this.path(pathDef, fields, queryParams);
+Router.prototype.go = function(pathDef, fields, queryParams, hash) {
+  var path = this.path(pathDef, fields, queryParams, hash);
 
   if (this._current.path !== path) {
     this._page(path);
@@ -92,6 +98,18 @@ Router.prototype.go = function(pathDef, fields, queryParams) {
 
 Router.prototype.redirect = function(path) {
   this._page.redirect(path);
+};
+
+Router.prototype.setHash = function(newHash) {
+  if(!this._current.route) {return false;}
+
+  var pathDef = this._current.route.path;
+  var params = this._current.params;
+  var queryParams = this._current.queryParams;
+  var hash = newHash;
+
+  this.go(pathDef, params, queryParams, hash);
+  return true;
 };
 
 Router.prototype.setParams = function(newParams) {
@@ -106,8 +124,9 @@ Router.prototype.setParams = function(newParams) {
 
   params = _.extend(params, newParams);
   var queryParams = this._current.queryParams;
+  var hash = this._current.hash;
 
-  this.go(pathDef, params, queryParams);
+  this.go(pathDef, params, queryParams, hash);
   return true;
 };
 
@@ -125,7 +144,9 @@ Router.prototype.setQueryParams = function(newParams) {
 
   var pathDef = this._current.route.path;
   var params = this._current.params;
-  this.go(pathDef, params, queryParams);
+  var hash = this._current.hash;
+
+  this.go(pathDef, params, queryParams, hash);
   return true;
 };
 
@@ -145,6 +166,10 @@ Router.prototype.getRouteName = function() {
   return this._routeName.get();
 };
 
+Router.prototype.getHash = function() {
+  return this._hash.get();
+};
+
 Router.prototype.getParam = function(key) {
   return this._params.get(key);
 };
@@ -155,6 +180,10 @@ Router.prototype.getQueryParam = function(key) {
 
 Router.prototype._registerRouteName = function() {
   this._routeName.set(this._current.route.name);
+};
+
+Router.prototype._registerHash = function() {
+  this._hash.set(this._current.hash);
 };
 
 Router.prototype._registerParams = function() {
@@ -312,6 +341,7 @@ Router.prototype._buildTracker = function() {
     });
 
     self._registerRouteName();
+    self._registerHash();
     self._registerParams();
     self._registerQueryParams();
 
