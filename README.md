@@ -326,7 +326,7 @@ var color = FlowRouter.getQueryParam("color");
 console.log(color); // prints "red"
 ~~~
 
-#### FlowRouter.path(pathDef, params, queryParams)
+#### FlowRouter.path(pathDef, params, queryParams, hash)
 
 Generate a path from a path definition. Both params and queryParams are optional.
 
@@ -334,9 +334,10 @@ Generate a path from a path definition. Both params and queryParams are optional
 var pathDef = "/blog/:cat/:id";
 var params = {cat: "meteor", id: "abc"};
 var queryParams = {show: "yes", color: "black"};
+var hash = "foo"
 
-var path = FlowRouter.path(pathDef, params, queryParams);
-console.log(path); // prints "/blog/meteor/abc?show=yes&color=black"
+var path = FlowRouter.path(pathDef, params, queryParams, hash);
+console.log(path); // prints "/blog/meteor/abc?show=yes&color=black#foo"
 ~~~
 
 If there are no params or queryParams, this will simply return the pathDef as it is.
@@ -356,11 +357,11 @@ FlowRouter.route("/blog/:cat/:id", {
 var params = {cat: "meteor", id: "abc"};
 var queryParams = {show: "yes", color: "black"};
 
-var path = FlowRouter.path("blogPostRoute", params, queryParams);
-console.log(path); // prints "/blog/meteor/abc?show=yes&color=black"
+var path = FlowRouter.path("blogPostRoute", params, queryParams, "foo");
+console.log(path); // prints "/blog/meteor/abc?show=yes&color=black#foo"
 ~~~
 
-#### FlowRouter.go(pathDef, params, queryParams);
+#### FlowRouter.go(pathDef, params, queryParams, hash);
 
 This will get the path via `FlowRouter.path` based on the arguments and re-route to that path.
 
