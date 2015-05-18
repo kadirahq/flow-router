@@ -14,6 +14,16 @@ FlowRouter.route('/no-fast-render', {
   }
 });
 
+var frGroup = FlowRouter.group({
+  prefix: "/fr"
+});
+
+frGroup.route("/have-fr", {
+  subscriptions: function() {
+    this.register('data', Meteor.subscribe('fast-render-data'));
+  }
+});
+
 if(Meteor.isServer) {
   if(!FastRenderColl.findOne()) {
     FastRenderColl.insert({_id: "one", aa: 10});

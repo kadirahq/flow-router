@@ -9,7 +9,7 @@ Router.prototype.route = function(path, options) {
   return this._routesMap[path];
 };
 
-Router.prototype.group = function(path, options) {
+Router.prototype.group = function(options) {
   return new Group(this, options);
 };
 
