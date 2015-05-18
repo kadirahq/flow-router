@@ -309,13 +309,14 @@ Router.prototype._buildTracker = function() {
     // this computation. which we do not need.
     Tracker.nonreactive(function() {
       route.callAction(self._current);
+      Tracker.afterFlush(function() {
+        self._registerRouteName();
+        self._registerParams();
+        self._registerQueryParams();
+        self._currentTracker.changed();
+      });
     });
 
-    self._registerRouteName();
-    self._registerParams();
-    self._registerQueryParams();
-
-    self._currentTracker.changed();
     self.safeToRun = false;
   });
 
