@@ -11,3 +11,12 @@ Tinytest.add('Server - Fast Render - no fast render supproted route', function (
   var data = GetFRData('/no-fast-render');
   test.equal(data.collectionData, {});
 });
+
+Tinytest.add('Server - Fast Render - with group routes', function (test) {
+  var expectedFastRenderCollData = [
+    [{_id: "two", aa: 20}, {_id: "one", aa: 10}]
+  ];
+
+  var data = GetFRData('/fr/have-fr');
+  test.equal(data.collectionData['fast-render-coll'], expectedFastRenderCollData);
+});
