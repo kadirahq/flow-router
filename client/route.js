@@ -12,6 +12,10 @@ Route = function(router, path, options, group) {
   this._subsMap = {};
   this._router = router;
 
+  this._params = new ReactiveDict();
+  this._queryParams = new ReactiveDict();
+  this._routeChangeDeps = new Tracker.Dependency();
+
   this.group = group;
 };
 
@@ -69,4 +73,53 @@ Route.prototype.callSubscriptions = function(current) {
   }
 
   this._subscriptions(current.params, current.queryParams);
+};
+
+Route.prototype.getRouteName = function() {
+  this._routeChangeDeps.depend();
+  return this.name;
+};
+
+Route.prototype.getParam = function(key) {
+  this._routeChangeDeps.depend();
+  return this._params.get(key);
+};
+
+Route.prototype.getQueryParam = function(key) {
+  this._routeChangeDeps.depend();
+  return this._queryParams.get(key);
+};
+
+Route.prototype.registerRouteClose = function() {
+  this._params = new ReactiveDict();
+  this._queryParams = new ReactiveDict();
+  this._routeChangeDeps.changed();
+};
+
+Route.prototype.registerRouteChange = function(fullRouteChange) {
+  // register params
+  var params = this._router._current.params;
+  this._updateReactiveDict(this._params, params);
+
+  // register query params
+  var queryParams = this._router._current.queryParams;
+  this._updateReactiveDict(this._queryParams, queryParams);
+};
+
+Route.prototype._updateReactiveDict = function(dict, newValues) {
+  var currentKeys = _.keys(newValues);
+  var oldKeys = _.keys(dict.keyDeps);
+
+  // set new values
+  //  params is an array. So, _.each(params) does not works
+  //  to iterate params
+  _.each(currentKeys, function(key) {
+    dict.set(key, newValues[key]);
+  });
+
+  // remove keys which does not exisits here
+  var removedKeys = _.difference(oldKeys, currentKeys);
+  _.each(removedKeys, function(key) {
+    dict.set(key, undefined);
+  });
 };

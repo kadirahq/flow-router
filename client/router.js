@@ -8,7 +8,9 @@ Router = function () {
   this._params = new ReactiveDict();
   this._queryParams = new ReactiveDict();
 
+  // tracks the current path change
   this._currentTracker = new Tracker.Dependency();
+
   this._globalRoute = new Route(this);
 
   this._middleware = [];
@@ -32,12 +34,15 @@ Router.prototype.route = function(path, options, group) {
   var route = new Route(this, path, options, group);
 
   route._handler = function (context, next) {
+    var oldRoute = self._current.route;
+
     self._current = {
       path: context.path,
       context: context,
       params: context.params,
       queryParams: self._qs.parse(context.querystring),
-      route: route
+      route: route,
+      oldRoute: oldRoute
     };
 
     self._invalidateTracker();
@@ -142,47 +147,28 @@ Router.prototype.reactiveCurrent = function() {
 };
 
 Router.prototype.getRouteName = function() {
-  return this._routeName.get();
+  if(!this._current.route) {
+    this._currentTracker.depend();
+    return;
+  }
+
+  return this._current.route.getRouteName();
 };
 
 Router.prototype.getParam = function(key) {
-  return this._params.get(key);
+  if(!this._current.route) {
+    this._currentTracker.depend();
+    return;
+  }
+  return this._current.route.getParam(key);
 };
 
 Router.prototype.getQueryParam = function(key) {
-  return this._queryParams.get(key);
-};
-
-Router.prototype._registerRouteName = function() {
-  this._routeName.set(this._current.route.name);
-};
-
-Router.prototype._registerParams = function() {
-  var params = this._current.params;
-  this._updateReactiveDict(this._params, params);
-};
-
-Router.prototype._registerQueryParams = function() {
-  var queryParams = this._current.queryParams;
-  this._updateReactiveDict(this._queryParams, queryParams);
-};
-
-Router.prototype._updateReactiveDict = function(dict, newValues) {
-  var currentKeys = _.keys(newValues);
-  var oldKeys = _.keys(dict.keyDeps);
-
-  // set new values
-  //  params is an array. So, _.each(params) does not works
-  //  to iterate params
-  _.each(currentKeys, function(key) {
-    dict.set(key, newValues[key]);
-  });
-
-  // remove keys which does not exisits here
-  var removedKeys = _.difference(oldKeys, currentKeys);
-  _.each(removedKeys, function(key) {
-    dict.set(key, undefined);
-  });
+  if(!this._current.route) {
+    this._currentTracker.depend();
+    return;
+  }
+  return this._current.route.getQueryParam(key);
 };
 
 Router.prototype.middleware = function(middlewareFn) {
@@ -308,12 +294,23 @@ Router.prototype._buildTracker = function() {
     // otherwise, computations inside action will trigger to re-run
     // this computation. which we do not need.
     Tracker.nonreactive(function() {
-      route.callAction(self._current);
+      var currentContext = self._current;
+      currentContext.route.registerRouteChange();
+      route.callAction(currentContext);
+
       Tracker.afterFlush(function() {
-        self._registerRouteName();
-        self._registerParams();
-        self._registerQueryParams();
         self._currentTracker.changed();
+        var isRouteChange = currentContext.oldRoute === currentContext.route;
+        if(isRouteChange && currentContext.oldRoute) {
+          // We need to trigger that route (definition itself) has changed.
+          // So, we need to re-run all the register callbacks to current route
+          // This is pretty important, otherwise tracker 
+          // can't identify new route's items
+
+          // We also need to afterFlush, otherwise this will re-run
+          // helpers on templates which are marked for destroying
+          currentContext.oldRoute.registerRouteClose();
+        }
       });
     });
 
