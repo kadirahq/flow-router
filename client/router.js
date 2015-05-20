@@ -9,7 +9,7 @@ Router = function () {
   this._queryParams = new ReactiveDict();
 
   // tracks the current path change
-  this._currentTracker = new Tracker.Dependency();
+  this._onEveryPath = new Tracker.Dependency();
 
   this._globalRoute = new Route(this);
 
@@ -142,13 +142,18 @@ Router.prototype.current = function() {
 };
 
 Router.prototype.reactiveCurrent = function() {
-  this._currentTracker.depend();
+  if(!this._current.route) {
+    this._onEveryPath.depend();
+    return;
+  }
+
+  this._current.route.pathChangeDep.depend();
   return this.current();
 };
 
 Router.prototype.getRouteName = function() {
   if(!this._current.route) {
-    this._currentTracker.depend();
+    this._onEveryPath.depend();
     return;
   }
 
@@ -157,7 +162,7 @@ Router.prototype.getRouteName = function() {
 
 Router.prototype.getParam = function(key) {
   if(!this._current.route) {
-    this._currentTracker.depend();
+    this._onEveryPath.depend();
     return;
   }
   return this._current.route.getParam(key);
@@ -165,7 +170,7 @@ Router.prototype.getParam = function(key) {
 
 Router.prototype.getQueryParam = function(key) {
   if(!this._current.route) {
-    this._currentTracker.depend();
+    this._onEveryPath.depend();
     return;
   }
   return this._current.route.getQueryParam(key);
@@ -205,7 +210,7 @@ Router.prototype.subsReady = function() {
 
   // we need to depend for every route change and
   // rerun subscriptions to check the ready state
-  this._currentTracker.depend();
+  this._onEveryPath.depend();
 
   if(!currentRoute) {
     return false;
@@ -295,13 +300,20 @@ Router.prototype._buildTracker = function() {
     // this computation. which we do not need.
     Tracker.nonreactive(function() {
       var currentContext = self._current;
+      var isRouteChange = currentContext.oldRoute !== currentContext.route;
+      var isFirstRoute = !currentContext.oldRoute;
+
       currentContext.route.registerRouteChange();
+      // Trigger the URL has changed, but not in the last url change
+      if(isFirstRoute || !isRouteChange) {
+        currentContext.route.pathChangeDep.changed();
+      }
+
       route.callAction(currentContext);
 
       Tracker.afterFlush(function() {
-        self._currentTracker.changed();
-        var isRouteChange = currentContext.oldRoute !== currentContext.route;
-        if(isRouteChange && currentContext.oldRoute) {
+        self._onEveryPath.changed();
+        if(!isFirstRoute && isRouteChange) {
           // We need to trigger that route (definition itself) has changed.
           // So, we need to re-run all the register callbacks to current route
           // This is pretty important, otherwise tracker 
@@ -310,6 +322,10 @@ Router.prototype._buildTracker = function() {
           // We also need to afterFlush, otherwise this will re-run
           // helpers on templates which are marked for destroying
           currentContext.oldRoute.registerRouteClose();
+
+          // Trigger that URL has changed
+          // Reason is same above
+          currentContext.oldRoute.pathChangeDep.changed();
         }
       });
     });
