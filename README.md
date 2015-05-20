@@ -65,8 +65,8 @@ FlowRouter.route('/blog/:postId', {
 
     // do some action for this route
     action: function(params, queryParams) {
-        console.log("Params:", params)
-        console.log("Query Params:", queryParams)
+        console.log("Params:", params);
+        console.log("Query Params:", queryParams);
     },
 
     name: "<name for the route>" // optional
@@ -76,7 +76,7 @@ FlowRouter.route('/blog/:postId', {
 So, this route will be activated when you visit a url like below:
 
 ~~~js
-FlowRouter.go('/blog/my-post?comments=on&color=dark')
+FlowRouter.go('/blog/my-post?comments=on&color=dark');
 ~~~
 
 After you've visit the route, this will be printed in the console:
