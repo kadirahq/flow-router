@@ -300,7 +300,7 @@ Router.prototype._buildTracker = function() {
 
       Tracker.afterFlush(function() {
         self._currentTracker.changed();
-        var isRouteChange = currentContext.oldRoute === currentContext.route;
+        var isRouteChange = currentContext.oldRoute !== currentContext.route;
         if(isRouteChange && currentContext.oldRoute) {
           // We need to trigger that route (definition itself) has changed.
           // So, we need to re-run all the register callbacks to current route
