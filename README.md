@@ -55,7 +55,7 @@ Here's the syntax for a simple route:
 
 ~~~js
 FlowRouter.route('/blog/:postId', {
-    // an array of middlewares (we'll discuess about this later on)
+    // an array of middlewares (we'll discuss about this later on)
     middlewares: [],
 
     // define your subscriptions
