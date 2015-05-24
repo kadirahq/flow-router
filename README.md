@@ -3,7 +3,7 @@
 
 Carefully Designed Client Side Router for Meteor. 
 
-Flow Router is a minimalistic router which only handles routing and subscriptions. You can't have any kind of reactive code inside routes, but there is a reactive API to dynamically change your app based on the state of the router.
+Flow Router is a minimalistic router which only handles routing and subscriptions. You can't have any kind of reactive code inside the router. But there is a rich reactive API to watch changes in the routes.
 
 ## TOC
 
@@ -23,7 +23,6 @@ Add Flow Router to your app:
 ~~~shell
 meteor add meteorhacks:flow-router
 ~~~
-
 
 Let's write our first route:
 (Add this file to `lib/router.js`)
@@ -93,7 +92,7 @@ You can define routes anywhere in the `client` directory. But, we recommend to a
 
 ### Group Routes
 
-You can also group routes as well. With that, we can group some common functionalities. Here's an example:
+You can group routes for better route organization. Here's an example:
 
 ~~~js
 var adminRoutes = FlowRouter.group({
@@ -153,7 +152,7 @@ superAdminRoutes.route('/post', {
 
 ## Subscription Management 
 
-Inside the route, Flow Router only registers subscriptions. It does not wait for the ready message before running the action. This is how to register a subscription.
+Flow Router does only registration of subscriptions. It does not wait until subscription became ready. This is how to register a subscription.
 
 ~~~js
 FlowRouter.route('/blog/:postId', {
@@ -196,7 +195,7 @@ Flow Router has built in support for [Fast Render](https://github.com/meteorhack
 - `meteor add meteorhacks:fast-render`
 - Put `router.js` in a shared location. We suggest `lib/router.js`.
 
-You can selectively exclude Fast Render support by wrapping the subscription registration in an isClient block:
+You can exclude Fast Render support by wrapping the subscription registration in an `isClient` block:
 
 ~~~js
 FlowRouter.route('/blog/:postId', {
@@ -232,11 +231,14 @@ FlowRouter.route('/blog/:postId', {
 
 ## Middlewares
 
-Sometimes, you need to do invoke some tasks just before entering into the route. That's where middlewares comes in. Here are some of the use cases for middlewares:
+> We'll deprecate middlewares in the next major version. We'll have an API called triggers where you add callbacks to run before and after the route change. <br>
+> Migrating from middlewares to triggers will be easy as few line changes.
+
+Sometimes, you need to invoke some tasks just before entering into the route. That's where middlewares comes in. Here are some of the use cases for middlewares:
 
 * Route Redirecting
 * Analytics
-* Initialzation tasks
+* Initialization tasks
 
 This is how we can implement simple redirection logic with middleware. It will redirect a user to the sign-in page if they are not logged in.
 
@@ -258,7 +260,6 @@ function requiredLogin(path, next) {
   next(redirectPath);
 }
 ~~~
-
 
 You can also write global middlewares like this:
 
@@ -289,7 +290,7 @@ FlowRouter.notFound = {
 
 ## API
 
-Flow Router has some utility APIs to help you navigate the router and get information from the router.
+Flow Router has rich API to help you to navigate the router and reactively get information from the router.
 
 #### FlowRouter.getParam(paramName);
 
@@ -355,7 +356,7 @@ This will get the path via `FlowRouter.path` based on the arguments and re-route
 
 You can call `FlowRouter.go` like this as well:
 
-~~~jswait
+~~~js
 FlowRouter.go("/blog");
 ~~~
 
@@ -395,9 +396,8 @@ Tracker.autorun(function() {
 
 #### FlowRouter.current()
 
-Get the current state of the router. **This API is not reactive**. You **don't** need to use this API most of the time. You can use reactive APIs like `FlowRouter.getParam()` and `FlowRouter.getQueryParam()` instead.
-
-> We have made this non reactive to reduce the unnecessary re-renders in your UI.
+Get the current state of the router. **This API is not reactive**.
+If you need to watch the changes in the path simply use `FlowRouter.watchPathChange()`.
 
 This gives an object like this:
 
@@ -413,12 +413,26 @@ console.log(current);
 //     path: "/apps/this-is-my-app?show=yes&color=red",
 //     params: {appId: "this-is-my-app"},
 //     queryParams: {show: "yes", color: "red"}
+//     route: {name: "name-of-the-route"}
 // }
 ~~~
 
-#### FlowRouter.reactiveCurrent()
+#### FlowRouter.watchPathChange()
 
-Sometimes we need to watch for the current route reactively. Avoid using this if possible.
+Reactively watch the changes in the path. If you need to simply get the params or queryParams use dedicated APIs like `FlowRouter.getQueryParam()`.
+
+~~~js
+Tracker.autorun(function() {
+  FlowRouter.watchPathChange();
+  var currentContext = FlowRouter.current();
+  // do anything with the current context
+  // or anything you wish
+});
+~~~
+
+#### FlowRouter.reactiveCurrent() [Deprecated]
+
+This API is deprecated. Use `FlowRouter.watchPathChange` instead. This API won't included in the next major release. (2.x.x)
 
 ## Difference with Iron Router
 
@@ -476,6 +490,10 @@ Templates['foo'].helpers({
 });
 ~~~
 
+### No data context
+
+Flow Router does not have a data context. Data context has the same problem as reactive `.current()`. We believe, it'll possible to get data directly in the template (component) layer.
+
 ### Built in Fast Render Support
 
 Flow Router has built in [Fast Render](https://github.com/meteorhacks/fast-render) support. Just add Fast Render to your app and it'll work. Nothing to change in the router.
@@ -484,15 +502,22 @@ For more information check [docs](#fast-render).
 
 ### Server Side Routing
 
-Flow Router is a client side router and it does not support sever side routing at all. `subscriptions` are only run on the server to enabled Fast Render support.
+Flow Router is a client side router and it **does not** support sever side routing at all. But `subscriptions` run on the server to enabled Fast Render support.
 
-#### Why not?
+#### Reason behind that
+
 Meteor is not a traditional framework where you can send HTML directly from the server. Meteor needs to send a special set of HTML to the client initially. So, you can't directly send something to the client your self.
 
 Also, in the server we need look for different things compared with the client. For example:
 
 * In server we've to deal with headers.
-* In server we've  methods like `GET`, `POST`, etc. 
+* In server we've to deal with methods like `GET`, `POST`, etc. 
 * In server we've Cookies
 
-Although we may decide to enable server side rendering by running the actions and middlewares on the server, it's better to use a dedicated server-side router. [`meteorhacks:picker`](https://github.com/meteorhacks/picker) supports connect and express middlewares and has a very easy to use route syntax.
+So, it's better to use a dedicated server-side router like [`meteorhacks:picker`](https://github.com/meteorhacks/picker). It supports connect and express middlewares and has a very easy to use route syntax.
+
+#### Server Side Rendering (SSR)
+
+Although, we don't have server side routes, we **will** have server side rendering support. We've some initial plans to achieve SSR and it's the main feature of version 3.0.
+
+We may have our own initial HTML rendering system to allow SSR bypassing meteor's default layout.

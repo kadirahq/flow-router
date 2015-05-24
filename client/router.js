@@ -4,11 +4,10 @@ Router = function () {
 
   this._tracker = this._buildTracker();
   this._current = {};
-  this._routeName = new ReactiveVar();
-  this._params = new ReactiveDict();
-  this._queryParams = new ReactiveDict();
 
-  this._currentTracker = new Tracker.Dependency();
+  // tracks the current path change
+  this._onEveryPath = new Tracker.Dependency();
+
   this._globalRoute = new Route(this);
 
   this._middleware = [];
@@ -32,12 +31,15 @@ Router.prototype.route = function(path, options, group) {
   var route = new Route(this, path, options, group);
 
   route._handler = function (context, next) {
+    var oldRoute = self._current.route;
+
     self._current = {
       path: context.path,
       context: context,
       params: context.params,
       queryParams: self._qs.parse(context.querystring),
-      route: route
+      route: route,
+      oldRoute: oldRoute
     };
 
     self._invalidateTracker();
@@ -131,59 +133,41 @@ Router.prototype.setQueryParams = function(newParams) {
 
 // .current is not reactive
 // This is by design. use .getParam() instead
-// If you really need a reactive current support, use .reactiveCurrent()
+// If you really need to watch the path change, use .watchPathChange()
 Router.prototype.current = function() {
   return this._current;
 };
 
 Router.prototype.reactiveCurrent = function() {
-  this._currentTracker.depend();
+  var warnMessage = 
+    ".reactiveCurrent() is deprecated. " +
+    "Use .watchPathChange() instead";
+  console.warn(warnMessage)
+  
+  this.watchPathChange();
   return this.current();
 };
 
-Router.prototype.getRouteName = function() {
-  return this._routeName.get();
-};
+// Implementing Reactive APIs
+var reactiveApis = [
+  'getParam', 'getQueryParam', 
+  'getRouteName', 'watchPathChange'
+];
+reactiveApis.forEach(function(api) {
+  Router.prototype[api] = function(arg1) {
+    // when this is calling, there may not be any route initiated
+    // so we need to handle it
+    var currentRoute = this._current.route;
+    if(!currentRoute) {
+      this._onEveryPath.depend();
+      return;
+    }
 
-Router.prototype.getParam = function(key) {
-  return this._params.get(key);
-};
-
-Router.prototype.getQueryParam = function(key) {
-  return this._queryParams.get(key);
-};
-
-Router.prototype._registerRouteName = function() {
-  this._routeName.set(this._current.route.name);
-};
-
-Router.prototype._registerParams = function() {
-  var params = this._current.params;
-  this._updateReactiveDict(this._params, params);
-};
-
-Router.prototype._registerQueryParams = function() {
-  var queryParams = this._current.queryParams;
-  this._updateReactiveDict(this._queryParams, queryParams);
-};
-
-Router.prototype._updateReactiveDict = function(dict, newValues) {
-  var currentKeys = _.keys(newValues);
-  var oldKeys = _.keys(dict.keyDeps);
-
-  // set new values
-  //  params is an array. So, _.each(params) does not works
-  //  to iterate params
-  _.each(currentKeys, function(key) {
-    dict.set(key, newValues[key]);
-  });
-
-  // remove keys which does not exisits here
-  var removedKeys = _.difference(oldKeys, currentKeys);
-  _.each(removedKeys, function(key) {
-    dict.set(key, undefined);
-  });
-};
+    // currently, there is only one argument. If we've more let's add more args
+    // this is not clean code, but better in performance
+    return currentRoute[api].call(currentRoute, arg1);
+  }
+});
 
 Router.prototype.middleware = function(middlewareFn) {
   var self = this;
@@ -219,7 +203,7 @@ Router.prototype.subsReady = function() {
 
   // we need to depend for every route change and
   // rerun subscriptions to check the ready state
-  this._currentTracker.depend();
+  this._onEveryPath.depend();
 
   if(!currentRoute) {
     return false;
@@ -308,14 +292,32 @@ Router.prototype._buildTracker = function() {
     // otherwise, computations inside action will trigger to re-run
     // this computation. which we do not need.
     Tracker.nonreactive(function() {
-      route.callAction(self._current);
+      var currentContext = self._current;
+      var isRouteChange = currentContext.oldRoute !== currentContext.route;
+      var isFirstRoute = !currentContext.oldRoute;
+      // first route is not a route change
+      if(isFirstRoute) {
+        isRouteChange = false;
+      }
+
+      currentContext.route.registerRouteChange(currentContext, isRouteChange);
+      route.callAction(currentContext);
+
+      Tracker.afterFlush(function() {
+        self._onEveryPath.changed();
+        if(isRouteChange) {
+          // We need to trigger that route (definition itself) has changed.
+          // So, we need to re-run all the register callbacks to current route
+          // This is pretty important, otherwise tracker 
+          // can't identify new route's items
+
+          // We also need to afterFlush, otherwise this will re-run
+          // helpers on templates which are marked for destroying
+          currentContext.oldRoute.registerRouteClose();
+        }
+      });
     });
 
-    self._registerRouteName();
-    self._registerParams();
-    self._registerQueryParams();
-
-    self._currentTracker.changed();
     self.safeToRun = false;
   });
 
