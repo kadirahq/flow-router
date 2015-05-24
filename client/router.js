@@ -133,45 +133,41 @@ Router.prototype.setQueryParams = function(newParams) {
 
 // .current is not reactive
 // This is by design. use .getParam() instead
-// If you really need a reactive current support, use .reactiveCurrent()
+// If you really need to watch the path change, use .watchPathChange()
 Router.prototype.current = function() {
   return this._current;
 };
 
 Router.prototype.reactiveCurrent = function() {
-  if(!this._current.route) {
-    this._onEveryPath.depend();
-    return;
-  }
-
-  this._current.route.watchPathChange();
+  var warnMessage = 
+    ".reactiveCurrent() is deprecated. " +
+    "Use .watchPathChange() instead";
+  console.warn(warnMessage)
+  
+  this.watchPathChange();
   return this.current();
 };
 
-Router.prototype.getRouteName = function() {
-  if(!this._current.route) {
-    this._onEveryPath.depend();
-    return;
-  }
+// Implementing Reactive APIs
+var reactiveApis = [
+  'getParam', 'getQueryParam', 
+  'getRouteName', 'watchPathChange'
+];
+reactiveApis.forEach(function(api) {
+  Router.prototype[api] = function(arg1) {
+    // when this is calling, there may not be any route initiated
+    // so we need to handle it
+    var currentRoute = this._current.route;
+    if(!currentRoute) {
+      this._onEveryPath.depend();
+      return;
+    }
 
-  return this._current.route.getRouteName();
-};
-
-Router.prototype.getParam = function(key) {
-  if(!this._current.route) {
-    this._onEveryPath.depend();
-    return;
+    // currently, there is only one argument. If we've more let's add more args
+    // this is not clean code, but better in performance
+    return currentRoute[api].call(currentRoute, arg1);
   }
-  return this._current.route.getParam(key);
-};
-
-Router.prototype.getQueryParam = function(key) {
-  if(!this._current.route) {
-    this._onEveryPath.depend();
-    return;
-  }
-  return this._current.route.getQueryParam(key);
-};
+});
 
 Router.prototype.middleware = function(middlewareFn) {
   var self = this;
