@@ -17,7 +17,7 @@ Route = function(router, path, options, group) {
   this._routeChangeDep = new Tracker.Dependency();
 
   // tracks the changes in the URL
-  this.pathChangeDep = new Tracker.Dependency();
+  this._pathChangeDep = new Tracker.Dependency();
 
   this.group = group;
 };
@@ -97,16 +97,25 @@ Route.prototype.registerRouteClose = function() {
   this._params = new ReactiveDict();
   this._queryParams = new ReactiveDict();
   this._routeChangeDep.changed();
+  this._pathChangeDep.changed();
 };
 
-Route.prototype.registerRouteChange = function(fullRouteChange) {
+Route.prototype.watchPathChange = function() {
+  this._pathChangeDep.depend();
+};
+
+Route.prototype.registerRouteChange = function(currentContext, routeChanging) {
   // register params
-  var params = this._router._current.params;
+  var params = currentContext.params;
   this._updateReactiveDict(this._params, params);
 
   // register query params
-  var queryParams = this._router._current.queryParams;
+  var queryParams = currentContext.queryParams;
   this._updateReactiveDict(this._queryParams, queryParams);
+
+  if(!routeChanging) {
+    this._pathChangeDep.changed();
+  }
 };
 
 Route.prototype._updateReactiveDict = function(dict, newValues) {

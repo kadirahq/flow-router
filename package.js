@@ -54,7 +54,6 @@ Package.onTest(function(api) {
   api.addFiles('test/client/router.spec.js', 'client');
   api.addFiles('test/client/router.subs_ready.spec.js', 'client');
   api.addFiles('test/client/router.naming.spec.js', 'client');
-  api.addFiles('test/client/route.test.js', 'client');
   api.addFiles('test/client/route.spec.js', 'client');
   api.addFiles('test/client/group.spec.js', 'client');
 

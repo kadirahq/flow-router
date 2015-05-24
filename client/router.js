@@ -4,9 +4,6 @@ Router = function () {
 
   this._tracker = this._buildTracker();
   this._current = {};
-  this._routeName = new ReactiveVar();
-  this._params = new ReactiveDict();
-  this._queryParams = new ReactiveDict();
 
   // tracks the current path change
   this._onEveryPath = new Tracker.Dependency();
@@ -147,7 +144,7 @@ Router.prototype.reactiveCurrent = function() {
     return;
   }
 
-  this._current.route.pathChangeDep.depend();
+  this._current.route.watchPathChange();
   return this.current();
 };
 
@@ -302,18 +299,17 @@ Router.prototype._buildTracker = function() {
       var currentContext = self._current;
       var isRouteChange = currentContext.oldRoute !== currentContext.route;
       var isFirstRoute = !currentContext.oldRoute;
-
-      currentContext.route.registerRouteChange();
-      // Trigger the URL has changed, but not in the last url change
-      if(isFirstRoute || !isRouteChange) {
-        currentContext.route.pathChangeDep.changed();
+      // first route is not a route change
+      if(isFirstRoute) {
+        isRouteChange = false;
       }
 
+      currentContext.route.registerRouteChange(currentContext, isRouteChange);
       route.callAction(currentContext);
 
       Tracker.afterFlush(function() {
         self._onEveryPath.changed();
-        if(!isFirstRoute && isRouteChange) {
+        if(isRouteChange) {
           // We need to trigger that route (definition itself) has changed.
           // So, we need to re-run all the register callbacks to current route
           // This is pretty important, otherwise tracker 
@@ -322,10 +318,6 @@ Router.prototype._buildTracker = function() {
           // We also need to afterFlush, otherwise this will re-run
           // helpers on templates which are marked for destroying
           currentContext.oldRoute.registerRouteClose();
-
-          // Trigger that URL has changed
-          // Reason is same above
-          currentContext.oldRoute.pathChangeDep.changed();
         }
       });
     });
