@@ -1,7 +1,7 @@
 Route = FlowRouter.Route;
 
 
-Tinytest.addAsync('Client - Route - getParam', function (test, done) {
+Tinytest.addAsync('Client - Route - Reactivity - getParam', function (test, done) {
   var r = new Route();
   Tracker.autorun(function(c) {
     var param = r.getParam("id");
@@ -21,7 +21,7 @@ Tinytest.addAsync('Client - Route - getParam', function (test, done) {
   }, 10);
 });
 
-Tinytest.addAsync('Client - Route - getParam on route close', function (test, done) {
+Tinytest.addAsync('Client - Route - Reactivity - getParam on route close', function (test, done) {
   var r = new Route();
   var closeTriggered = false;
   Tracker.autorun(function(c) {
@@ -39,7 +39,7 @@ Tinytest.addAsync('Client - Route - getParam on route close', function (test, do
   }, 10);
 });
 
-Tinytest.addAsync('Client - Route - getQueryParam', function (test, done) {
+Tinytest.addAsync('Client - Route - Reactivity - getQueryParam', function (test, done) {
   var r = new Route();
   Tracker.autorun(function(c) {
     var param = r.getQueryParam("id");
@@ -59,7 +59,7 @@ Tinytest.addAsync('Client - Route - getQueryParam', function (test, done) {
   }, 10);
 });
 
-Tinytest.addAsync('Client - Route - getQueryParam on route close', function (test, done) {
+Tinytest.addAsync('Client - Route - Reactivity - getQueryParam on route close', function (test, done) {
   var r = new Route();
   var closeTriggered = false;
   Tracker.autorun(function(c) {
@@ -77,7 +77,7 @@ Tinytest.addAsync('Client - Route - getQueryParam on route close', function (tes
   }, 10);
 });
 
-Tinytest.addAsync('Client - Route - getRouteName rerun when route closed', function (test, done) {
+Tinytest.addAsync('Client - Route - Reactivity - getRouteName rerun when route closed', function (test, done) {
   var r = new Route();
   r.name = "my-route";
   var closeTriggered = false;
@@ -98,7 +98,7 @@ Tinytest.addAsync('Client - Route - getRouteName rerun when route closed', funct
   }, 10);
 });
 
-Tinytest.addAsync('Client - Route - watchPathChange when routeChange', function (test, done) {
+Tinytest.addAsync('Client - Route - Reactivity - watchPathChange when routeChange', function (test, done) {
   var r = new Route();
   var pathChangeCounts = 0;
 
@@ -131,7 +131,7 @@ Tinytest.addAsync('Client - Route - watchPathChange when routeChange', function 
   }
 });
 
-Tinytest.addAsync('Client - Route - watchPathChange when routeClose', function (test, done) {
+Tinytest.addAsync('Client - Route - Reactivity - watchPathChange when routeClose', function (test, done) {
   var r = new Route();
   var pathChangeCounts = 0;
 

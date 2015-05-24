@@ -113,6 +113,12 @@ Route.prototype.registerRouteChange = function(currentContext, routeChanging) {
   var queryParams = currentContext.queryParams;
   this._updateReactiveDict(this._queryParams, queryParams);
 
+  // if the route is changing, we need to defer triggering path changing
+  // if we did this, old route's path watchers will detect this
+  // Real issue is, above watcher will get removed with the new route
+  // So, we don't need to trigger it now
+  // We are doing it on the route close event. So, if they exists they'll 
+  // get notify that
   if(!routeChanging) {
     this._pathChangeDep.changed();
   }
