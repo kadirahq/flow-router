@@ -291,6 +291,18 @@ FlowRouter.notFound = {
 
 Flow Router has some utility APIs to help you navigate the router and get information from the router.
 
+#### FlowRouter.getHash();
+
+Reactive function which you can use to get the hash from the URL.
+
+~~~js
+// route def: /apps/:appId
+// url: /apps/this-is-my-app#tab2
+
+var tabId = FlowRouter.getHash();
+console.log(tabId); // prints "tab2"
+~~~
+
 #### FlowRouter.getParam(paramName);
 
 Reactive function which you can use to get a param from the URL.
@@ -315,7 +327,7 @@ var color = FlowRouter.getQueryParam("color");
 console.log(color); // prints "red"
 ~~~
 
-#### FlowRouter.path(pathDef, params, queryParams)
+#### FlowRouter.path(pathDef, params, queryParams, hash)
 
 Generate a path from a path definition. Both params and queryParams are optional.
 
@@ -323,9 +335,10 @@ Generate a path from a path definition. Both params and queryParams are optional
 var pathDef = "/blog/:cat/:id";
 var params = {cat: "meteor", id: "abc"};
 var queryParams = {show: "yes", color: "black"};
+var hash = "foo"
 
-var path = FlowRouter.path(pathDef, params, queryParams);
-console.log(path); // prints "/blog/meteor/abc?show=yes&color=black"
+var path = FlowRouter.path(pathDef, params, queryParams, hash);
+console.log(path); // prints "/blog/meteor/abc?show=yes&color=black#foo"
 ~~~
 
 If there are no params or queryParams, this will simply return the pathDef as it is.
@@ -345,11 +358,11 @@ FlowRouter.route("/blog/:cat/:id", {
 var params = {cat: "meteor", id: "abc"};
 var queryParams = {show: "yes", color: "black"};
 
-var path = FlowRouter.path("blogPostRoute", params, queryParams);
-console.log(path); // prints "/blog/meteor/abc?show=yes&color=black"
+var path = FlowRouter.path("blogPostRoute", params, queryParams, "foo");
+console.log(path); // prints "/blog/meteor/abc?show=yes&color=black#foo"
 ~~~
 
-#### FlowRouter.go(pathDef, params, queryParams);
+#### FlowRouter.go(pathDef, params, queryParams, hash);
 
 This will get the path via `FlowRouter.path` based on the arguments and re-route to that path.
 
@@ -357,6 +370,19 @@ You can call `FlowRouter.go` like this as well:
 
 ~~~jswait
 FlowRouter.go("/blog");
+~~~
+
+#### FlowRouter.setHash(newHash)
+
+This will change the current hash with the hash and re-route to the new path.
+
+~~~js
+// route def: /apps/:appId
+// url: /apps/this-is-my-app?show=yes&color=red#foo
+
+FlowRouter.setHash("bar");
+// Then the user will be redirected to the following path
+//      /apps/new-id?show=yes&color=red#bar
 ~~~
 
 #### FlowRouter.setParams(newParams)

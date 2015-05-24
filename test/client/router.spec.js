@@ -222,6 +222,42 @@ Tinytest.addAsync('Client - Router - subscribe to global subs', function (test, 
   }, 100);
 });
 
+Tinytest.add('Client - Router - getHash - registration', function (test, next) {
+  var randomHash = Random.id();
+
+  FlowRouter._current.hash = randomHash;
+  FlowRouter._registerHash();
+
+  test.equal(randomHash, FlowRouter.getHash());
+});
+
+Tinytest.addAsync('Client - Router - getHash - reactive', function (test, next) {
+  var v1 = Random.id();
+  var v2 = Random.id();
+
+  FlowRouter._current.hash = v1;
+  FlowRouter._registerHash();
+
+  var ranFor = 0;
+  var c = Tracker.autorun(function () {
+    var value = FlowRouter.getHash();
+    if (ranFor === 0)
+      test.equal(value, v1);
+    else
+      test.equal(value, v2);
+    ranFor++;
+  });
+
+  FlowRouter._current.hash = v2;
+  FlowRouter._registerHash();
+
+  Meteor.setTimeout(function() {
+    test.equal(ranFor, 2);
+    Meteor.defer(bind(c, "stop"));
+    next();
+  }, 100);
+});
+
 Tinytest.addAsync('Client - Router - getParam - reactive params', function (test, next) {
   var v1 = Random.id();
   var v2 = Random.id();
@@ -451,6 +487,25 @@ Tinytest.add('Client - Router - path - optional last param exists', function (te
 
   var path = FlowRouter.path(pathDef, fields);
   test.equal(path, expectedPath);
+});
+
+Tinytest.addAsync('Client - Router - setHash - generic', function (test, done) {
+  var randomKey = Random.id();
+  var pathDef = "/" + randomKey + "";
+
+  FlowRouter.route(pathDef);
+
+  FlowRouter.go(pathDef, {}, {}, "hash1");
+
+  setTimeout(function () {
+    test.equal(FlowRouter.getHash(), "hash1");
+    var success = FlowRouter.setHash("hash2");
+    test.isTrue(success);
+    setTimeout(function() {
+      test.equal(FlowRouter.getHash(), "hash2");
+      done();
+    }, 50);
+  }, 50);
 });
 
 Tinytest.addAsync('Client - Router - setParams - generic', function (test, done) {
