@@ -14,7 +14,7 @@ Route = function(router, path, options, group) {
 
   this._params = new ReactiveDict();
   this._queryParams = new ReactiveDict();
-  this._routeChangeDep = new Tracker.Dependency();
+  this._routeCloseDep = new Tracker.Dependency();
 
   // tracks the changes in the URL
   this._pathChangeDep = new Tracker.Dependency();
@@ -79,29 +79,29 @@ Route.prototype.callSubscriptions = function(current) {
 };
 
 Route.prototype.getRouteName = function() {
-  this._routeChangeDep.depend();
+  this._routeCloseDep.depend();
   return this.name;
 };
 
 Route.prototype.getParam = function(key) {
-  this._routeChangeDep.depend();
+  this._routeCloseDep.depend();
   return this._params.get(key);
 };
 
 Route.prototype.getQueryParam = function(key) {
-  this._routeChangeDep.depend();
+  this._routeCloseDep.depend();
   return this._queryParams.get(key);
+};
+
+Route.prototype.watchPathChange = function() {
+  this._pathChangeDep.depend();
 };
 
 Route.prototype.registerRouteClose = function() {
   this._params = new ReactiveDict();
   this._queryParams = new ReactiveDict();
-  this._routeChangeDep.changed();
+  this._routeCloseDep.changed();
   this._pathChangeDep.changed();
-};
-
-Route.prototype.watchPathChange = function() {
-  this._pathChangeDep.depend();
 };
 
 Route.prototype.registerRouteChange = function(currentContext, routeChanging) {
