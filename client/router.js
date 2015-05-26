@@ -198,6 +198,13 @@ Router.prototype.ready = function() {
 };
 
 Router.prototype.subsReady = function() {
+  var callback = null;
+  var args = _.toArray(arguments);
+
+  if (typeof _.last(args) === "function") {
+    callback = args.pop();
+  }
+
   var currentRoute = this.current().route;
   var globalRoute = this._globalRoute;
 
@@ -210,20 +217,33 @@ Router.prototype.subsReady = function() {
   }
 
   var subscriptions;
-  if(arguments.length === 0) {
+  if(args.length === 0) {
     subscriptions = _.values(globalRoute.getAllSubscriptions());
     subscriptions = subscriptions.concat(_.values(currentRoute.getAllSubscriptions()));
   } else {
-    subscriptions = _.map(arguments, function(subName) {
+    subscriptions = _.map(args, function(subName) {
       return globalRoute.getSubscription(subName) || currentRoute.getSubscription(subName);
     });
   }
 
-  var isReady =  _.every(subscriptions, function(sub) {
-    return sub && sub.ready();
-  });
+  var isReady = function() {
+    var ready =  _.every(subscriptions, function(sub) {
+      return sub && sub.ready();
+    });
 
-  return isReady;
+    return ready;
+  };
+
+  if (callback) {
+    Tracker.autorun(function(c) {
+      if (isReady()) {
+        callback();
+        c.stop();
+      }
+    });
+  } else {
+    return isReady();
+  }
 };
 
 Router.prototype._notfoundRoute = function(context) {
