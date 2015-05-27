@@ -56,6 +56,7 @@ Package.onTest(function(api) {
   api.addFiles('test/client/router.subs_ready.spec.js', 'client');
   api.addFiles('test/client/router.reactivity.spec.js', 'client');
   api.addFiles('test/client/group.spec.js', 'client');
+  api.addFiles('test/client/trigger.spec.js', 'client');
 
   api.addFiles('test/server/plugins/fast_render.js', 'server');
 });

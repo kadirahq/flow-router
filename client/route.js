@@ -8,6 +8,8 @@ Route = function(router, path, options, group) {
 
   this._action = options.action || Function.prototype;
   this._subscriptions = options.subscriptions || Function.prototype;
+  this._triggersEnter = options.triggersEnter || [];
+  this._triggersExit = options.triggersExit || [];
   this._middlewares = options.middlewares || [];
   this._subsMap = {};
   this._router = router;
@@ -41,6 +43,14 @@ Route.prototype.getAllSubscriptions = function() {
 };
 
 
+Route.prototype._processTriggersEnter = function(context) {
+  _.each(this._triggersEnter, function(fn) {
+    if (typeof fn === 'function') {
+      fn(context);
+    }
+  });
+};
+
 Route.prototype._processMiddlewares = function(context, after) {
   var currentIndex = 0;
   var self = this;
@@ -49,6 +59,7 @@ Route.prototype._processMiddlewares = function(context, after) {
   function runMiddleware() {
     var fn = self._middlewares[currentIndex++];
     if(fn) {
+      console.warn("'middleware' is deprecated. Use 'triggers' instead");
       fn(context.path, function(redirectPath) {
         if(redirectPath) {
           return self._router.redirect(redirectPath);
@@ -64,6 +75,9 @@ Route.prototype._processMiddlewares = function(context, after) {
 
 Route.prototype.callAction = function(current) {
   var self = this;
+
+  self._processTriggersEnter(current);
+
   self._processMiddlewares(current.context, function() {
     self._action(current.params, current.queryParams);
   });
