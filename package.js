@@ -21,7 +21,7 @@ Package.onUse(function(api) {
   api.use('meteorhacks:fast-render@2.3.2', ['client', 'server'], {weak: true});
   api.use('cosmos:browserify@0.1.3', 'client');
 
-  api.addFiles('browserify.js', 'client');
+  api.addFiles('client.browserify.js', 'client');
   api.addFiles('client/router.js', 'client');
   api.addFiles('client/group.js', 'client');
   api.addFiles('client/route.js', 'client');

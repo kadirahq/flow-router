@@ -50,6 +50,9 @@ Router.prototype.route = function(path, options, group) {
       oldRoute: oldRoute
     };
 
+    // to backward compatibility
+    self._current.params.query = self._current.queryParams;
+
     self._invalidateTracker();
   };
 
@@ -276,12 +279,6 @@ Router.prototype._notfoundRoute = function(context) {
 
 Router.prototype.initialize = function() {
   var self = this;
-
-  this._triggersEnter.push(function(ctx) {
-    var str = location.search.slice(1);
-    ctx.params.query = self._qs.parse(str);
-  });
-
   this._updateCallbacks();
   // initialize
   this._page();
@@ -434,7 +431,7 @@ Router.prototype._processTriggersExit = function(ctx, next) {
   next();
 };
 
-Router.prototype._processRouteTriggersExit = function(route) {
+Router.prototype._registerRouteTriggersExit = function(route) {
   var self = this;
 
   if (route._triggersExit.length > 0) {
@@ -457,13 +454,6 @@ Router.prototype._updateCallbacks = function () {
   self._page.callbacks = [];
   self._page.exits = [];
 
-  self._page("*", function(ctx, next) {
-    var str = location.search.slice(1);
-    ctx.params.query = self._qs.parse(str);
-
-    next();
-  });
-
   // add global middleware
   _.each(self._middleware, function(fn) {
     self._page("*", fn);
@@ -471,7 +461,7 @@ Router.prototype._updateCallbacks = function () {
 
   _.each(self._routes, function(route) {
     self._page(route.path, route._handler);
-    self._processRouteTriggersExit(route);
+    self._registerRouteTriggersExit(route);
   });
 
   self._page.exit("*", self._processTriggersExit.bind(self));

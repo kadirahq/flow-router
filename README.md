@@ -11,6 +11,7 @@ Flow Router is a minimalistic router which only handles routing and subscription
 * [Routes Definition](#routes-definition)
 * [Subscription Management](#subscription-management)
 * [Rendering and Layout Management](#rendering-and-layout-management)
+* [Triggers](#triggers)
 * [Middlewares](#middlewares)
 * [Not Found Routes](#not-found-routes)
 * [API](#api)
@@ -243,10 +244,74 @@ FlowRouter.route('/blog/:postId', {
 });
 ~~~
 
+## Triggers
+
+Triggers are the way how flow-router allows you to do tasks before **enter** into a route and after **exit** from a route.
+
+#### Defining triggers for a route
+
+Here's how you can define triggers for a route:
+
+~~~js
+FlowRouter.route('/home', {
+  // calls just before the action
+  triggersEnter: [trackRouteEntry],
+  action: function() {
+    // do something you like
+  },
+  // calls when when we decide to move to another route
+  // but calls before the next route started
+  triggersExit: [trackRouteClose]
+});
+
+function trackRouteEntry(context) {
+  // context is the output of `FlowRouter.current()`
+  Mixpanel.track("visit-to-home", context.queryParams);
+}
+
+function trackRouteClose(context) {
+  Mixpanel.track("move-from-home", context.queryParams);
+}
+~~~
+
+#### Defining triggers for a group route
+
+This is how you can define triggers to a group definition.
+
+~~~js
+var adminRoutes = FlowRouter.group({
+  prefix: '/admin',
+  subscriptions: function() {
+    this.register('adminSettings', Meteor.subscribe('settings', {admin: true}));
+  },
+  triggersEnter: [trackRouteEntry],
+  triggersExit: [trackRouteEntry]
+});
+~~~
+
+> You can add triggers to individual routes in the group too.
+
+#### Defining Trigges Globally
+
+You can also define triggers globally. Here's how to do it:
+
+~~~js
+FlowRouter.triggers.enter([cb1, cb2]);
+FlowRouter.triggers.exit([cb1, cb2]);
+
+// filtering
+FlowRouter.triggers.enter([trackRouteEntry], {only: ["home"]});
+FlowRouter.triggers.exit([trackRouteExit], {except: ["home"]});
+~~~
+
+As you can see from the last two examples, you can filter routes by `only` or `except` keywords. But, you can't use both `only` and `except` at once.
+
+> If like to learn more about triggers and design decitions, visit [here](https://github.com/meteorhacks/flow-router/pull/59).
+
 ## Middlewares
 
-> We'll deprecate middlewares in the next major version. We'll have an API called triggers where you add callbacks to run before and after the route change. <br>
-> Migrating from middlewares to triggers will be easy as few line changes.
+> Right now middlewares are deprecated. Use triggers instead. <br>
+> Triggers are very similar to middlewares, but triggers don't have a `next()` argument. So, you've no way to block or wait the route.
 
 Sometimes, you need to invoke some tasks just before entering into the route. That's where middlewares comes in. Here are some of the use cases for middlewares:
 
