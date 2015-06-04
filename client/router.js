@@ -10,6 +10,8 @@ Router = function () {
 
   this._globalRoute = new Route(this);
 
+  this._triggersEnter = [];
+  this._triggersExit = [];
   this._middleware = [];
   this._routes = [];
   this._routesMap = {};
@@ -18,6 +20,12 @@ Router = function () {
   // indicate it's okay (or not okay) to run the tracker
   // when doing subscriptions
   this.safeToRun = false;
+
+  var self = this;
+  this.triggers = {
+    enter: self._getRegisterTriggersFn(self._triggersEnter),
+    exit: self._getRegisterTriggersFn(self._triggersExit)
+  };
 };
 
 Router.prototype.route = function(path, options, group) {
@@ -41,6 +49,9 @@ Router.prototype.route = function(path, options, group) {
       route: route,
       oldRoute: oldRoute
     };
+
+    // to backward compatibility
+    self._current.params.query = self._current.queryParams;
 
     self._invalidateTracker();
   };
@@ -142,7 +153,7 @@ Router.prototype.reactiveCurrent = function() {
   var warnMessage = 
     ".reactiveCurrent() is deprecated. " +
     "Use .watchPathChange() instead";
-  console.warn(warnMessage)
+  console.warn(warnMessage);
   
   this.watchPathChange();
   return this.current();
@@ -166,10 +177,11 @@ reactiveApis.forEach(function(api) {
     // currently, there is only one argument. If we've more let's add more args
     // this is not clean code, but better in performance
     return currentRoute[api].call(currentRoute, arg1);
-  }
+  };
 });
 
 Router.prototype.middleware = function(middlewareFn) {
+  console.warn("'middleware' is deprecated. Use 'triggers' instead");
   var self = this;
   var mw = function(ctx, next) {
     // make sure middlewars run after Meteor has been initialized
@@ -267,15 +279,6 @@ Router.prototype._notfoundRoute = function(context) {
 
 Router.prototype.initialize = function() {
   var self = this;
-
-  this._middleware.push(function (ctx, next) {
-    setTimeout(function() {
-      var str = location.search.slice(1);
-      ctx.params.query = self._qs.parse(str);
-      next();
-    }, 0);
-  });
-
   this._updateCallbacks();
   // initialize
   this._page();
@@ -313,6 +316,9 @@ Router.prototype._buildTracker = function() {
     // this computation. which we do not need.
     Tracker.nonreactive(function() {
       var currentContext = self._current;
+
+      self._processTriggersEnter(currentContext);
+
       var isRouteChange = currentContext.oldRoute !== currentContext.route;
       var isFirstRoute = !currentContext.oldRoute;
       // first route is not a route change
@@ -349,18 +355,116 @@ Router.prototype._invalidateTracker = function() {
   this._tracker.invalidate();
 };
 
+Router.prototype._getRegisterTriggersFn = function(triggers) {
+  var fn = function(triggerFns, options) {
+    options = options || {};
+
+    if (options.only && options.except) {
+      var message = "triggers does not support 'only' and 'except' at the same time.";
+      throw new Error(message);
+    }
+
+    _.each(triggerFns, function(fn) {
+      if (typeof fn !== 'function') {
+        return;
+      }
+
+      if (options.only) {
+        fn._only = {};
+        _.each(options.only, function(name) {
+          fn._only[name] = 1;
+        });
+      }
+
+      if (options.except) {
+        fn._except = {};
+        _.each(options.except, function(name) {
+          fn._except[name] = 1;
+        });
+      }
+
+      triggers.push(fn);
+    });
+  };
+
+  return fn;
+};
+
+Router.prototype._shouldCallTrigger = function(current, fn) {
+  var name = current.route.name;
+  var shouldCall;
+
+  if (typeof fn !== 'function') {
+    return false;
+  }
+
+  if (fn._only) {
+    shouldCall = !!fn._only[name];
+  } else if (fn._except) {
+    shouldCall = !fn._except[name];
+  } else {
+    shouldCall = true;
+  }
+
+  return shouldCall;
+};
+
+Router.prototype._processTriggersEnter = function(current) {
+  var self = this;
+
+  _.each(this._triggersEnter, function(fn) {
+    if (self._shouldCallTrigger(current, fn)) {
+      fn(current);
+    }
+  });
+};
+
+Router.prototype._processTriggersExit = function(ctx, next) {
+  var self = this;
+
+  _.each(self._triggersExit, function(fn) {
+    if (self._shouldCallTrigger(self._current, fn)) {
+      fn(self._current);
+    }
+  });
+
+  next();
+};
+
+Router.prototype._registerRouteTriggersExit = function(route) {
+  var self = this;
+
+  if (route._triggersExit.length > 0) {
+    // add route's exit triggers
+    self._page.exit(route.path, function(ctx, next) {
+      _.each(route._triggersExit, function(fn) {
+        if (typeof fn === 'function') {
+          fn(self._current);
+        }
+      });
+
+      next();
+    });
+  }
+};
+
 Router.prototype._updateCallbacks = function () {
   var self = this;
 
-  // add global middleware
   self._page.callbacks = [];
+  self._page.exits = [];
+
+  // add global middleware
   _.each(self._middleware, function(fn) {
     self._page("*", fn);
   });
 
   _.each(self._routes, function(route) {
     self._page(route.path, route._handler);
+    self._registerRouteTriggersExit(route);
   });
+
+  self._page.exit("*", self._processTriggersExit.bind(self));
 
   self._page("*", function(context) {
     self._notfoundRoute(context);

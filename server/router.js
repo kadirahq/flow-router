@@ -24,6 +24,15 @@ Router.prototype.current = function() {
 };
 
 
+Router.prototype.triggers = {
+  enter: function() {
+    // client only
+  },
+  exit: function() {
+    // client only
+  }
+};
+
 Router.prototype.middleware = function() {
   // client only
 };

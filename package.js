@@ -21,7 +21,7 @@ Package.onUse(function(api) {
   api.use('meteorhacks:fast-render@2.3.2', ['client', 'server'], {weak: true});
   api.use('cosmos:browserify@0.1.3', 'client');
 
-  api.addFiles('browserify.js', 'client');
+  api.addFiles('client.browserify.js', 'client');
   api.addFiles('client/router.js', 'client');
   api.addFiles('client/group.js', 'client');
   api.addFiles('client/route.js', 'client');
@@ -56,6 +56,7 @@ Package.onTest(function(api) {
   api.addFiles('test/client/router.subs_ready.spec.js', 'client');
   api.addFiles('test/client/router.reactivity.spec.js', 'client');
   api.addFiles('test/client/group.spec.js', 'client');
+  api.addFiles('test/client/trigger.spec.js', 'client');
 
   api.addFiles('test/server/plugins/fast_render.js', 'server');
 });
