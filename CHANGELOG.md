@@ -1,5 +1,10 @@
 # Change Log
 
+### v1.10.0
+Add support for [triggers](https://github.com/meteorhacks/flow-router#triggers). This is something similar to middlewares but not as middlewares. Visit [here](https://github.com/meteorhacks/flow-router/pull/59) to learn about design decisions.
+
+_**Now, middlewares are deprecated.**_
+
 ### v1.9.0
 Fix [#120](https://github.com/meteorhacks/flow-router/issues/120) and added callback support for `FlowRouter.subsReady()`.
 
