@@ -11,6 +11,10 @@
 
 Triggers = {};
 
+// Apply filters for a set of triggers
+// @triggers - a set of triggers
+// @filter - filter with array fileds with `only` and `except` 
+//           support only either `only` or `except`, but not both
 Triggers.applyFilters = functions(triggers, filter) {
   if(!(triggers instanceof Array)) {
     triggers = [triggers];
@@ -43,6 +47,10 @@ Triggers.applyFilters = functions(triggers, filter) {
   throw new Error("Provided a filter but not supported");
 };
 
+//  create triggers by bounding them to a set of route names
+//  @triggers - a set of triggers 
+//  @names - list of names to be bound (trigger runs only for these names)
+//  @negate - negate the result (triggers won't run for above names)
 Triggers.createTriggers = function(triggers, names, negate) {
   var namesMap = {};
   _.each(names, function(name) {
@@ -65,6 +73,11 @@ Triggers.createTriggers = function(triggers, names, negate) {
   return filteredTriggers;
 };
 
+//  run triggers and abort if redirected
+//  @triggers - a set of triggers 
+//  @context - context we need to pass (it must have the route)
+//  @redirectFn - function which used to redirect 
+//  @after - called after if only all the triggers runs
 Triggers.runTriggers = functions(triggers, context, redirectFn, after) {
   var abort = false;
   for(var lc=0; lc<triggers.length; lc++) {
