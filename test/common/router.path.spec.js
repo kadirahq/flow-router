@@ -102,3 +102,15 @@ Tinytest.add('Common - Router - path - optional last param exists', function (te
   var path = FlowRouter.path(pathDef, fields);
   test.equal(path, expectedPath);
 });
+
+Tinytest.add('Common - Router - path - remove trailing slashes', function (test) {
+  var pathDef = "/blog/:blogId/some/:name//";
+  var fields = {
+    blogId: "1001",
+    name: "superb"
+  };
+  var expectedPath = "/blog/1001/some/superb";
+
+  var path = FlowRouter.path(pathDef, fields);
+  test.equal(path, expectedPath);
+});

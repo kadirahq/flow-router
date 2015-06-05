@@ -30,6 +30,9 @@ Router.prototype.path = function(pathDef, fields, queryParams) {
     pathDef = this._routesMap[pathDef].path;
   }
 
+  // remove trailing slash(es)
+  pathDef = pathDef.replace(/\/+$/, "");
+
   fields = fields || {};
   var regExp = /(:[\w\(\)\\\+\*\.\?]+)+/g;
   var path = pathDef.replace(regExp, function(key) {
