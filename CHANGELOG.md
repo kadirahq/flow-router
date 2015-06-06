@@ -1,5 +1,10 @@
 # Change Log
 
+### v1.11.0
+* Fix [#145](https://github.com/meteorhacks/flow-router/issues/145) by changing how safeToRun works.
+* Add `FlowRouter.path()` to the server side
+* Fix [#130](https://github.com/meteorhacks/flow-router/issues/130)
+
 ### v1.10.0
 Add support for [triggers](https://github.com/meteorhacks/flow-router#triggers). This is something similar to middlewares but not as middlewares. Visit [here](https://github.com/meteorhacks/flow-router/pull/59) to learn about design decisions.
 
