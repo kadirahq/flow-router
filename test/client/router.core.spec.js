@@ -140,6 +140,34 @@ Tinytest.addAsync('Client - Router - redirect using middleware', function (test,
   }, 100);
 });
 
+Tinytest.addAsync('Client - Router - redirect using FlowRouter.go', function (test, next) {
+  var rand = Random.id(), rand2 = Random.id();
+  var log = [];
+  var paths = ['/' + rand2, '/' + rand];
+  var done = false;
+
+  FlowRouter.route(paths[0], {
+    action: function(_params) {
+      log.push(1);
+      FlowRouter.go(paths[1]);
+    }
+  });
+
+  FlowRouter.route(paths[1], {
+    action: function(_params) {
+      log.push(2);
+    }
+  });
+
+  FlowRouter.go(paths[0]);
+
+  setTimeout(function() {
+    test.equal(log, [1, 2]);
+    done = true;
+    next();
+  }, 100);
+});
+
 Tinytest.addAsync('Client - Router - get current route path', function (test, next) {
   var value = Random.id();
   var randomValue = Random.id();

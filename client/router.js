@@ -19,7 +19,10 @@ Router = function () {
   this.notFound = this.notfound = null;
   // indicate it's okay (or not okay) to run the tracker
   // when doing subscriptions
-  this.safeToRun = false;
+  // using a number and increment it help us to support FlowRouter.go() 
+  // and legitimate reruns inside tracker on the same event loop.
+  // this is a solution for #145
+  this.safeToRun = 0;
 
   var self = this;
   this.triggers = {
@@ -296,7 +299,7 @@ Router.prototype._buildTracker = function() {
     var route = self._current.route;
     var path = self._current.path;
 
-    if(!self.safeToRun) {
+    if(self.safeToRun == 0) {
       var message =
         "You can't use reactive data sources like Session" +
         " inside the `.subscriptions` method!";
@@ -344,14 +347,14 @@ Router.prototype._buildTracker = function() {
       });
     });
 
-    self.safeToRun = false;
+    self.safeToRun--;
   });
 
   return tracker;
 };
 
 Router.prototype._invalidateTracker = function() {
-  this.safeToRun = true;
+  this.safeToRun++;
   this._tracker.invalidate();
 };
 
