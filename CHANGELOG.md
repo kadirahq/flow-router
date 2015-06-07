@@ -1,5 +1,10 @@
 # Change Log
 
+### v1.13.0
+* Remove browserified pagejs and qs dependancy loading. With that we could reduce ~10kb of data size. (without compression) We can look for a bower integration future. For now, here are the dependancies we have.
+    - page@1.6.3: https://github.com/visionmedia/page.js
+    - qs@3.1.0: https://github.com/hapijs/qs
+
 ### v1.12.0
 * Add [`FlowRouter.withReplaceState`](https://github.com/meteorhacks/flow-router##flowrouterwithreplcaestatefn) api to use replaceState when changing routes via FlowRouter apis.
 
