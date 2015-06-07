@@ -1,7 +1,7 @@
 # Change Log
 
 ### v1.12.0
-* Add [`FlowRouter.withReplaceState`](https://github.com/meteorhacks/flow-router##flowrouterwithreplcaestatefn) api to use replaceState when changing routes via FlowRouter apis.
+* Add [`FlowRouter.withReplaceState`](https://github.com/meteorhacks/flow-router#flowrouterwithreplcaestatefn) api to use replaceState when changing routes via FlowRouter apis.
 
 ### v1.11.0
 * Fix [#145](https://github.com/meteorhacks/flow-router/issues/145) by changing how safeToRun works.
