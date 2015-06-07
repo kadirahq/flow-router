@@ -402,6 +402,54 @@ Tinytest.addAsync('Client - Router - notFound', function (test, done) {
   }, 50);
 });
 
+Tinytest.addAsync('Client - Router - withReplaceState - enabled', 
+function (test, done) {
+  var path = "/" + Random.id() + "/:id";
+  var originalRedirect = FlowRouter._page.redirect;
+  var callCount = 0;
+  FlowRouter._page.redirect = function(path) {
+    callCount++;
+    originalRedirect.call(FlowRouter._page, path);
+  };
+
+  FlowRouter.route(path, {
+    name: name,
+    action: function(params) {
+      test.equal(params.id, "awesome");
+      test.equal(callCount, 1);
+      FlowRouter._page.redirect = originalRedirect;
+      Meteor.defer(done);
+    }
+  });
+
+  FlowRouter.withReplaceState(function() {
+    FlowRouter.go(path, {id: "awesome"});
+  });
+});
+
+Tinytest.addAsync('Client - Router - withReplaceState - disabled', 
+function (test, done) {
+  var path = "/" + Random.id() + "/:id";
+  var originalRedirect = FlowRouter._page.redirect;
+  var callCount = 0;
+  FlowRouter._page.redirect = function(path) {
+    callCount++;
+    originalRedirect.call(FlowRouter._page, path);
+  };
+
+  FlowRouter.route(path, {
+    name: name,
+    action: function(params) {
+      test.equal(params.id, "awesome");
+      test.equal(callCount, 0);
+      FlowRouter._page.redirect = originalRedirect;
+      Meteor.defer(done);
+    }
+  });
+
+  FlowRouter.go(path, {id: "awesome"});
+});
+
 function bind(obj, method) {
   return function() {
     obj[method].apply(obj, arguments);

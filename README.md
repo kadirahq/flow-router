@@ -513,6 +513,31 @@ Tracker.autorun(function() {
 
 This API is deprecated. Use `FlowRouter.watchPathChange` instead. This API won't included in the next major release. (2.x.x)
 
+#### FlowRouter.withReplcaeState(fn)
+Normally, all the route changes done with APIs like `FlowRouter.go` and `FlowRouter.setParams()` add an URL item to the browser history. For an example, if you apply following code:
+
+~~~js
+FlowRouter.setParams({id: "the-id-1"});
+FlowRouter.setParams({id: "the-id-2"});
+FlowRouter.setParams({id: "the-id-3"});
+~~~
+
+Now you can hit the back button of your browser two times. This is normal behaviour since users may click back button and expect to see the previous state of the app.
+
+But sometimes, this is not something you want. You don't need to pollute the browser history. Then, you can use following syntax.
+
+~~~js
+FlowRouter.withReplaceState(function() {
+  FlowRouter.setParams({id: "the-id-1"});
+  FlowRouter.setParams({id: "the-id-2"});
+  FlowRouter.setParams({id: "the-id-3"});
+});
+~~~
+
+Now, there is no item in the browser history. Just like `FlowRouter.setParams`, you can use any FlowRouter API inside `FlowRouter.withReplaceState`.
+
+> We named this function as `withReplaceState` because, replaceState is the underline API used for this functionality. Read more about [replace state & the history API](https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Manipulating_the_browser_history).
+
 ## Difference with Iron Router
 
 Flow Router and Iron Router are two different routers. Iron Router tries to be a full featured solution. It tries to do everything including routing, subscriptions, rendering and layout management.

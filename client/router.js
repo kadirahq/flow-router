@@ -29,6 +29,10 @@ Router = function () {
     enter: self._getRegisterTriggersFn(self._triggersEnter),
     exit: self._getRegisterTriggersFn(self._triggersExit)
   };
+
+  this.env = {
+    replaceState: new Meteor.EnvironmentVariable()
+  };
 };
 
 Router.prototype.route = function(path, options, group) {
@@ -104,7 +108,14 @@ Router.prototype.path = function(pathDef, fields, queryParams) {
 Router.prototype.go = function(pathDef, fields, queryParams) {
   var path = this.path(pathDef, fields, queryParams);
 
-  if (this._current.path !== path) {
+  if (this._current.path === path) {
+    return;
+  }
+  
+  var useReplaceState = this.env.replaceState.get();
+  if(useReplaceState) {
+    this._page.redirect(path);
+  } else {
     this._page(path);
   }
 };
@@ -262,6 +273,10 @@ Router.prototype.subsReady = function() {
   } else {
     return isReady();
   }
+};
+
+Router.prototype.withReplaceState = function(fn) {
+  return this.env.replaceState.withValue(true, fn);
 };
 
 Router.prototype._notfoundRoute = function(context) {
