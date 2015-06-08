@@ -493,6 +493,4 @@ Router.prototype._updateCallbacks = function () {
 };
 
 Router.prototype._page = page;
-Router.prototype._qs = Qs;
-delete window.page;
-delete window.Qs;
+Router.prototype._qs = qs;
