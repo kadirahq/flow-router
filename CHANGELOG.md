@@ -1,5 +1,9 @@
 # Change Log
 
+### v1.14.1
+
+* Fix regression came from v1.11.0. With that, `FlowRouter.go("/")` does not work. More information on [#147](https://github.com/meteorhacks/flow-router/issues/147).
+
 ### v1.14.0
 * Bring browserify back with the updated version of `cosmos:browserify` which fixes some size issues. See [more info](https://github.com/meteorhacks/flow-router/issues/128#issuecomment-109799953).
 
