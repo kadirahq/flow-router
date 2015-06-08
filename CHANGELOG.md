@@ -1,5 +1,8 @@
 # Change Log
 
+### v1.14.0
+* Bring browserify back with the updated version of `cosmos:browserify` which fixes some size issues. See [more info](https://github.com/meteorhacks/flow-router/issues/128#issuecomment-109799953).
+
 ### v1.13.0
 * Remove browserified pagejs and qs dependancy loading. With that we could reduce ~10kb of data size. (without compression) We can look for a bower integration future. For now, here are the dependancies we have.
     - page@1.6.3: https://github.com/visionmedia/page.js

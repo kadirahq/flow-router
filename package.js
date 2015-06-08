@@ -1,13 +1,13 @@
 Package.describe({
   name: 'meteorhacks:flow-router',
   summary: 'Carefully Designed Client Side Router for Meteor',
-  version: '1.13.0',
+  version: '1.14.0',
   git: 'https://github.com/meteorhacks/flow-router.git'
 });
 
 Npm.depends({
   'page':'1.6.3',
-    'qs':'2.4.1'
+    'qs':'3.1.0'
 });
 
 Package.onUse(function(api) {
@@ -19,7 +19,7 @@ Package.onUse(function(api) {
   api.use('reactive-var');
 
   api.use('meteorhacks:fast-render@2.3.2', ['client', 'server'], {weak: true});
-  api.use('cosmos:browserify@0.1.3', 'client');
+  api.use('cosmos:browserify@0.3.0', 'client');
 
   api.addFiles('client.browserify.js', 'client');
   api.addFiles('client/router.js', 'client');
