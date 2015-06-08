@@ -114,3 +114,12 @@ Tinytest.add('Common - Router - path - remove trailing slashes', function (test)
   var path = FlowRouter.path(pathDef, fields);
   test.equal(path, expectedPath);
 });
+
+Tinytest.add('Common - Router - path - keep the root slash', function (test) {
+  var pathDef = "/";
+  var fields = {};
+  var expectedPath = "/";
+
+  var path = FlowRouter.path(pathDef, fields);
+  test.equal(path, expectedPath);
+})
