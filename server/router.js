@@ -31,7 +31,8 @@ Router.prototype.path = function(pathDef, fields, queryParams) {
   }
 
   // remove trailing slash(es)
-  pathDef = pathDef.replace(/\/+$/, "");
+  // but kepp the root slash if it's the only one
+  pathDef = pathDef.match(/^\/{1}$/) ? pathDef : pathDef.replace(/\/+$/, "");
 
   fields = fields || {};
   var regExp = /(:[\w\(\)\\\+\*\.\?]+)+/g;
