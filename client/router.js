@@ -31,7 +31,8 @@ Router = function () {
   };
 
   this.env = {
-    replaceState: new Meteor.EnvironmentVariable()
+    replaceState: new Meteor.EnvironmentVariable(),
+    reload: new Meteor.EnvironmentVariable()
   };
 };
 
@@ -46,6 +47,11 @@ Router.prototype.route = function(path, options, group) {
   var route = new Route(this, path, options, group);
 
   route._handler = function (context, next) {
+    var reload = self.env.reload.get();
+    if (!reload && self._current.path === context.path) {
+      return;
+    }
+
     var oldRoute = self._current.route;
 
     self._current = {
@@ -108,10 +114,6 @@ Router.prototype.path = function(pathDef, fields, queryParams) {
 
 Router.prototype.go = function(pathDef, fields, queryParams) {
   var path = this.path(pathDef, fields, queryParams);
-
-  if (this._current.path === path) {
-    return;
-  }
   
   var useReplaceState = this.env.replaceState.get();
   if(useReplaceState) {
@@ -122,7 +124,11 @@ Router.prototype.go = function(pathDef, fields, queryParams) {
 };
 
 Router.prototype.reload = function() {
-  this._page.replace(this._current.path);
+  var self = this;
+
+  self.env.reload.withValue(true, function() {
+    self._page.replace(self._current.path);
+  });
 };
 
 Router.prototype.redirect = function(path) {
