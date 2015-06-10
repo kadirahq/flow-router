@@ -121,6 +121,10 @@ Router.prototype.go = function(pathDef, fields, queryParams) {
   }
 };
 
+Router.prototype.reload = function() {
+  this._page.replace(this._current.path);
+};
+
 Router.prototype.redirect = function(path) {
   this._page.redirect(path);
 };
@@ -318,7 +322,7 @@ Router.prototype._buildTracker = function() {
     var route = self._current.route;
     var path = self._current.path;
 
-    if(self.safeToRun == 0) {
+    if(self.safeToRun === 0) {
       var message =
         "You can't use reactive data sources like Session" +
         " inside the `.subscriptions` method!";
