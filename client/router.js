@@ -308,7 +308,9 @@ Router.prototype.initialize = function() {
   var self = this;
   this._updateCallbacks();
 
-  var oldShow = this._page.show;
+  // Overriding page.js's "show" method
+  // in order to implement idempotent routing.
+  var originalShow = this._page.show;
 
   this._page.show = function(path, state, dispatch, push) {
     var reload = self.env.reload.get();
@@ -316,7 +318,7 @@ Router.prototype.initialize = function() {
       return;
     }
 
-    oldShow(path, state, dispatch, push);
+    originalShow(path, state, dispatch, push);
   };
 
   // initialize

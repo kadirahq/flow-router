@@ -450,6 +450,54 @@ function (test, done) {
   FlowRouter.go(path, {id: "awesome"});
 });
 
+Tinytest.addAsync('Client - Router - idempotent routing',
+function (test, done) {
+  var rand = Random.id();
+  var pathDef = "/" + rand;
+  var rendered = 0;
+
+  FlowRouter.route(pathDef, {
+    action: function(params) {
+      rendered++;
+    }
+  });
+
+  FlowRouter.go(pathDef);
+
+  Meteor.defer(function() {
+    FlowRouter.go(pathDef);
+
+    Meteor.defer(function() {
+      test.equal(rendered, 1);
+      done();
+    });
+  });
+});
+
+Tinytest.addAsync('Client - Router - reload',
+function (test, done) {
+  var rand = Random.id();
+  var pathDef = "/" + rand;
+  var rendered = 0;
+
+  FlowRouter.route(pathDef, {
+    action: function(params) {
+      rendered++;
+    }
+  });
+
+  FlowRouter.go(pathDef);
+
+  Meteor.defer(function() {
+    FlowRouter.reload();
+
+    Meteor.defer(function() {
+      test.equal(rendered, 2);
+      done();
+    });
+  });
+});
+
 function bind(obj, method) {
   return function() {
     obj[method].apply(obj, arguments);
