@@ -47,11 +47,6 @@ Router.prototype.route = function(path, options, group) {
   var route = new Route(this, path, options, group);
 
   route._handler = function (context, next) {
-    var reload = self.env.reload.get();
-    if (!reload && self._current.path === context.path) {
-      return;
-    }
-
     var oldRoute = self._current.route;
 
     self._current = {
@@ -312,6 +307,18 @@ Router.prototype._notfoundRoute = function(context) {
 Router.prototype.initialize = function() {
   var self = this;
   this._updateCallbacks();
+
+  var oldShow = this._page.show;
+
+  this._page.show = function(path, state, dispatch, push) {
+    var reload = self.env.reload.get();
+    if (!reload && self._current.path === path) {
+      return;
+    }
+
+    oldShow(path, state, dispatch, push);
+  };
+
   // initialize
   this._page();
 };
