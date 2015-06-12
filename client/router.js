@@ -308,8 +308,12 @@ Router.prototype.initialize = function() {
   var self = this;
   this._updateCallbacks();
 
-  // Overriding page.js's "show" method
-  // in order to implement idempotent routing.
+  // Implementing idempotent routing
+  // by overriding page.js`s "show" method.
+  // Why?
+  // It is impossible to bypass exit triggers,
+  // becuase they execute before the handler and
+  // can not know what the next path is, inside exit trigger.
   var originalShow = this._page.show;
 
   this._page.show = function(path, state, dispatch, push) {

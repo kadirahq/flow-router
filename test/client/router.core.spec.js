@@ -450,7 +450,7 @@ function (test, done) {
   FlowRouter.go(path, {id: "awesome"});
 });
 
-Tinytest.addAsync('Client - Router - idempotent routing',
+Tinytest.addAsync('Client - Router - idempotent routing - action',
 function (test, done) {
   var rand = Random.id();
   var pathDef = "/" + rand;
@@ -474,7 +474,42 @@ function (test, done) {
   });
 });
 
-Tinytest.addAsync('Client - Router - reload',
+Tinytest.addAsync('Client - Router - idempotent routing - triggers',
+function (test, next) {
+  var rand = Random.id();
+  var pathDef = "/" + rand;
+  var runnedTriggers = 0;
+  var done = false;
+
+  var triggerFns = [function(params) {
+    if (done) return;
+
+    runnedTriggers++;
+  }];
+
+  FlowRouter.triggers.enter(triggerFns);
+
+  FlowRouter.route(pathDef, {
+    triggersEnter: triggerFns,
+    triggersExit: triggerFns
+  });
+
+  FlowRouter.go(pathDef);
+
+  FlowRouter.triggers.exit(triggerFns);
+
+  Meteor.defer(function() {
+    FlowRouter.go(pathDef);
+
+    Meteor.defer(function() {
+      test.equal(runnedTriggers, 2);
+      done = true;
+      next();
+    });
+  });
+});
+
+Tinytest.addAsync('Client - Router - reload - action',
 function (test, done) {
   var rand = Random.id();
   var pathDef = "/" + rand;
@@ -494,6 +529,41 @@ function (test, done) {
     Meteor.defer(function() {
       test.equal(rendered, 2);
       done();
+    });
+  });
+});
+
+Tinytest.addAsync('Client - Router - reload - triggers',
+function (test, next) {
+  var rand = Random.id();
+  var pathDef = "/" + rand;
+  var runnedTriggers = 0;
+  var done = false;
+
+  var triggerFns = [function(params) {
+    if (done) return;
+
+    runnedTriggers++;
+  }];
+
+  FlowRouter.triggers.enter(triggerFns);
+
+  FlowRouter.route(pathDef, {
+    triggersEnter: triggerFns,
+    triggersExit: triggerFns
+  });
+
+  FlowRouter.go(pathDef);
+
+  FlowRouter.triggers.exit(triggerFns);
+
+  Meteor.defer(function() {
+    FlowRouter.reload();
+
+    Meteor.defer(function() {
+      test.equal(runnedTriggers, 6);
+      done = true;
+      next();
     });
   });
 });
