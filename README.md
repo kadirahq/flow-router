@@ -25,8 +25,7 @@ Add Flow Router to your app:
 meteor add meteorhacks:flow-router
 ~~~
 
-Let's write our first route:
-(Add this file to `lib/router.js`)
+Let's write our first route (add this file to `lib/router.js`):
 
 ~~~js
 FlowRouter.route('/blog/:postId', {
@@ -50,7 +49,7 @@ Then you can see some messages printed in the console.
 
 ## Routes Definition
 
-Flow Router routes are very simple and based on the syntax of [path-to-regexp](https://github.com/pillarjs/path-to-regexp) which is used in both express and iron-router.
+Flow Router routes are very simple and based on the syntax of [path-to-regexp](https://github.com/pillarjs/path-to-regexp) which is used in both [Express](http://expressjs.com/) and `iron:router`.
 
 Here's the syntax for a simple route:
 
@@ -87,9 +86,9 @@ Params: {postId: "my-post"}
 Query Params: {comments: "on", color: "dark"}
 ~~~
 
-For a single interaction, router only runs once. That means, after you've visit a route, first it will call `middlewares`, then `subscriptions` and finally `action`. After that happens, there is no way any of those methods to be called again for that route visit.
+For a single interaction, the router only runs once. That means, after you've visit a route, first it will call `middlewares`, then `subscriptions` and finally `action`. After that happens, none of those methods will be called again for that route visit.
 
-You can define routes anywhere in the `client` directory. But, we recommend to add it on `lib` directory. Then `fast-render` can detect subscriptions and send them for you (we'll talk about this is a moment).
+You can define routes anywhere in the `client` directory. But, we recommend to add them in the `lib` directory. Then `fast-render` can detect subscriptions and send them for you (we'll talk about this is a moment).
 
 ### Group Routes
 
@@ -171,7 +170,7 @@ FlowRouter.subscriptions = function() {
 };
 ~~~
 
-All these global subscriptions run on every route. So, make special attention to names when registering subscriptions.
+All these global subscriptions run on every route. So, pay special attention to names when registering subscriptions.
 
 After you've registered your subscriptions, you can reactively check for the status of those subscriptions like this:
 
@@ -246,7 +245,7 @@ FlowRouter.route('/blog/:postId', {
 
 ## Triggers
 
-Triggers are the way how flow-router allows you to do tasks before **enter** into a route and after **exit** from a route.
+Triggers are the way flow-router allows you to perform tasks before **enter** into a route and after **exit** from a route.
 
 #### Defining triggers for a route
 
@@ -304,22 +303,22 @@ FlowRouter.triggers.enter([trackRouteEntry], {only: ["home"]});
 FlowRouter.triggers.exit([trackRouteExit], {except: ["home"]});
 ~~~
 
-As you can see from the last two examples, you can filter routes by `only` or `except` keywords. But, you can't use both `only` and `except` at once.
+As you can see from the last two examples, you can filter routes using the `only` or `except` keywords. But, you can't use both `only` and `except` at once.
 
-> If like to learn more about triggers and design decitions, visit [here](https://github.com/meteorhacks/flow-router/pull/59).
+> If you'd like to learn more about triggers and design decisions, visit [here](https://github.com/meteorhacks/flow-router/pull/59).
 
 ## Middlewares
 
 > Right now middlewares are deprecated. Use triggers instead. <br>
 > Triggers are very similar to middlewares, but triggers don't have a `next()` argument. So, you've no way to block or wait the route.
 
-Sometimes, you need to invoke some tasks just before entering into the route. That's where middlewares comes in. Here are some of the use cases for middlewares:
+Sometimes, you need to invoke some tasks just before entering the route. That's where middlewares come in. Here are some of the use cases for middlewares:
 
-* Route Redirecting
+* Route redirecting
 * Analytics
 * Initialization tasks
 
-This is how we can implement simple redirection logic with middleware. It will redirect a user to the sign-in page if they are not logged in.
+Below is an example of implementing simple redirection logic with middlewares. It will redirect a user to the sign-in page if they are not logged in.
 
 ~~~js
 
@@ -353,7 +352,7 @@ function trackingMiddleware(path, next) {
 
 ## Not Found Routes
 
-You can configure Not Found routes like this.
+You can configure Not Found routes like this:
 
 ~~~js
 FlowRouter.notFound = {
@@ -369,11 +368,11 @@ FlowRouter.notFound = {
 
 ## API
 
-Flow Router has rich API to help you to navigate the router and reactively get information from the router.
+Flow Router has a rich API to help you to navigate the router and reactively get information from the router.
 
 #### FlowRouter.getParam(paramName);
 
-Reactive function which you can use to get a param from the URL.
+Reactive function which you can use to get a parameter from the URL.
 
 ~~~js
 // route def: /apps/:appId
@@ -397,7 +396,7 @@ console.log(color); // prints "red"
 
 #### FlowRouter.path(pathDef, params, queryParams)
 
-Generate a path from a path definition. Both params and queryParams are optional.
+Generate a path from a path definition. Both `params` and `queryParams` are optional.
 
 ~~~js
 var pathDef = "/blog/:cat/:id";
@@ -412,7 +411,7 @@ If there are no params or queryParams, this will simply return the pathDef as it
 
 ##### Using Route name instead of the pathDef
 
-You can also use route's name instead of the pathDef. Then, flow router will pick the pathDef from the given route. See following example:
+You can also use the route's name instead of the pathDef. Then, Flow Router will pick the pathDef from the given route. See the following example:
 
 ~~~js
 FlowRouter.route("/blog/:cat/:id", {
@@ -513,8 +512,8 @@ Tracker.autorun(function() {
 
 This API is deprecated. Use `FlowRouter.watchPathChange` instead. This API won't included in the next major release. (2.x.x)
 
-#### FlowRouter.withReplcaeState(fn)
-Normally, all the route changes done with APIs like `FlowRouter.go` and `FlowRouter.setParams()` add an URL item to the browser history. For an example, if you apply following code:
+#### FlowRouter.withReplaceState(fn)
+Normally, all the route changes made via APIs like `FlowRouter.go` and `FlowRouter.setParams()` add a URL item to the browser history. For example, run the following code:
 
 ~~~js
 FlowRouter.setParams({id: "the-id-1"});
@@ -522,9 +521,9 @@ FlowRouter.setParams({id: "the-id-2"});
 FlowRouter.setParams({id: "the-id-3"});
 ~~~
 
-Now you can hit the back button of your browser two times. This is normal behaviour since users may click back button and expect to see the previous state of the app.
+Now you can hit the back button of your browser two times. This is normal behaviour since users may click the back button and expect to see the previous state of the app.
 
-But sometimes, this is not something you want. You don't need to pollute the browser history. Then, you can use following syntax.
+But sometimes, this is not something you want. You don't need to pollute the browser history. Then, you can use the following syntax.
 
 ~~~js
 FlowRouter.withReplaceState(function() {
