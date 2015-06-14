@@ -537,6 +537,12 @@ Now, there is no item in the browser history. Just like `FlowRouter.setParams`, 
 
 > We named this function as `withReplaceState` because, replaceState is the underline API used for this functionality. Read more about [replace state & the history API](https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Manipulating_the_browser_history).
 
+#### FlowRouter.reload()
+
+FlowRouter routes are idempotent. That means, even if you call `FlowRouter.go()` to the same URL multiple times, it only activates in the first run. This is also true for directly clicking on paths.
+
+So, if you really need to reload the route, this is the API you want.
+
 ## Difference with Iron Router
 
 Flow Router and Iron Router are two different routers. Iron Router tries to be a full featured solution. It tries to do everything including routing, subscriptions, rendering and layout management.
