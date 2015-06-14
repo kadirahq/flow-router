@@ -1,5 +1,10 @@
 # Change Log
 
+### v1.15.0
+
+* Now all our routes are idempotent.
+* If some one needs to re-run the route, he needs to use our `FlowRouter.reload()` API.
+
 ### v1.14.1
 
 * Fix regression came from v1.11.0. With that, `FlowRouter.go("/")` does not work. More information on [#147](https://github.com/meteorhacks/flow-router/issues/147).
