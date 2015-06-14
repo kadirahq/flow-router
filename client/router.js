@@ -31,7 +31,8 @@ Router = function () {
   };
 
   this.env = {
-    replaceState: new Meteor.EnvironmentVariable()
+    replaceState: new Meteor.EnvironmentVariable(),
+    reload: new Meteor.EnvironmentVariable()
   };
 };
 
@@ -108,10 +109,6 @@ Router.prototype.path = function(pathDef, fields, queryParams) {
 
 Router.prototype.go = function(pathDef, fields, queryParams) {
   var path = this.path(pathDef, fields, queryParams);
-
-  if (this._current.path === path) {
-    return;
-  }
   
   var useReplaceState = this.env.replaceState.get();
   if(useReplaceState) {
@@ -119,6 +116,14 @@ Router.prototype.go = function(pathDef, fields, queryParams) {
   } else {
     this._page(path);
   }
+};
+
+Router.prototype.reload = function() {
+  var self = this;
+
+  self.env.reload.withValue(true, function() {
+    self._page.replace(self._current.path);
+  });
 };
 
 Router.prototype.redirect = function(path) {
@@ -302,6 +307,24 @@ Router.prototype._notfoundRoute = function(context) {
 Router.prototype.initialize = function() {
   var self = this;
   this._updateCallbacks();
+
+  // Implementing idempotent routing
+  // by overriding page.js`s "show" method.
+  // Why?
+  // It is impossible to bypass exit triggers,
+  // becuase they execute before the handler and
+  // can not know what the next path is, inside exit trigger.
+  var originalShow = this._page.show;
+
+  this._page.show = function(path, state, dispatch, push) {
+    var reload = self.env.reload.get();
+    if (!reload && self._current.path === path) {
+      return;
+    }
+
+    originalShow(path, state, dispatch, push);
+  };
+
   // initialize
   this._page();
 };
@@ -318,7 +341,7 @@ Router.prototype._buildTracker = function() {
     var route = self._current.route;
     var path = self._current.path;
 
-    if(self.safeToRun == 0) {
+    if(self.safeToRun === 0) {
       var message =
         "You can't use reactive data sources like Session" +
         " inside the `.subscriptions` method!";
