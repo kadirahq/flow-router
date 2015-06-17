@@ -96,7 +96,7 @@ Router.prototype.path = function(pathDef, fields, queryParams) {
     // remove +?*
     key = key.replace(/[\+\*\?]+/g, "");
 
-    return fields[key] || "";
+    return encodeURIComponent(fields[key] || "");
   });
 
   var strQueryParams = this._qs.stringify(queryParams || {});
@@ -326,7 +326,7 @@ Router.prototype.initialize = function() {
   };
 
   // initialize
-  this._page();
+  this._page({decodeURLComponents: false});
 };
 
 Router.prototype._buildTracker = function() {

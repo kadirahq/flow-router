@@ -398,13 +398,15 @@ console.log(color); // prints "red"
 
 Generate a path from a path definition. Both `params` and `queryParams` are optional.
 
+Special characters in `params` and `queryParams` will be urlencoded.
+
 ~~~js
 var pathDef = "/blog/:cat/:id";
-var params = {cat: "meteor", id: "abc"};
-var queryParams = {show: "yes", color: "black"};
+var params = {cat: "met eor", id: "abc"};
+var queryParams = {show: "y+e=s", color: "black"};
 
 var path = FlowRouter.path(pathDef, params, queryParams);
-console.log(path); // prints "/blog/meteor/abc?show=yes&color=black"
+console.log(path); // prints "/blog/met%20eor/abc?show=y%2Be%3Ds&color=black"
 ~~~
 
 If there are no params or queryParams, this will simply return the pathDef as it is.
