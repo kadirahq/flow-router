@@ -28,20 +28,20 @@ Triggers.applyFilters = function(triggers, filter) {
     throw new Error("Triggers don't support only and except filters at once");
   }
 
-  if(!(filter.only instanceof Array)) {
+  if(filter.only && !(filter.only instanceof Array)) {
     throw new Error("only filters needs to be an array");
   }
 
-  if(!(filter.except instanceof Array)) {
+  if(filter.except && !(filter.except instanceof Array)) {
     throw new Error("except filters needs to be an array");
   }
 
   if(filter.only) {
-    return createTriggers(triggers, filter.only);
+    return Triggers.createRouteBoundTriggers(triggers, filter.only);
   }
 
   if(filter.except) {
-    return createTriggers(triggers, filter.except, true);
+    return Triggers.createRouteBoundTriggers(triggers, filter.except, true);
   }
 
   throw new Error("Provided a filter but not supported");
@@ -49,23 +49,23 @@ Triggers.applyFilters = function(triggers, filter) {
 
 //  create triggers by bounding them to a set of route names
 //  @triggers - a set of triggers 
-//  @names - list of names to be bound (trigger runs only for these names)
+//  @names - list of route names to be bound (trigger runs only for these names)
 //  @negate - negate the result (triggers won't run for above names)
-Triggers.createTriggers = function(triggers, names, negate) {
+Triggers.createRouteBoundTriggers = function(triggers, names, negate) {
   var namesMap = {};
   _.each(names, function(name) {
     namesMap[name] = true;
   });
 
-  var filteredTriggers = _.map(triggers, function(trigger) {
+  var filteredTriggers = _.map(triggers, function(originalTrigger) {
     var modifiedTrigger = function(context, next) {
       var routeName = context.route.name;
-      if(namesMap[routeName] && !negate) {
-        context(context, next);
-      } else {
-        next();
-      }
+      var matched = (namesMap[routeName])? 1: -1;
+      matched = (negate)? matched * -1 : matched;
 
+      if(matched === 1) {
+        originalTrigger(context, next);
+      }
     };
     return modifiedTrigger;
   });

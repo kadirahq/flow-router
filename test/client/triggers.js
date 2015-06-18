@@ -108,6 +108,161 @@ function(test, done) {
   Triggers.runTriggers([trigger], context, function() {}, function() {});
 });
 
+Tinytest.addAsync(
+'Triggers - createRouteBoundTriggers - matching trigger',
+function(test, done) {
+  var context = {route: {name: "abc"}};
+  var redirect = function() {};
+
+  var trigger = function(c, r) {
+    test.equal(c, context);
+    test.equal(r, redirect);
+    done();
+  };
+
+  var triggers = Triggers.createRouteBoundTriggers([trigger], ["abc"]);
+  triggers[0](context, redirect);
+});
+
+Tinytest.addAsync(
+'Triggers - createRouteBoundTriggers - multiple matching triggers',
+function(test, done) {
+  var context = {route: {name: "abc"}};
+  var redirect = function() {};
+  var doneCount = 0;
+
+  var trigger = function(c, r) {
+    test.equal(c, context);
+    test.equal(r, redirect);
+    doneCount++;
+  };
+
+  var triggers = Triggers.createRouteBoundTriggers([trigger, trigger], ["abc"]);
+  triggers[0](context, redirect);
+  triggers[1](context, redirect);
+
+  test.equal(doneCount, 2);
+  done();
+});
+
+Tinytest.addAsync(
+'Triggers - createRouteBoundTriggers - no matching trigger',
+function(test, done) {
+  var context = {route: {name: "some-other-route"}};
+  var redirect = function() {};
+  var doneCount = 0;
+
+  var trigger = function(c, r) {
+    test.equal(c, context);
+    test.equal(r, redirect);
+    doneCount++;
+  };
+
+  var triggers = Triggers.createRouteBoundTriggers([trigger], ["abc"]);
+  triggers[0](context, redirect);
+
+  test.equal(doneCount, 0);
+  done();
+});
+
+Tinytest.addAsync(
+'Triggers - createRouteBoundTriggers - negate logic',
+function(test, done) {
+  var context = {route: {name: "some-other-route"}};
+  var redirect = function() {};
+  var doneCount = 0;
+
+  var trigger = function(c, r) {
+    test.equal(c, context);
+    test.equal(r, redirect);
+    doneCount++;
+  };
+
+  var triggers = Triggers.createRouteBoundTriggers([trigger], ["abc"], true);
+  triggers[0](context, redirect);
+
+  test.equal(doneCount, 1);
+  done();
+});
+
+Tinytest.addAsync(
+'Triggers - applyFilters - no filters',
+function(test, done) {
+  var original = [];
+  test.equal(Triggers.applyFilters(original), original);
+  done();
+});
+
+Tinytest.addAsync(
+'Triggers - applyFilters - single trigger to array',
+function(test, done) {
+  var original = function() {};
+  test.equal(Triggers.applyFilters(original)[0], original);
+  done();
+});
+
+Tinytest.addAsync(
+'Triggers - applyFilters - only and except both',
+function(test, done) {
+  var original = [];
+  try {
+    Triggers.applyFilters(original, {only: [], except: []});
+  } catch(ex) {
+    test.isTrue(/only and except/.test(ex.message));
+    done();
+  }
+});
+
+Tinytest.addAsync(
+'Triggers - applyFilters - only is not an array',
+function(test, done) {
+  var original = [];
+  try {
+    Triggers.applyFilters(original, {only: "name"});
+  } catch(ex) {
+    test.isTrue(/to be an array/.test(ex.message));
+    done();
+  }
+});
+
+Tinytest.addAsync(
+'Triggers - applyFilters - except is not an array',
+function(test, done) {
+  var original = [];
+  try {
+    Triggers.applyFilters(original, {except: "name"});
+  } catch(ex) {
+    test.isTrue(/to be an array/.test(ex.message));
+    done();
+  }
+});
+
+Tinytest.addAsync(
+'Triggers - applyFilters - unsupporeted filter',
+function(test, done) {
+  var original = [];
+  try {
+    Triggers.applyFilters(original, {wowFilter: []});
+  } catch(ex) {
+    test.isTrue(/not supported/.test(ex.message));
+    done();
+  }
+});
+
+Tinytest.addAsync(
+'Triggers - applyFilters - just only filter',
+function(test, done) {
+  var bounded = Triggers.applyFilters(done, {only: ["abc"]});
+  bounded[0]({route: {name: "abc"}});
+});
+
+Tinytest.addAsync(
+'Triggers - applyFilters - just except filter',
+function(test, done) {
+  var bounded = Triggers.applyFilters(done, {except: ["abc"]});
+  bounded[0]({route: {name: "some-other"}});
+});
+
 function MakeTriggers(count, store) {
   var triggers = [];
 
