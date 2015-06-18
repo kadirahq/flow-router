@@ -15,7 +15,7 @@ Triggers = {};
 // @triggers - a set of triggers
 // @filter - filter with array fileds with `only` and `except` 
 //           support only either `only` or `except`, but not both
-Triggers.applyFilters = functions(triggers, filter) {
+Triggers.applyFilters = function(triggers, filter) {
   if(!(triggers instanceof Array)) {
     triggers = [triggers];
   }
@@ -78,8 +78,11 @@ Triggers.createTriggers = function(triggers, names, negate) {
 //  @context - context we need to pass (it must have the route)
 //  @redirectFn - function which used to redirect 
 //  @after - called after if only all the triggers runs
-Triggers.runTriggers = functions(triggers, context, redirectFn, after) {
+Triggers.runTriggers = function(triggers, context, redirectFn, after) {
   var abort = false;
+  var inCurrentLoop = true;
+  var alreadyRedirected = false;
+
   for(var lc=0; lc<triggers.length; lc++) {
     var trigger = triggers[lc];
     trigger(context, doRedirect);
@@ -89,14 +92,26 @@ Triggers.runTriggers = functions(triggers, context, redirectFn, after) {
     }
   }
 
-  // call the after function, if only all the triggered have ran
-  // but not if aborted
+  // mark that, we've exceeds the currentEventloop for
+  // this set of triggers.
+  inCurrentLoop = false;
   after();
 
   function doRedirect(url) {
-    if(url) {
-      abort = true;
-      redirectFn(url);
+    if(alreadyRedirected) {
+      throw new Error("already redirected");
     }
+
+    if(!inCurrentLoop) {
+      throw new Error("redirect needs to be done in sync");
+    }
+
+    if(!url) {
+      throw new Error("trigger redirect requires an URL");
+    }
+
+    abort = true;
+    alreadyRedirected = true;
+    redirectFn(url);
   }
 };
