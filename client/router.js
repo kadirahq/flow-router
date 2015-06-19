@@ -21,7 +21,7 @@ Router = function () {
   // when doing subscriptions
   this.safeToRun = false;
 
-  this._redirectFn = this._page.redirect.bind(this._page);
+  this._redirectFn = _.bind(this._page.redirect, this._page);
   this._initTriggersAPI();
 };
 
