@@ -1,12 +1,3 @@
-/*
-  Refactor info:
-    * Triggers are fully handled in the router layer
-    * Run all the enter triggers just before invalidating
-    * If redirected, don't invalidate
-    * implement exit handler for each route and run triggers
-    * call that handler for each route
-    * Run global exit handlers in global page exit handler
-*/
 // a set of utility functions for triggers
 
 Triggers = {};
