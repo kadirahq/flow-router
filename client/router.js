@@ -10,8 +10,6 @@ Router = function () {
 
   this._globalRoute = new Route(this);
 
-  this._triggersEnter = [];
-  this._triggersExit = [];
   this._middleware = [];
   this._routes = [];
   this._routesMap = {};
@@ -22,10 +20,6 @@ Router = function () {
   this.safeToRun = false;
 
   var self = this;
-  this.triggers = {
-    enter: self._getRegisterTriggersFn(self._triggersEnter),
-    exit: self._getRegisterTriggersFn(self._triggersExit)
-  };
 };
 
 Router.prototype.route = function(path, options, group) {
@@ -317,8 +311,6 @@ Router.prototype._buildTracker = function() {
     Tracker.nonreactive(function() {
       var currentContext = self._current;
 
-      self._processTriggersEnter(currentContext);
-
       var isRouteChange = currentContext.oldRoute !== currentContext.route;
       var isFirstRoute = !currentContext.oldRoute;
       // first route is not a route change
@@ -355,99 +347,6 @@ Router.prototype._invalidateTracker = function() {
   this._tracker.invalidate();
 };
 
-Router.prototype._getRegisterTriggersFn = function(triggers) {
-  var fn = function(triggerFns, options) {
-    options = options || {};
-
-    if (options.only && options.except) {
-      var message = "triggers does not support 'only' and 'except' at the same time.";
-      throw new Error(message);
-    }
-
-    _.each(triggerFns, function(fn) {
-      if (typeof fn !== 'function') {
-        return;
-      }
-
-      if (options.only) {
-        fn._only = {};
-        _.each(options.only, function(name) {
-          fn._only[name] = 1;
-        });
-      }
-
-      if (options.except) {
-        fn._except = {};
-        _.each(options.except, function(name) {
-          fn._except[name] = 1;
-        });
-      }
-
-      triggers.push(fn);
-    });
-  };
-
-  return fn;
-};
-
-Router.prototype._shouldCallTrigger = function(current, fn) {
-  var name = current.route.name;
-  var shouldCall;
-
-  if (typeof fn !== 'function') {
-    return false;
-  }
-
-  if (fn._only) {
-    shouldCall = !!fn._only[name];
-  } else if (fn._except) {
-    shouldCall = !fn._except[name];
-  } else {
-    shouldCall = true;
-  }
-
-  return shouldCall;
-};
-
-Router.prototype._processTriggersEnter = function(current) {
-  var self = this;
-
-  _.each(this._triggersEnter, function(fn) {
-    if (self._shouldCallTrigger(current, fn)) {
-      fn(current);
-    }
-  });
-};
-
-Router.prototype._processTriggersExit = function(ctx, next) {
-  var self = this;
-
-  _.each(self._triggersExit, function(fn) {
-    if (self._shouldCallTrigger(self._current, fn)) {
-      fn(self._current);
-    }
-  });
-
-  next();
-};
-
-Router.prototype._registerRouteTriggersExit = function(route) {
-  var self = this;
-
-  if (route._triggersExit.length > 0) {
-    // add route's exit triggers
-    self._page.exit(route.path, function(ctx, next) {
-      _.each(route._triggersExit, function(fn) {
-        if (typeof fn === 'function') {
-          fn(self._current);
-        }
-      });
-
-      next();
-    });
-  }
-};
-
 Router.prototype._updateCallbacks = function () {
   var self = this;
 
@@ -461,10 +360,7 @@ Router.prototype._updateCallbacks = function () {
 
   _.each(self._routes, function(route) {
     self._page(route.path, route._handler);
-    self._registerRouteTriggersExit(route);
   });
-
-  self._page.exit("*", self._processTriggersExit.bind(self));
 
   self._page("*", function(context) {
     self._notfoundRoute(context);
