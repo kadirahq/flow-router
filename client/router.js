@@ -10,6 +10,8 @@ Router = function () {
 
   this._globalRoute = new Route(this);
 
+  this._triggersEnter = [];
+  this._triggersExit = [];
   this._middleware = [];
   this._routes = [];
   this._routesMap = {};
@@ -19,7 +21,8 @@ Router = function () {
   // when doing subscriptions
   this.safeToRun = false;
 
-  var self = this;
+  this._redirectFn = this._page.redirect.bind(this._page);
+  this._initTriggersAPI();
 };
 
 Router.prototype.route = function(path, options, group) {
@@ -32,7 +35,8 @@ Router.prototype.route = function(path, options, group) {
   var self = this;
   var route = new Route(this, path, options, group);
 
-  route._handler = function (context, next) {
+  // calls when the page route being activates
+  route._actionHandle = function (context, next) {
     var oldRoute = self._current.route;
 
     self._current = {
@@ -47,7 +51,31 @@ Router.prototype.route = function(path, options, group) {
     // to backward compatibility
     self._current.params.query = self._current.queryParams;
 
-    self._invalidateTracker();
+    // we need to invalidate if all the triggers have been completed
+    // if not that means, we've been redirected to another path
+    // then we don't need to invalidate
+    var afterAllTriggersRan = function() {
+      self._invalidateTracker();
+    };
+
+    var triggers = self._triggersEnter.concat(route._triggersEnter);
+    Triggers.runTriggers(
+      triggers, 
+      self._current, 
+      self._redirectFn, 
+      afterAllTriggersRan
+    );
+  };
+
+  // calls when you exit from the page js route
+  route._exitHandle = function(context, next) {
+    var triggers = self._triggersExit.concat(route._triggersExit);
+    Triggers.runTriggers(
+      triggers,
+      self._current,
+      self._redirectFn,
+      next
+    );
   };
 
   this._routes.push(route);
@@ -359,12 +387,28 @@ Router.prototype._updateCallbacks = function () {
   });
 
   _.each(self._routes, function(route) {
-    self._page(route.path, route._handler);
+    self._page(route.path, route._actionHandle);
+    self._page.exit(route.path, route._exitHandle);
   });
 
   self._page("*", function(context) {
     self._notfoundRoute(context);
   });
+};
+
+Router.prototype._initTriggersAPI = function() {
+  var self = this;
+  this.triggers = {
+    enter: function(triggers, filter) {
+      triggers = Triggers.applyFilters(triggers, filter);
+      _.extend(self._triggersEnter, triggers);
+    },
+
+    exit: function(triggers, filter) {
+      triggers = Triggers.applyFilters(triggers, filter);
+      _.extend(self._triggersExit, triggers);
+    }
+  };
 };
 
 Router.prototype._page = page;
