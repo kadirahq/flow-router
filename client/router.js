@@ -373,6 +373,7 @@ Router.prototype._buildTracker = function() {
 Router.prototype._invalidateTracker = function() {
   this.safeToRun = true;
   this._tracker.invalidate();
+  Tracker.flush();
 };
 
 Router.prototype._updateCallbacks = function () {

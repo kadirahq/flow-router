@@ -323,7 +323,6 @@ Tinytest.addAsync('Client - Triggers - group exit triggers', function (test, nex
   var log = [];
 
   var triggerFn = function (context) {
-    test.equal(context.path, '/' + rand);
     log.push(4);
   };
 
@@ -351,6 +350,79 @@ Tinytest.addAsync('Client - Triggers - group exit triggers', function (test, nex
     setTimeout(function() {
       test.equal(log, [1, 4, 2]);
       setTimeout(next, 100);
+    }, 100);
+  }, 100);
+});
+
+Tinytest.addAsync('Client - Triggers - redirect from enter', function(test, next) {
+  var rand = Random.id(), rand2 = Random.id();
+  var log = [];
+
+  FlowRouter.route('/' + rand, {
+    triggersEnter: [function(context, redirect) {
+      redirect("/" + rand2);
+    }, function() {
+      throw new Error("should not execute this trigger");
+    }],
+    action: function(_params) {
+      log.push(1);
+    },
+    name: rand
+  });
+
+  FlowRouter.route('/' + rand2, {
+    action: function(_params) {
+      log.push(2);
+    },
+    name: rand2
+  });
+
+  FlowRouter.go('/' + rand);
+
+  setTimeout(function() {
+    test.equal(log, [2]);
+    next();
+  }, 300);
+});
+
+Tinytest.addAsync('Client - Triggers - redirect from exit', function(test, next) {
+  var rand = Random.id(), rand2 = Random.id(), rand3 = Random.id();
+  var log = [];
+
+  FlowRouter.route('/' + rand, {
+    action: function() {
+      log.push(1);
+    },
+    triggersExit: [
+      function(context, redirect) {
+        redirect('/' + rand3);
+      },
+      function() {
+        throw new Error("should not call this trigger");
+      }
+    ]
+  });
+
+  FlowRouter.route('/' + rand2, {
+    action: function() {
+      log.push(2);
+    }
+  });
+
+  FlowRouter.route('/' + rand3, {
+    action: function() {
+      log.push(3);
+    }
+  });
+
+  FlowRouter.go('/' + rand);
+
+  setTimeout(function() {
+    FlowRouter.go('/' + rand2);
+    
+    setTimeout(function() {
+      test.equal(log, [1, 3]);
+      next();
     }, 100);
   }, 100);
 });
