@@ -373,6 +373,8 @@ Router.prototype._buildTracker = function() {
 Router.prototype._invalidateTracker = function() {
   this.safeToRun = true;
   this._tracker.invalidate();
+  // we need to trigger the above invalidations immediately
+  // otherwise, we need to face some issues with route context swapping
   Tracker.flush();
 };
 
