@@ -452,7 +452,7 @@ Router.prototype._initTriggersAPI = function() {
   this.triggers = {
     enter: function(triggers, filter) {
       triggers = Triggers.applyFilters(triggers, filter);
-      _.extend(self._triggersEnter, triggers);
+      self._triggersEnter = self._triggersEnter.concat(triggers);
     },
 
     exit: function(triggers, filter) {
