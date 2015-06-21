@@ -1,5 +1,11 @@
 # Change Log
 
+### v1.16.0
+
+* [Refactor](https://github.com/meteorhacks/flow-router/pull/172) triggers API for clean code
+* Added [redirect](https://github.com/meteorhacks/flow-router#redirecting-with-triggers) functionality for triggers
+* Now we are API complete with Flow Router 2.x
+
 ### v1.15.0
 
 * Now all our routes are idempotent.
