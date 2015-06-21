@@ -307,6 +307,29 @@ As you can see from the last two examples, you can filter routes using the `only
 
 > If you'd like to learn more about triggers and design decisions, visit [here](https://github.com/meteorhacks/flow-router/pull/59).
 
+#### Redirecting With Triggers
+
+You can redirect to a different route using triggers. You can do it from both enter and exit triggers. See how to do it:
+
+~~~js
+FlowRouter.route('/', {
+  triggersEnter: [function(context, redirect) {
+    redirect('/some-other-path');
+  }],
+  action: function(_params) {
+    throw new Error("this should not get called");
+  }
+});
+~~~
+
+Every trigger callback comes with a second argument. It's a function where you can used to redirect to a different route. Redirect also has few properties to make sure it's not blocking the router.
+
+* redirect must be called with an URL
+* redirect must be called within the same eventloop cycle (no async or called inside a Tracker)
+* redirect cannot be called multiple times
+
+Check this [PR](https://github.com/meteorhacks/flow-router/pull/172) to learn more about our redirect API.
+
 ## Middlewares
 
 > Right now middlewares are deprecated. Use triggers instead. <br>

@@ -42,15 +42,6 @@ Route.prototype.getAllSubscriptions = function() {
   return this._subsMap;
 };
 
-
-Route.prototype._processTriggersEnter = function(context) {
-  _.each(this._triggersEnter, function(fn) {
-    if (typeof fn === 'function') {
-      fn(context);
-    }
-  });
-};
-
 Route.prototype._processMiddlewares = function(context, after) {
   var currentIndex = 0;
   var self = this;
@@ -75,8 +66,6 @@ Route.prototype._processMiddlewares = function(context, after) {
 
 Route.prototype.callAction = function(current) {
   var self = this;
-
-  self._processTriggersEnter(current);
 
   self._processMiddlewares(current.context, function() {
     self._action(current.params, current.queryParams);
