@@ -377,6 +377,7 @@ Tinytest.addAsync('Client - Triggers - redirect from enter', function(test, next
     name: rand2
   });
 
+  FlowRouter.go('/');
   FlowRouter.go('/' + rand);
 
   setTimeout(function() {
@@ -423,6 +424,47 @@ Tinytest.addAsync('Client - Triggers - redirect from exit', function(test, next)
     setTimeout(function() {
       test.equal(log, [1, 3]);
       next();
+    }, 100);
+  }, 100);
+});
+
+Tinytest.addAsync(
+'Client - Triggers - invalidate inside an autorun', 
+function(test, next) {
+  var rand = Random.id(), rand2 = Random.id();
+  var log = [];
+  var paths = ['/' + rand2, '/' + rand];
+  var done = false;
+
+  FlowRouter.route('/' + rand, {
+    action: function(_params) {
+      log.push(1);
+    }
+  });
+
+  FlowRouter.route('/' + rand2, {
+    action: function(_params) {
+      log.push(2);
+    }
+  });
+
+  FlowRouter.triggers.enter([function(context) {
+    if(done) return;
+    test.equal(context.path, paths.pop());
+    log.push(0);
+  }]);
+
+  Tracker.autorun(function(c) {
+    FlowRouter.go('/' + rand);
+  });
+
+  setTimeout(function() {
+    FlowRouter.go('/' + rand2);
+
+    setTimeout(function() {
+      test.equal(log, [0, 1, 0, 2]);
+      done = true;
+      setTimeout(next, 100);
     }, 100);
   }, 100);
 });

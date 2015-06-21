@@ -375,7 +375,10 @@ Router.prototype._invalidateTracker = function() {
   this._tracker.invalidate();
   // we need to trigger the above invalidations immediately
   // otherwise, we need to face some issues with route context swapping
-  Tracker.flush();
+  // if this is a running autorun we don't need to flush it
+  if(!Tracker.currentComputation) {
+    Tracker.flush();
+  }
 };
 
 Router.prototype._updateCallbacks = function () {
