@@ -1,5 +1,8 @@
 # Change Log
 
+### v1.16.1
+* Fix [issue](https://github.com/meteorhacks/flow-router/pull/173) of overwriting global triggers when written multiple times.
+
 ### v1.16.0
 
 * [Refactor](https://github.com/meteorhacks/flow-router/pull/172) triggers API for clean code
