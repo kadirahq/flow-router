@@ -4,6 +4,17 @@ Router = function () {
 
   this._tracker = this._buildTracker();
   this._current = {};
+  // It's possible that, more than one context is processing at a give time
+  // This is used for running action handler
+  // by putting them into an array allow us to handle them in order
+  // If we get the context via `this._current`, 
+  // it may not be the correct context
+  // 
+  // See "redirect from enter" test case for a good example
+  // It first redirect to "/" and into a another route.
+  // Second route's action should not be called, but it's calling
+  // because of the "/" route.
+  this._processingContexts = [];
 
   // tracks the current path change
   this._onEveryPath = new Tracker.Dependency();
@@ -362,8 +373,10 @@ Router.prototype._buildTracker = function() {
       return;
     }
 
-    var route = self._current.route;
-    var path = self._current.path;
+    // see the definition of `this._processingContexts`
+    var currentContext = self._processingContexts.shift();
+    var route = currentContext.route;
+    var path = currentContext.path;
 
     if(self.safeToRun === 0) {
       var message =
@@ -379,13 +392,11 @@ Router.prototype._buildTracker = function() {
     // We tackle this with the `safeToRun` variable
     self._globalRoute.clearSubscriptions();
     self.subscriptions.call(self._globalRoute, path);
-    route.callSubscriptions(self._current);
+    route.callSubscriptions(currentContext);
 
     // otherwise, computations inside action will trigger to re-run
     // this computation. which we do not need.
     Tracker.nonreactive(function() {
-      var currentContext = self._current;
-
       var isRouteChange = currentContext.oldRoute !== currentContext.route;
       var isFirstRoute = !currentContext.oldRoute;
       // first route is not a route change
@@ -419,13 +430,9 @@ Router.prototype._buildTracker = function() {
 
 Router.prototype._invalidateTracker = function() {
   this.safeToRun++;
+  // see the definition of `this._processingContexts`
+  this._processingContexts.push(this._current);
   this._tracker.invalidate();
-  // we need to trigger the above invalidations immediately
-  // otherwise, we need to face some issues with route context swapping
-  // if this is a running autorun we don't need to flush it
-  if(!Tracker.currentComputation) {
-    Tracker.flush();
-  }
 };
 
 Router.prototype._updateCallbacks = function () {
