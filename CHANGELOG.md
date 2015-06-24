@@ -1,5 +1,9 @@
 # Change Log
 
+### v1.16.2
+* Fix issue [#167](https://github.com/meteorhacks/flow-router/issues/167) via [#175](https://github.com/meteorhacks/flow-router/pull/175)
+* Fix [#176](https://github.com/meteorhacks/flow-router/issues/176) by the removal of `Tracker.flush` usage.
+
 ### v1.16.1
 * Fix [issue](https://github.com/meteorhacks/flow-router/pull/173) of overwriting global triggers when written multiple times.
 
