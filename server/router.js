@@ -30,10 +30,6 @@ Router.prototype.path = function(pathDef, fields, queryParams) {
     pathDef = this._routesMap[pathDef].path;
   }
 
-  // remove trailing slash(es)
-  // but kepp the root slash if it's the only one
-  pathDef = pathDef.match(/^\/{1}$/) ? pathDef : pathDef.replace(/\/+$/, "");
-
   fields = fields || {};
   var regExp = /(:[\w\(\)\\\+\*\.\?]+)+/g;
   var path = pathDef.replace(regExp, function(key) {
@@ -45,6 +41,12 @@ Router.prototype.path = function(pathDef, fields, queryParams) {
 
     return fields[key] || "";
   });
+
+  path = path.replace(/\/\/+/g, "/"); // Replace multiple slashes with single slash
+
+  // remove trailing slash
+  // but keep the root slash if it's the only one
+  path = path.match(/^\/{1}$/) ? path: path.replace(/\/$/, "");
 
   var strQueryParams = Qs.stringify(queryParams || {});
   if(strQueryParams) {
