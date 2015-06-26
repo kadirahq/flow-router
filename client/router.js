@@ -4,17 +4,6 @@ Router = function () {
 
   this._tracker = this._buildTracker();
   this._current = {};
-  // It's possible that, more than one context is processing at a give time
-  // This is used for running action handler
-  // by putting them into an array allow us to handle them in order
-  // If we get the context via `this._current`, 
-  // it may not be the correct context
-  // 
-  // See "redirect from enter" test case for a good example
-  // It first redirect to "/" and into a another route.
-  // Second route's action should not be called, but it's calling
-  // because of the "/" route.
-  this._processingContexts = [];
 
   // tracks the current path change
   this._onEveryPath = new Tracker.Dependency();
@@ -374,7 +363,7 @@ Router.prototype._buildTracker = function() {
     }
 
     // see the definition of `this._processingContexts`
-    var currentContext = self._processingContexts.shift();
+    var currentContext = self._current;
     var route = currentContext.route;
     var path = currentContext.path;
 
@@ -430,9 +419,25 @@ Router.prototype._buildTracker = function() {
 
 Router.prototype._invalidateTracker = function() {
   this.safeToRun++;
-  // see the definition of `this._processingContexts`
-  this._processingContexts.push(this._current);
   this._tracker.invalidate();
+  // After the invalidation we need to flush to make changes imediately
+  // otherwise, we have face some issues context mix-maches and so on.
+  // But there are some cases we can't flush. So we need to ready for that.
+
+  // we clearly know, we can't flush inside an autorun
+  // this may leads some issues on flow-routing
+  // we may need to do some warning
+  if(!Tracker.currentComputation) {
+    // Still there are some cases where we can't flush
+    //  eg:- when there is a flush currently
+    // But we've no public API or hacks to get that state
+    // So, this is the only solution
+    try {
+      Tracker.flush();
+    } catch(ex) {
+
+    }
+  }
 };
 
 Router.prototype._updateCallbacks = function () {
