@@ -1,5 +1,9 @@
 # Change Log
 
+### v1.16.3
+
+* Fix a crazy context switching issue. For more information see commit [6ca54cc](https://github.com/meteorhacks/flow-router/commit/6ca54cc7969b3a8aa71d63c98c99a20b175125a2)
+
 ### v1.16.2
 * Fix issue [#167](https://github.com/meteorhacks/flow-router/issues/167) via [#175](https://github.com/meteorhacks/flow-router/pull/175)
 * Fix [#176](https://github.com/meteorhacks/flow-router/issues/176) by the removal of `Tracker.flush` usage.
