@@ -114,3 +114,7 @@ Router.prototype.ready = function() {
 Router.prototype.initialize = function() {
   // client only
 };
+
+Router.prototype.wait = function() {
+  // client only
+};

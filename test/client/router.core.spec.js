@@ -568,6 +568,40 @@ function (test, next) {
   });
 });
 
+Tinytest.addAsync(
+'Client - Router - wait - before initialize', 
+function(test, done) {
+  FlowRouter._initialized = false;
+  FlowRouter.wait();
+  test.equal(FlowRouter._askedToWait, true);
+
+  FlowRouter._initialized = true;
+  FlowRouter._askedToWait = false;
+  done();
+});
+
+Tinytest.addAsync(
+'Client - Router - wait - after initialized', 
+function(test, done) {
+  try {
+    FlowRouter.wait();
+  } catch(ex) {
+    test.isTrue(/can't wait/.test(ex.message));
+    done();
+  }
+});
+
+Tinytest.addAsync(
+'Client - Router - initialize - after initialized', 
+function(test, done) {
+  try {
+    FlowRouter.initialize();
+  } catch(ex) {
+    test.isTrue(/already initialized/.test(ex.message));
+    done();
+  }
+});
+
 function bind(obj, method) {
   return function() {
     obj[method].apply(obj, arguments);

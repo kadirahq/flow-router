@@ -566,6 +566,24 @@ FlowRouter routes are idempotent. That means, even if you call `FlowRouter.go()`
 
 So, if you really need to reload the route, this is the API you want.
 
+#### FlowRouter.wait() and FlowRouter.initialize()
+
+By default, Flow Router initilize the routing process in a `Meteor.startup()` callback. This works for most of the apps. But, some apps have custom initializations and FlowRouter needs to initialize after that.
+
+So, that's where `FlowRouter.wait()` comes to save you. You need to call it directly inside your JavaScript file. After that, whenever your app is ready call `FlowRouter.initialize()`.
+
+eg:-
+
+~~~js
+// file: app.js
+FlowRouter.wait();
+WhenEverYourAppIsReady(function() {
+  FlowRouter.initialize();
+});
+~~~
+
+For more information visit [issue #180](https://github.com/meteorhacks/flow-router/issues/180).
+
 ## Difference with Iron Router
 
 Flow Router and Iron Router are two different routers. Iron Router tries to be a full featured solution. It tries to do everything including routing, subscriptions, rendering and layout management.

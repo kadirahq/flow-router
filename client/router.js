@@ -10,6 +10,11 @@ Router = function () {
 
   this._globalRoute = new Route(this);
 
+  // if _askedToWait is true. We don't automatically start the router 
+  // in Meteor.startup callback. (see client/_init.js)
+  // Instead user need to call `.initialize()
+  this._askedToWait = false;
+  this._initialized = false;
   this._triggersEnter = [];
   this._triggersExit = [];
   this._middleware = [];
@@ -329,6 +334,10 @@ Router.prototype._notfoundRoute = function(context) {
 };
 
 Router.prototype.initialize = function() {
+  if(this._initialized) {
+    throw new Error("FlowRouter is already initialized");
+  }
+
   var self = this;
   this._updateCallbacks();
 
@@ -350,7 +359,8 @@ Router.prototype.initialize = function() {
   };
 
   // initialize
-  this._page();
+  this._page({decodeURLComponents: false});
+  this._initialized = true;
 };
 
 Router.prototype._buildTracker = function() {
@@ -478,6 +488,14 @@ Router.prototype._initTriggersAPI = function() {
       }
     }
   };
+};
+
+Router.prototype.wait = function() {
+  if(this._initialized) {
+    throw new Error("can't wait after FlowRouter has been initialized");
+  }
+
+  this._askedToWait = true;
 };
 
 Router.prototype._page = page;
