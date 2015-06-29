@@ -1,4 +1,7 @@
 # Change Log
+### v1.17.0
+
+* Add an API called `FlowRouter.wait()` to wait the initialization and pass it back to the app. Fixes issue [180](https://github.com/meteorhacks/flow-router/issues/180).
 
 ### v1.16.3
 
