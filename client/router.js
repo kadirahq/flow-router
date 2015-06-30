@@ -359,7 +359,7 @@ Router.prototype.initialize = function() {
       return;
     }
 
-    originalShow(path, state, dispatch, push);
+    originalShow.call(this, path, state, dispatch, push);
   };
 
   // this is very ugly part of pagejs and it does decoding few times
