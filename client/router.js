@@ -119,7 +119,11 @@ Router.prototype.path = function(pathDef, fields, queryParams) {
     // remove +?*
     key = key.replace(/[\+\*\?]+/g, "");
 
-    return fields[key] || "";
+    // this is to allow page js to keep the custom characters as it is
+    // we need to encode 2 times otherwise "/" char does not work properly
+    // So, in that case, when I includes "/" it will think it's a part of the 
+    // route. encoding 2times fixes it
+    return encodeURIComponent(encodeURIComponent(fields[key] || ""));
   });
 
   path = path.replace(/\/\/+/g, "/"); // Replace multiple slashes with single slash
@@ -358,8 +362,11 @@ Router.prototype.initialize = function() {
     originalShow(path, state, dispatch, push);
   };
 
-  // initialize
-  this._page({decodeURLComponents: false});
+  // this is very ugly part of pagejs and it does decoding few times
+  // in unpredicatable manner. See #168
+  // this is the default behaviour and we need keep it like that
+  // we are doing a hack. see .path()
+  this._page({decodeURLComponents: true});
   this._initialized = true;
 };
 
