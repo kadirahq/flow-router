@@ -51,12 +51,19 @@ Router.prototype.route = function(path, options, group) {
   // calls when the page route being activates
   route._actionHandle = function (context, next) {
     var oldRoute = self._current.route;
+    var queryParams = self._qs.parse(context.querystring);
+    // _qs.parse() gives us a object without prototypes, 
+    // created with Object.create(null)
+    // Meteor's check doesn't play nice with it. 
+    // So, we need to fix it by cloning it.
+    // see more: https://github.com/meteorhacks/flow-router/issues/164
+    queryParams = JSON.parse(JSON.stringify(queryParams));
 
     self._current = {
       path: context.path,
       context: context,
       params: context.params,
-      queryParams: self._qs.parse(context.querystring),
+      queryParams: queryParams,
       route: route,
       oldRoute: oldRoute
     };

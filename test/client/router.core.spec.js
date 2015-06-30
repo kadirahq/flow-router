@@ -267,6 +267,23 @@ Tinytest.add('Client - Router - setParams - no route selected', function (test) 
   FlowRouter._current.route = originalRoute;
 });
 
+Tinytest.addAsync('Client - Router - setQueryParams - using check', function (test, done) {
+  var randomKey = Random.id();
+  var pathDef = "/" + randomKey + "";
+  var queryParamsList = [];
+  FlowRouter.route(pathDef, {
+    action: function(params, queryParams) {
+      queryParamsList.push(queryParams);
+    }
+  });
+
+  FlowRouter.go(pathDef, {}, {cat: "meteor", id: "200"});
+  setTimeout(function() {
+    check(FlowRouter.current().queryParams, {cat: String, id: String});
+    done();
+  }, 50);
+});
+
 Tinytest.addAsync('Client - Router - setQueryParams - generic', function (test, done) {
   var randomKey = Random.id();
   var pathDef = "/" + randomKey + "";
