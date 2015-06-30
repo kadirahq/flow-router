@@ -1,4 +1,9 @@
 # Change Log
+### v1.17.1
+
+* Fix [#164](https://github.com/meteorhacks/flow-router/issues/164) - It's an issue when using `check` with flow router query params.
+* Fix [#168](https://github.com/meteorhacks/flow-router/pull/168) - It's URL encoding issue.
+
 ### v1.17.0
 
 * Add an API called `FlowRouter.wait()` to wait the initialization and pass it back to the app. Fixes issue [180](https://github.com/meteorhacks/flow-router/issues/180).
