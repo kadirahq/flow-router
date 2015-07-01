@@ -219,7 +219,7 @@ FlowRouter.route('/blog/:postId', {
 
         // not using Fast Render
         if(Meteor.isClient) {
-            this.register('data', Meteor.subscribe('bootstrap-data');
+            this.register('data', Meteor.subscribe('bootstrap-data'));
         }
     }
 });
