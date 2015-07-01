@@ -54,6 +54,7 @@ function configure(api) {
 
   api.use('meteorhacks:fast-render@2.3.2', ['client', 'server'], {weak: true});
   api.use('cosmos:browserify@0.3.0', 'client');
+  api.use('meteorhacks:picker@1.0.2', 'server');
 
   api.addFiles('client.browserify.js', 'client');
   api.addFiles('client/triggers.js', 'client');
@@ -65,6 +66,7 @@ function configure(api) {
   api.addFiles('server/router.js', 'server');
   api.addFiles('server/group.js', 'server');
   api.addFiles('server/route.js', 'server');
+  api.addFiles('server/ssr_context.js', 'server');
   api.addFiles('server/_init.js', 'server');
 
   api.addFiles('server/plugins/fast_render.js', 'server');

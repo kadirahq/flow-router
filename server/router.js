@@ -4,6 +4,7 @@ Router = function () {
   this._routesMap = {};
   this._routeNamesMap = {};
   this.subscriptions = Function.prototype;
+  this.ssrContext = new Meteor.EnvironmentVariable();
 };
 
 
