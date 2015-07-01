@@ -1,4 +1,5 @@
 Route = function(router, path, options) {
+  var self = this;
   options = options || {};
 
   this.path = path;
@@ -8,16 +9,21 @@ Route = function(router, path, options) {
 
   Picker.route(path, function(params, req, res, next) {
     var ssrContext = new SsrContext();
-    router.ssrContext.withValue(ssrContext, function() {
+    
+    router.ssrContext.withValue(ssrContext, function() {  
+      if(options.subscriptions) {
+        options.subscriptions.call(self, params);
+      }
+
       if(options.action) {
-        var context = {params: params};
-        options.action.call(null, context);
+        options.action.call(null, params);
       }
 
       var originalWrite = res.write;
       res.write = function(data) {
         if(typeof data === 'string') {
-          data = data.replace('<body>', '<body>' + ssrContext.getHtml());
+          var reactRoot = "<div id='react-root'>" + ssrContext.getHtml() + "</div>";
+          data = data.replace('<body>', '<body>' + reactRoot);
         }
         originalWrite.call(this, data);
       };
