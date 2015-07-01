@@ -1,4 +1,9 @@
 # Change Log
+### v2.0.1
+
+* Add initial SSR support
+* It's implemented as extendable manner. Currently ReactLayout supports it.
+
 ### v1.17.1
 
 * Fix [#164](https://github.com/meteorhacks/flow-router/issues/164) - It's an issue when using `check` with flow router query params.
