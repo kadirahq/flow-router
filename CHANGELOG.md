@@ -1,4 +1,8 @@
 # Change Log
+
+### v1.17.2
+* Fix [#182](https://github.com/meteorhacks/flow-router/issues/182) - Now trigger's redirect function support `FlowRouter.go()` syntax.
+
 ### v1.17.1
 
 * Fix [#164](https://github.com/meteorhacks/flow-router/issues/164) - It's an issue when using `check` with flow router query params.
