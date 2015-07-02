@@ -1,4 +1,5 @@
 Router = function () {
+  var self = this;
   this.globals = [];
   this.subscriptions = Function.prototype;
 
@@ -34,7 +35,12 @@ Router = function () {
     reload: new Meteor.EnvironmentVariable()
   };
 
-  this._redirectFn = _.bind(this._page.redirect, this._page);
+  // redirect function used inside triggers
+  this._redirectFn = function(pathDef, fields, queryParams) {
+    self.withReplaceState(function() {
+      self.go(pathDef, fields, queryParams);
+    });
+  };
   this._initTriggersAPI();
 };
 

@@ -386,6 +386,41 @@ Tinytest.addAsync('Client - Triggers - redirect from enter', function(test, next
   }, 300);
 });
 
+Tinytest.addAsync('Client - Triggers - redirect by routeName', function(test, next) {
+  var rand = Random.id(), rand2 = Random.id();
+  var log = [];
+
+  FlowRouter.route('/' + rand, {
+    name: rand,
+    triggersEnter: [function(context, redirect) {
+      redirect(rand2, null, {aa: "bb"});
+    }, function() {
+      throw new Error("should not execute this trigger");
+    }],
+    action: function(_params) {
+      log.push(1);
+    },
+    name: rand
+  });
+
+  FlowRouter.route('/' + rand2, {
+    name: rand2,
+    action: function(_params, queryParams) {
+      log.push(2);
+      test.equal(queryParams, {aa: "bb"});
+    },
+    name: rand2
+  });
+
+  FlowRouter.go('/');
+  FlowRouter.go('/' + rand);
+
+  setTimeout(function() {
+    test.equal(log, [2]);
+    next();
+  }, 300);
+});
+
 Tinytest.addAsync('Client - Triggers - redirect from exit', function(test, next) {
   var rand = Random.id(), rand2 = Random.id(), rand3 = Random.id();
   var log = [];
