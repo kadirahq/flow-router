@@ -1,5 +1,10 @@
 # Change Log
 
+### v1.18.0
+
+* Implement idempotant routing on withReplaceState. See [#197](https://github.com/meteorhacks/flow-router/issues/197)
+* Add an [API](https://github.com/meteorhacks/flow-router#flowrouterwithtrailingslashfn) to set trailing slashes.
+
 ### v1.17.2
 * Fix [#182](https://github.com/meteorhacks/flow-router/issues/182) - Now trigger's redirect function support `FlowRouter.go()` syntax.
 
