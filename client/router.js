@@ -158,7 +158,7 @@ Router.prototype.go = function(pathDef, fields, queryParams) {
   
   var useReplaceState = this.env.replaceState.get();
   if(useReplaceState) {
-    this._page.redirect(path);
+    this._page.replace(path);
   } else {
     this._page(path);
   }
@@ -364,16 +364,20 @@ Router.prototype.initialize = function() {
   // It is impossible to bypass exit triggers,
   // becuase they execute before the handler and
   // can not know what the next path is, inside exit trigger.
-  var originalShow = this._page.show;
+  //
+  // we need override both show, replace to make this work
+  // since we use redirect when we are talking about withReplaceState 
+  _.each(['show', 'replace'], function(fnName) {
+    var original = self._page[fnName];
+    self._page[fnName] = function(path, state, dispatch, push) {
+      var reload = self.env.reload.get();
+      if (!reload && self._current.path === path) {
+        return;
+      }
 
-  this._page.show = function(path, state, dispatch, push) {
-    var reload = self.env.reload.get();
-    if (!reload && self._current.path === path) {
-      return;
-    }
-
-    originalShow.call(this, path, state, dispatch, push);
-  };
+      original.call(this, path, state, dispatch, push);
+    };
+  });
 
   // this is very ugly part of pagejs and it does decoding few times
   // in unpredicatable manner. See #168
