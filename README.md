@@ -564,6 +564,18 @@ Now, there is no item in the browser history. Just like `FlowRouter.setParams`, 
 
 > We named this function as `withReplaceState` because, replaceState is the underline API used for this functionality. Read more about [replace state & the history API](https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Manipulating_the_browser_history).
 
+#### FlowRouter.withTrailingSlash(fn)
+
+By default, FlowRouter removes trailing slash because it's nice. We only do it when generating path via `FlowRouter.path()`. Some other functions like `.setParams(), .go()` which changes the URL also use `FlowRouter.path()`. So, this behaviour is applied to them as well.
+
+But, something we [want](https://github.com/meteorhacks/flow-router/issues/192) trailing slashes. For those cases, you can use this API.
+
+~~~js
+FlowRouter.withTrailingSlash(function() {
+  FlowRouter.go('/mypath/');
+});
+~~~
+
 #### FlowRouter.reload()
 
 FlowRouter routes are idempotent. That means, even if you call `FlowRouter.go()` to the same URL multiple times, it only activates in the first run. This is also true for directly clicking on paths.

@@ -32,7 +32,8 @@ Router = function () {
 
   this.env = {
     replaceState: new Meteor.EnvironmentVariable(),
-    reload: new Meteor.EnvironmentVariable()
+    reload: new Meteor.EnvironmentVariable(),
+    trailingSlash: new Meteor.EnvironmentVariable()
   };
 
   // redirect function used inside triggers
@@ -144,6 +145,11 @@ Router.prototype.path = function(pathDef, fields, queryParams) {
   // remove trailing slash
   // but keep the root slash if it's the only one
   path = path.match(/^\/{1}$/) ? path: path.replace(/\/$/, "");
+
+  // explictly asked to add a trailing slash
+  if(this.env.trailingSlash.get() && _.last(path) !== "/") {
+    path += "/";
+  }
 
   var strQueryParams = this._qs.stringify(queryParams || {});
   if(strQueryParams) {
@@ -329,6 +335,10 @@ Router.prototype.subsReady = function() {
 
 Router.prototype.withReplaceState = function(fn) {
   return this.env.replaceState.withValue(true, fn);
+};
+
+Router.prototype.withTrailingSlash = function(fn) {
+  return this.env.trailingSlash.withValue(true, fn);
 };
 
 Router.prototype._notfoundRoute = function(context) {

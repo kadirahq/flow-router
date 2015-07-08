@@ -470,6 +470,27 @@ function (test, done) {
   FlowRouter.go(path, {id: "awesome"});
 });
 
+Tinytest.addAsync('Client - Router - withTrailingSlash - enabled', function (test, next) {
+  var rand = Random.id();
+  var rendered = 0;
+
+  FlowRouter.route('/' + rand, {
+    action: function(_params) {
+      rendered++;
+    }
+  });
+
+  FlowRouter.withTrailingSlash(function() {
+    FlowRouter.go('/' + rand);
+  });
+
+  setTimeout(function() {
+    test.equal(rendered, 1);
+    test.equal(_.last(location.href), '/');
+    setTimeout(next, 100);
+  }, 100);
+});
+
 Tinytest.addAsync('Client - Router - idempotent routing - action',
 function (test, done) {
   var rand = Random.id();
