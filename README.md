@@ -373,7 +373,7 @@ function trackingMiddleware(path, next) {
 }
 ~~~
 
-## Not Found Routes
+## Not Found Route
 
 You can configure Not Found routes like this:
 
@@ -388,6 +388,8 @@ FlowRouter.notFound = {
     }
 };
 ~~~
+
+**There is no triggers support for the notFound route. See: [#188](https://github.com/meteorhacks/flow-router/issues/188)**
 
 ## API
 
