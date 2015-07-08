@@ -331,7 +331,8 @@ Router.prototype.withReplaceState = function(fn) {
   return this.env.replaceState.withValue(true, fn);
 };
 
-Router.prototype._notfoundRoute = function(context) {
+Router.prototype._notFoundActionHandle = function(context) {
+  var self = this;
   this._current = {
     path: context.path,
     context: context,
@@ -346,8 +347,18 @@ Router.prototype._notfoundRoute = function(context) {
     return;
   }
 
-  this._current.route = new Route(this, "*", this.notFound);
-  this._invalidateTracker();
+  function afterAllTriggersRan() {
+    self._current.route = new Route(self, "*", self.notFound);
+    self._invalidateTracker();
+  }
+
+  var triggers = this._triggersEnter.concat(this.notFound.triggersEnter);
+  Triggers.runTriggers(
+    triggers, 
+    this._current, 
+    this._redirectFn, 
+    afterAllTriggersRan
+  );
 };
 
 Router.prototype.initialize = function() {
@@ -491,7 +502,7 @@ Router.prototype._updateCallbacks = function () {
   });
 
   self._page("*", function(context) {
-    self._notfoundRoute(context);
+    self._notFoundActionHandle(context);
   });
 };
 
