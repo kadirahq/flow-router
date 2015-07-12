@@ -37,6 +37,11 @@ Route = function(router, path, options) {
       var originalWrite = res.write;
       res.write = function(data) {
         if(typeof data === 'string') {
+          var head = ssrContext.getHead();
+          if(head && head.trim() !== "") {
+            data = data.replace('</head>', head + '\n</head>');
+          }
+
           var reactRoot = "<div id='react-root'>" + ssrContext.getHtml() + "</div>";
           data = data.replace('<body>', '<body>' + reactRoot);
         }

@@ -2,6 +2,7 @@ var deepMerge = Npm.require('deepmerge');
 
 SsrContext = function() {
   this._html = "";
+  this._head = "";
   this._collections = {};
 };
 
@@ -21,6 +22,14 @@ SsrContext.prototype.setHtml = function(html) {
 
 SsrContext.prototype.getHtml = function() {
   return this._html;
+};
+
+SsrContext.prototype.addToHead = function(headHtml) {
+  this._head += '\n' + headHtml;
+};
+
+SsrContext.prototype.getHead = function() {
+  return this._head;
 };
 
 SsrContext.prototype.addSubscription = function(name, params) {
