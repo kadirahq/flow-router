@@ -9,15 +9,17 @@ Route = function(router, path, options) {
 
   Picker.route(path, function(params, req, res, next) {
     var ssrContext = new SsrContext();
-    
-    router.ssrContext.withValue(ssrContext, function() {  
-      if(options.subscriptions) {
-        options.subscriptions.call(self, params);
-      }
+    router.ssrContext.withValue(ssrContext, function() {
+      var context = {path: req.url, params: params};
+      router.currentRoute.withValue(context, function () {
+        if(options.subscriptions) {
+          options.subscriptions.call(self, params);
+        }
 
-      if(options.action) {
-        options.action.call(null, params);
-      }
+        if(options.action) {
+          options.action.call(null, params);
+        }
+      });
 
       var originalWrite = res.write;
       res.write = function(data) {
@@ -43,5 +45,5 @@ Route.prototype.subscription = function(name) {
 
 
 Route.prototype.middleware = function(middleware) {
- 
+
 };

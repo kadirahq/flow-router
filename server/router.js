@@ -6,6 +6,7 @@ Router = function () {
   this.subscriptions = Function.prototype;
   this.ssrContext = new Meteor.EnvironmentVariable();
   this.inSubscription = new Meteor.EnvironmentVariable();
+  this.currentRoute = new Meteor.EnvironmentVariable();
 };
 
 
@@ -63,11 +64,9 @@ Router.prototype.go = function() {
   // client only
 };
 
-
 Router.prototype.current = function() {
-  // client only
+  return this.currentRoute.get();
 };
-
 
 Router.prototype.triggers = {
   enter: function() {
@@ -119,4 +118,8 @@ Router.prototype.initialize = function() {
 
 Router.prototype.wait = function() {
   // client only
+};
+
+Router.prototype.watchPathChange = function () {
+
 };
