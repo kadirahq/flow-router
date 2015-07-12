@@ -18,7 +18,6 @@ Meteor.subscribe = function(pubName) {
 var Mongo = Package['mongo'].Mongo;
 var originalFind = Mongo.Collection.prototype.find;
 Mongo.Collection.prototype.find = function(selector, options) {
-  console.log("fetching data", selector);
   selector = selector || {};
   var collName = this._name;
   var ssrContext = FlowRouter.ssrContext.get();

@@ -7,7 +7,8 @@ Package.describe({
 
 Npm.depends({
   'page':'1.6.3',
-    'qs':'3.1.0'
+    'qs':'3.1.0',
+    'deepmerge': '0.2.10'
 });
 
 Package.onUse(function(api) {

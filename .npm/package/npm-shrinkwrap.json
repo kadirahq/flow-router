@@ -1,5 +1,8 @@
 {
   "dependencies": {
+    "deepmerge": {
+      "version": "0.2.10"
+    },
     "page": {
       "version": "1.6.3",
       "dependencies": {

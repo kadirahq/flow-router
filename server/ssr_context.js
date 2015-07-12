@@ -1,3 +1,5 @@
+var deepMerge = Npm.require('deepmerge');
+
 SsrContext = function() {
   this._html = "";
   this._collections = {};
@@ -22,7 +24,6 @@ SsrContext.prototype.getHtml = function() {
 };
 
 SsrContext.prototype.addSubscription = function(name, params) {
-  console.log("adding data data --", name, params);
   var self = this;
   var pub = Meteor.default_server.publish_handlers[name];
   var publishContext = {};
@@ -43,9 +44,9 @@ SsrContext.prototype.addSubscription = function(name, params) {
         // we need to merge data here
         var existingDoc = collection.findOne(item._id);
         if(existingDoc) {
-          _.extend(existingDoc, item);
-          delete existingDoc._id;
-          collection.update(item._id, existingDoc);
+          var newDoc = deepMerge(existingDoc, item);
+          delete newDoc._id;
+          collection.update(item._id, newDoc);
         } else {
           collection.insert(item);
         }
