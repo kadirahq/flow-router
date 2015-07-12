@@ -37,8 +37,15 @@ Mongo.Collection.prototype.findOne = function(selector, options) {
   return this.find(selector, options).fetch()[0];
 };
 
+var originalAutorun = Tracker.autorun;
 Tracker.autorun = function (fn) {
-  var c = {firstRun: true, stop: function () {}};
-  fn(c);
-  return c;
+  // if autorun is in the ssrContext, we need fake and run the callback 
+  // in the same eventloop
+  if(FlowRouter.ssrContext.get()) {
+    var c = {firstRun: true, stop: function () {}};
+    fn(c);
+    return c;
+  } else {
+    return originalAutorun.call(Tracker, fn);
+  }
 };
