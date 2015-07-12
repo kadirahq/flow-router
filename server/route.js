@@ -8,6 +8,14 @@ Route = function(router, path, options) {
   this._subsMap = {};
 
   Picker.route(path, function(params, req, res, next) {
+    // a check to see if this is a html page or a static assets like js, css
+    // we don't need to do SSR for them
+    // not sure, google bot do this, still a good idea to do this
+    var isHtmlPage = /html/.test(req.headers['accept']);
+    if(!isHtmlPage) {
+      return next();
+    }
+
     var ssrContext = new SsrContext();
     router.ssrContext.withValue(ssrContext, function() {
       var context = {path: req.url, params: params};
