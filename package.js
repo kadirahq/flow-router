@@ -7,8 +7,9 @@ Package.describe({
 
 Npm.depends({
   'page':'1.6.3',
-    'qs':'3.1.0',
-    'deepmerge': '0.2.10'
+  'qs':'3.1.0',
+  'deepmerge': '0.2.10',
+  "connect": "2.13.0"
 });
 
 Package.onUse(function(api) {
@@ -54,7 +55,7 @@ function configure(api) {
   api.use('reactive-dict');
   api.use('reactive-var');
 
-  api.use('meteorhacks:fast-render@2.3.2', ['client', 'server'], {weak: true});
+  api.use('meteorhacks:fast-render@2.6.0', ['client', 'server']);
   api.use('cosmos:browserify@0.3.0', 'client');
   api.use('meteorhacks:picker@1.0.3', 'server');
   api.use('meteorhacks:inject-data@1.3.0');

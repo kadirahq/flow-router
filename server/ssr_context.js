@@ -35,11 +35,14 @@ SsrContext.prototype.getHead = function() {
 SsrContext.prototype.addSubscription = function(name, params) {
   var self = this;
   var pub = Meteor.default_server.publish_handlers[name];
-  var publishContext = {};
-  // here we can use a lot of stuff from fast-render
-  // since it does solves publication contexts, auth and everything
-  // already.
-  var cursors = pub.apply(publishContext, params);
+  var fastRenderContext = FastRender.frContext.get();
+  var args = [name].concat(params);
+  fastRenderContext.subscribe.apply(fastRenderContext, args);
+
+  // XXX run the publication via the fast-render context 
+  // and get data from it
+  // we may need to change FR apis a bit for this
+  var cursors = pub.apply({}, params);
   if(cursors && !(cursors instanceof Array)) {
     cursors = [cursors];
   }
