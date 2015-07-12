@@ -20,12 +20,17 @@ Route = function(router, path, options) {
     router.ssrContext.withValue(ssrContext, function() {
       var context = {path: req.url, params: params};
       router.currentRoute.withValue(context, function () {
-        if(options.subscriptions) {
-          options.subscriptions.call(self, params);
-        }
+        try {
+          if(options.subscriptions) {
+            options.subscriptions.call(self, params);
+          }
 
-        if(options.action) {
-          options.action.call(null, params);
+          if(options.action) {
+            options.action.call(null, params);
+          }
+        } catch(ex) {
+          console.error("Error when doing SSR. path:", req.url, " ", ex.message);
+          console.error(ex.stack);
         }
       });
 
