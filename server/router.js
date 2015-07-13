@@ -7,8 +7,12 @@ Router = function () {
   this.ssrContext = new Meteor.EnvironmentVariable();
   this.inSubscription = new Meteor.EnvironmentVariable();
   this.currentRoute = new Meteor.EnvironmentVariable();
+  this.pageCacheTimeout = 1000 * 30;
 };
 
+Router.prototype.setPageCacheTimeout = function(timeout) {
+  this._pageCacheTimeout = timeout;
+};
 
 Router.prototype.route = function(path, options) {
   this._routesMap[path] = new Route(this, path, options);

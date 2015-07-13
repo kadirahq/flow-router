@@ -16,6 +16,7 @@ Flow Router is a minimalistic router which only handles routing and subscription
 * [Not Found Routes](#not-found-routes)
 * [API](#api)
 * [Difference with Iron Router](#difference-with-iron-router)
+* [SSR](#ssr)
 
 ## Getting Started
 
@@ -673,3 +674,13 @@ So, it's better to use a dedicated server-side router like [`meteorhacks:picker`
 Although, we don't have server side routes, we **will** have server side rendering support. We've some initial plans to achieve SSR and it's the main feature of version 3.0.
 
 We may have our own initial HTML rendering system to allow SSR bypassing meteor's default layout.
+
+## SSR
+
+Current SSR is in alpha stage. Here are some APIs.
+
+### FlowRouter.setPageCacheTimeout(timeInMillis)
+
+We cache generated pages so, we don't need to render them again and again. This is performance improvement to deal with commonly requested pages. That's because React SSR on the server is very costly.
+
+Anyway, you can turn this off by setting the timeout to `0`
