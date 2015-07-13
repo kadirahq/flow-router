@@ -1,3 +1,5 @@
+var Url = Npm.require('url');
+
 Route = function(router, path, options) {
   var self = this;
   options = options || {};
@@ -9,11 +11,8 @@ Route = function(router, path, options) {
 
   Picker.middleware(Npm.require('connect').cookieParser());
   Picker.route(path, function(params, req, res, next) {
-    // a check to see if this is a html page or a static assets like js, css
-    // we don't need to do SSR for them
-    // not sure, google bot do this, still a good idea to do this
-    var isHtmlPage = /html/.test(req.headers['accept']);
-    if(!isHtmlPage) {
+    
+    if(!self.isHtmlPage(req.url)) {
       return next();
     }
 
@@ -57,15 +56,32 @@ Route = function(router, path, options) {
   });
 };
 
+Route.prototype.isHtmlPage = function(url) {
+  var pathname = Url.parse(url).pathname;
+  var ext = pathname.split('.').slice(1).join('.');
+
+  // if there is no extention, yes that's a html page
+  if(!ext) {
+    return true;
+  }
+
+  // if this is htm or html, yes that's a html page
+  if(/^htm/.test(ext)) {
+    return true;
+  }
+
+  // if not we assume this is not as a html page
+  // this doesn't do any harm. But no SSR
+  return false;
+};
+
 Route.prototype.register = function(name, sub, options) {
   this._subsMap[name] = sub;
 };
 
-
 Route.prototype.subscription = function(name) {
   return this._subsMap[name];
 };
-
 
 Route.prototype.middleware = function(middleware) {
 
