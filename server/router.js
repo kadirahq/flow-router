@@ -102,40 +102,9 @@ Router.prototype.triggers = {
   }
 };
 
-Router.prototype.middleware = function() {
-  // client only
-};
-
-
-Router.prototype.getState = function() {
-  // client only
-};
-
-
-Router.prototype.getAllStates = function() {
-  // client only
-};
-
-
-Router.prototype.setState = function() {
-  // client only
-};
-
-
-Router.prototype.removeState = function() {
-  // client only
-};
-
-
-Router.prototype.clearStates = function() {
-  // client only
-};
-
-
 Router.prototype.ready = function() {
   // client only
 };
-
 
 Router.prototype.initialize = function() {
   // client only
