@@ -72,6 +72,27 @@ Router.prototype.current = function() {
   return this.currentRoute.get();
 };
 
+Router.prototype.getParam = function(key) {
+  var current = this.current();
+  if(current) {
+    return current.params[key];
+  }
+};
+
+Router.prototype.getQueryParam = function(key) {
+  var current = this.current();
+  if(current) {
+    return current.queryParams[key];
+  }
+};
+
+Router.prototype.getRouteName = function() {
+  var current = this.current();
+  if(current) {
+    return current.route.name;
+  }
+};
+
 Router.prototype.triggers = {
   enter: function() {
     // client only

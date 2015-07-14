@@ -5,6 +5,7 @@ Route = function(router, path, options) {
   options = options || {};
 
   this.path = path;
+  this.name = options.name;
   this.action = options.action || Function.prototype;
   this.subscriptions = options.subscriptions || Function.prototype;
   this._subsMap = {};
