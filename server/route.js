@@ -13,7 +13,7 @@ Route = function(router, path, options) {
 
   Picker.middleware(Npm.require('connect').cookieParser());
   Picker.route(path, function(params, req, res, next) {
-    
+
     if(!self.isHtmlPage(req.url)) {
       return next();
     }
@@ -38,7 +38,7 @@ Route = function(router, path, options) {
             }
 
             if(options.action) {
-              options.action.call(null, params);
+              options.action.call(self, params);
             }
           } catch(ex) {
             console.error("Error when doing SSR. path:", req.url, " ", ex.message);
@@ -58,7 +58,7 @@ Route = function(router, path, options) {
             data = data.replace('<body>', '<body>' + reactRoot);
           }
           originalWrite.call(this, data);
-          
+
           var pageInfo = {
             frData: res.getData("fast-render-data"),
             head: head,
