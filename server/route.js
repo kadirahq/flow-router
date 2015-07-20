@@ -1,4 +1,5 @@
 var Url = Npm.require('url');
+var Cheerio = Npm.require('cheerio');
 
 Route = function(router, path, options) {
   var self = this;
@@ -55,6 +56,7 @@ Route = function(router, path, options) {
             }
 
             var reactRoot = "<div id='react-root'>" + ssrContext.getHtml() + "</div>";
+            data = moveScripts(data);
             data = data.replace('<body>', '<body>' + reactRoot);
           }
           originalWrite.call(this, data);
@@ -77,12 +79,24 @@ Route = function(router, path, options) {
       var originalWrite = res.write;
       res.write = function(data) {
         data = data.replace('</head>', page.head + '\n</head>');
+        data = moveScripts(data);
         data = data.replace('<body>', '<body>' + page.body);
         originalWrite.call(this, data);
       }
 
       res.pushData('fast-render-data', page.frData);
       next();
+    }
+
+    function moveScripts(data) {
+      var $ = Cheerio.load(data);
+      var heads = $('head link, head script');
+      $('body').append(heads);
+
+      // Remove empty lines caused by removing scripts
+      $('head').html($('head').html().replace(/(^[ \t]*\n)/gm, ''));
+
+      return $.html();
     }
   });
 };
