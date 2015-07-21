@@ -56,7 +56,9 @@ Route = function(router, path, options) {
             }
 
             var reactRoot = "<div id='react-root'>" + ssrContext.getHtml() + "</div>";
-            data = moveScripts(data);
+            if (FlowRouter.deferScriptLoading) {
+              data = moveScripts(data);
+            }
             data = data.replace('<body>', '<body>' + reactRoot);
           }
           originalWrite.call(this, data);
@@ -79,7 +81,9 @@ Route = function(router, path, options) {
       var originalWrite = res.write;
       res.write = function(data) {
         data = data.replace('</head>', page.head + '\n</head>');
-        data = moveScripts(data);
+        if (FlowRouter.deferScriptLoading) {
+          data = moveScripts(data);
+        }
         data = data.replace('<body>', '<body>' + page.body);
         originalWrite.call(this, data);
       }
