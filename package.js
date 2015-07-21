@@ -53,7 +53,7 @@ function configure(api) {
   api.use('reactive-var');
 
   api.use('meteorhacks:fast-render@2.3.2', ['client', 'server'], {weak: true});
-  api.use('cosmos:browserify@0.3.0', 'client');
+  api.use('cosmos:browserify@0.5.0', 'client');
 
   api.addFiles('client.browserify.js', 'client');
   api.addFiles('client/triggers.js', 'client');

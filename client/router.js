@@ -462,6 +462,7 @@ Router.prototype._buildTracker = function() {
 };
 
 Router.prototype._invalidateTracker = function() {
+  var self = this;
   this.safeToRun++;
   this._tracker.invalidate();
   // After the invalidation we need to flush to make changes imediately
@@ -479,7 +480,34 @@ Router.prototype._invalidateTracker = function() {
     try {
       Tracker.flush();
     } catch(ex) {
+      // only handling "while flushing" errors
+      if(!/Tracker\.flush while flushing/.test(ex.message)) {
+        return;
+      }
 
+      // XXX: fix this with a proper solution by removing subscription mgt.
+      // from the router. Then we don't need to run invalidate using a tracker
+
+      // this happens when we are trying to invoke a route change 
+      // with inside a route chnage. (eg:- Template.onCreated)
+      // Since we use page.js and tracker, we don't have much control 
+      // over this process.
+      // only solution is to defer route execution.
+
+      // It's possible to have more than one path want to defer
+      // But, we only need to pick the last one.
+      self._nextPath = self._current.path;
+      Meteor.defer(function() {
+        var path = self._nextPath;
+        if(!path) {
+          return;
+        }
+
+        delete self._nextPath;
+        self.env.reload.withValue(true, function() {
+          self.go(path);
+        });
+      });
     }
   }
 };
