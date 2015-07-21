@@ -90,7 +90,7 @@ Route = function(router, path, options) {
 
     function moveScripts(data) {
       var $ = Cheerio.load(data);
-      var heads = $('head link, head script');
+      var heads = $('head script');
       $('body').append(heads);
 
       // Remove empty lines caused by removing scripts
