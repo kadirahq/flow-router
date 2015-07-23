@@ -477,7 +477,17 @@ Router.prototype._updateCallbacks = function () {
 
   _.each(self._routes, function(route) {
     self._page(route.path, route._actionHandle);
-    self._page.exit(route.path, route._exitHandle);
+    self._page.exit(route.path, function(context, next) {
+      // XXX: With React, exit handler gets called twice
+      // We've not debugged into why yet, but it's an issue
+      // so, we need to manually handle it like this
+      if(self._oldExitPath === context.path) {
+        return next();
+      }
+
+      self._oldExitPath = context.path;
+      route._exitHandle(context, next);
+    });
   });
 
   self._page("*", function(context) {
