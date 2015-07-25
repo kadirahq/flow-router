@@ -1,4 +1,4 @@
-# Flow Router [![Build Status](https://travis-ci.org/meteorhacks/flow-router.svg?branch=master)](https://travis-ci.org/meteorhacks/flow-router) [![Stories in Ready](https://badge.waffle.io/meteorhacks/flow-router.svg?label=doing&title=Activities)](http://waffle.io/meteorhacks/flow-router)
+`# Flow Router [![Build Status](https://travis-ci.org/meteorhacks/flow-router.svg?branch=master)](https://travis-ci.org/meteorhacks/flow-router) [![Stories in Ready](https://badge.waffle.io/meteorhacks/flow-router.svg?label=doing&title=Activities)](http://waffle.io/meteorhacks/flow-router)
 
 
 Carefully Designed Client Side Router for Meteor. 
@@ -12,10 +12,10 @@ Flow Router is a minimalistic router which only handles routing and subscription
 * [Subscription Management](#subscription-management)
 * [Rendering and Layout Management](#rendering-and-layout-management)
 * [Triggers](#triggers)
-* [Middlewares](#middlewares)
 * [Not Found Routes](#not-found-routes)
 * [API](#api)
 * [Difference with Iron Router](#difference-with-iron-router)
+* [SSR](#ssr)
 
 ## Getting Started
 
@@ -55,14 +55,6 @@ Here's the syntax for a simple route:
 
 ~~~js
 FlowRouter.route('/blog/:postId', {
-    // an array of middlewares (we'll discuss about this later on)
-    middlewares: [],
-
-    // define your subscriptions
-    subscriptions: function(params, queryParams) {
-       
-    },
-
     // do some action for this route
     action: function(params, queryParams) {
         console.log("Params:", params);
@@ -86,7 +78,7 @@ Params: {postId: "my-post"}
 Query Params: {comments: "on", color: "dark"}
 ~~~
 
-For a single interaction, the router only runs once. That means, after you've visit a route, first it will call `middlewares`, then `subscriptions` and finally `action`. After that happens, none of those methods will be called again for that route visit.
+For a single interaction, the router only runs once. That means, after you've visit a route, first it will call `triggers`, then `subscriptions` and finally `action`. After that happens, none of those methods will be called again for that route visit.
 
 You can define routes anywhere in the `client` directory. But, we recommend to add them in the `lib` directory. Then `fast-render` can detect subscriptions and send them for you (we'll talk about this is a moment).
 
@@ -100,9 +92,9 @@ var adminRoutes = FlowRouter.group({
   subscriptions: function() {
     this.register('adminSettings', Meteor.subscribe('settings', {admin: true}));
   },
-  middlewares: [
+  triggersEnter: [
     function(path, next) {
-      console.log('running group middleware');
+      console.log('running group triggers');
       next();
     }
   ]
@@ -113,9 +105,9 @@ adminRoutes.route('/', {
   action: function() {
     FlowLayout.render('componentLayout', {content: 'admin'});
   },
-  middlewares: [
+  triggersEnter: [
     function(path, next) {
-      console.log('running /admin middleware');
+      console.log('running /admin trigger');
       next();
     }
   ]
@@ -219,7 +211,7 @@ FlowRouter.route('/blog/:postId', {
 
         // not using Fast Render
         if(Meteor.isClient) {
-            this.register('data', Meteor.subscribe('bootstrap-data'));
+            this.register('data', Meteor.subscribe('bootstrap-data');
         }
     }
 });
@@ -330,50 +322,7 @@ Every trigger callback comes with a second argument. It's a function where you c
 
 Check this [PR](https://github.com/meteorhacks/flow-router/pull/172) to learn more about our redirect API.
 
-## Middlewares
-
-> Right now middlewares are deprecated. Use triggers instead. <br>
-> Triggers are very similar to middlewares, but triggers don't have a `next()` argument. So, you've no way to block or wait the route.
-
-Sometimes, you need to invoke some tasks just before entering the route. That's where middlewares come in. Here are some of the use cases for middlewares:
-
-* Route redirecting
-* Analytics
-* Initialization tasks
-
-Below is an example of implementing simple redirection logic with middlewares. It will redirect a user to the sign-in page if they are not logged in.
-
-~~~js
-
-FlowRouter.route('/apps/:appId', {
-    middlewares: [requiredLogin],
-    subscriptions: function(params) {
-        
-    },
-    action: function(params) {
-
-    }
-});
-
-function requiredLogin(path, next) {
-  // this works only because the use of Fast Render
-  var redirectPath = (!Meteor.userId())? "/sign-in" : null;
-  next(redirectPath);
-}
-~~~
-
-You can also write global middlewares like this:
-
-~~~js
-FlowRouter.middleware(trackingMiddleware);
-
-function trackingMiddleware(path, next) {
-    console.log("tracking path:", path);
-    next();
-}
-~~~
-
-## Not Found Route
+## Not Found Routes
 
 You can configure Not Found routes like this:
 
@@ -388,8 +337,6 @@ FlowRouter.notFound = {
     }
 };
 ~~~
-
-**There is no triggers support for the notFound route. See: [#188](https://github.com/meteorhacks/flow-router/issues/188)**
 
 ## API
 
@@ -535,10 +482,6 @@ Tracker.autorun(function() {
 });
 ~~~
 
-#### FlowRouter.reactiveCurrent() [Deprecated]
-
-This API is deprecated. Use `FlowRouter.watchPathChange` instead. This API won't included in the next major release. (2.x.x)
-
 #### FlowRouter.withReplaceState(fn)
 Normally, all the route changes made via APIs like `FlowRouter.go` and `FlowRouter.setParams()` add a URL item to the browser history. For example, run the following code:
 
@@ -563,18 +506,6 @@ FlowRouter.withReplaceState(function() {
 Now, there is no item in the browser history. Just like `FlowRouter.setParams`, you can use any FlowRouter API inside `FlowRouter.withReplaceState`.
 
 > We named this function as `withReplaceState` because, replaceState is the underline API used for this functionality. Read more about [replace state & the history API](https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Manipulating_the_browser_history).
-
-#### FlowRouter.withTrailingSlash(fn)
-
-By default, FlowRouter removes trailing slash because it's nice. We only do it when generating path via `FlowRouter.path()`. Some other functions like `.setParams(), .go()` which changes the URL also use `FlowRouter.path()`. So, this behaviour is applied to them as well.
-
-But, something we [want](https://github.com/meteorhacks/flow-router/issues/192) trailing slashes. For those cases, you can use this API.
-
-~~~js
-FlowRouter.withTrailingSlash(function() {
-  FlowRouter.go('/mypath/');
-});
-~~~
 
 #### FlowRouter.reload()
 
@@ -681,9 +612,4 @@ Also, in the server we need look for different things compared with the client. 
 * In server we've Cookies
 
 So, it's better to use a dedicated server-side router like [`meteorhacks:picker`](https://github.com/meteorhacks/picker). It supports connect and express middlewares and has a very easy to use route syntax.
-
-#### Server Side Rendering (SSR)
-
-Although, we don't have server side routes, we **will** have server side rendering support. We've some initial plans to achieve SSR and it's the main feature of version 3.0.
-
-We may have our own initial HTML rendering system to allow SSR bypassing meteor's default layout.
+`

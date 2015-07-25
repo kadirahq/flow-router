@@ -18,7 +18,6 @@ Router = function () {
   this._initialized = false;
   this._triggersEnter = [];
   this._triggersExit = [];
-  this._middleware = [];
   this._routes = [];
   this._routesMap = {};
   this._updateCallbacks();
@@ -224,16 +223,6 @@ Router.prototype.current = function() {
   return this._current;
 };
 
-Router.prototype.reactiveCurrent = function() {
-  var warnMessage = 
-    ".reactiveCurrent() is deprecated. " +
-    "Use .watchPathChange() instead";
-  console.warn(warnMessage);
-  
-  this.watchPathChange();
-  return this.current();
-};
-
 // Implementing Reactive APIs
 var reactiveApis = [
   'getParam', 'getQueryParam', 
@@ -254,35 +243,6 @@ reactiveApis.forEach(function(api) {
     return currentRoute[api].call(currentRoute, arg1);
   };
 });
-
-Router.prototype.middleware = function(middlewareFn) {
-  console.warn("'middleware' is deprecated. Use 'triggers' instead");
-  var self = this;
-  var mw = function(ctx, next) {
-    // make sure middlewars run after Meteor has been initialized
-    // this is very important for specially for fast render and Meteor.user()
-    // availability
-    Meteor.startup(function() {
-      middlewareFn(ctx.pathname, processNext);
-    });
-
-    function processNext(path) {
-      if(path) {
-        return self._page.redirect(path);
-      }
-      next();
-    }
-  };
-
-  this._middleware.push(mw);
-  this._updateCallbacks();
-  return this;
-};
-
-Router.prototype.ready = function() {
-  console.warn("'FlowRouter.ready()' is deprecated. Use 'FlowRouter.subsReady()' instead");
-  return this.subsReady.apply(this, arguments);
-};
 
 Router.prototype.subsReady = function() {
   var callback = null;
@@ -517,11 +477,6 @@ Router.prototype._updateCallbacks = function () {
 
   self._page.callbacks = [];
   self._page.exits = [];
-
-  // add global middleware
-  _.each(self._middleware, function(fn) {
-    self._page("*", fn);
-  });
 
   _.each(self._routes, function(route) {
     self._page(route.path, route._actionHandle);

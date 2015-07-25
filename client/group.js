@@ -9,7 +9,6 @@ Group = function(router, options, parent) {
   this._router = router;
   this.prefix = options.prefix || '';
 
-  this._middlewares = options.middlewares || [];
   this._triggersEnter = options.triggersEnter || [];
   this._triggersExit = options.triggersExit || [];
   this._subscriptions = options.subscriptions || Function.prototype;
@@ -17,7 +16,6 @@ Group = function(router, options, parent) {
   this.parent = parent;
   if (this.parent) {
     this.prefix = parent.prefix + this.prefix;
-    this._middlewares = parent._middlewares.concat(this._middlewares);
 
     this._triggersEnter = parent._triggersEnter.concat(this._triggersEnter);
     this._triggersExit = this._triggersExit.concat(parent._triggersExit);
@@ -34,9 +32,6 @@ Group.prototype.route = function(path, options, group) {
 
   group = group || this;
   path = this.prefix + path;
-
-  var middlewares = options.middlewares || [];
-  options.middlewares = this._middlewares.concat(middlewares);
 
   var triggersEnter = options.triggersEnter || [];
   options.triggersEnter = this._triggersEnter.concat(triggersEnter);
