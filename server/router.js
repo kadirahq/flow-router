@@ -8,6 +8,7 @@ Router = function () {
 
 
 Router.prototype.route = function(path, options) {
+  options = options || {};
   this._routesMap[path] = new Route(this, path, options);
 
   if (options.name) {
