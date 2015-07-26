@@ -1,8 +1,8 @@
 var Qs = Npm.require('qs');
 
 Router = function () {
+  this._routes = [];
   this._routesMap = {};
-  this._routeNamesMap = {};
   this.subscriptions = Function.prototype;
 };
 
@@ -14,13 +14,14 @@ Router.prototype.route = function(path, options) {
   }
   
   options = options || {};
-  this._routesMap[path] = new Route(this, path, options);
+  var route = new Route(this, path, options);
+  this._routes.push(route);
 
   if (options.name) {
-    this._routeNamesMap[options.name] = path;
+    this._routesMap[options.name] = route;
   }
 
-  return this._routesMap[path];
+  return route;
 };
 
 Router.prototype.group = function(options) {
@@ -28,10 +29,6 @@ Router.prototype.group = function(options) {
 };
 
 Router.prototype.path = function(pathDef, fields, queryParams) {
-  if (this._routeNamesMap[pathDef]) {
-    pathDef = this._routeNamesMap[pathDef];
-  }
-
   if (this._routesMap[pathDef]) {
     pathDef = this._routesMap[pathDef].path;
   }

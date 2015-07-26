@@ -1,7 +1,7 @@
 Package.describe({
-  name: 'meteorhacks:flow-router',
+  name: 'kadira:flow-router',
   summary: 'Carefully Designed Client Side Router for Meteor',
-  version: '1.19.0',
+  version: '2.0.0',
   git: 'https://github.com/meteorhacks/flow-router.git'
 });
 
@@ -41,6 +41,7 @@ Package.onTest(function(api) {
   api.addFiles('test/server/plugins/fast_render.js', 'server');
   
   api.addFiles('test/common/router.path.spec.js', ['client', 'server']);
+  api.addFiles('test/common/route.spec.js', ['client', 'server']);
 });
 
 

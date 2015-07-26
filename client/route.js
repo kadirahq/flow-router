@@ -1,6 +1,7 @@
 Route = function(router, path, options, group) {
   options = options || {};
 
+  this.options = options;
   this.path = path;
   if (options.name) {
     this.name = options.name;

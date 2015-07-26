@@ -1,5 +1,6 @@
 Route = function(router, path, options) {
   options = options || {};
+  this.options = options;
 
   this.path = path;
   this.action = options.action || Function.prototype;
