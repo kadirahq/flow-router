@@ -74,9 +74,6 @@ Router.prototype.route = function(path, options, group) {
       oldRoute: oldRoute
     };
 
-    // to backward compatibility
-    self._current.params.query = self._current.queryParams;
-
     // we need to invalidate if all the triggers have been completed
     // if not that means, we've been redirected to another path
     // then we don't need to invalidate

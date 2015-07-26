@@ -8,6 +8,11 @@ Router = function () {
 
 
 Router.prototype.route = function(path, options) {
+  if (!/^\/.*/.test(path)) {
+    var message = "route's path must start with '/'";
+    throw new Error(message);
+  }
+  
   options = options || {};
   this._routesMap[path] = new Route(this, path, options);
 
