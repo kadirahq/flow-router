@@ -1,5 +1,15 @@
 # Change Log
 
+### v2.0.0 
+
+* Released 2.0  :)
+* Now flow-router comes as `kadira:flow-router`
+* Remove deprecated APIs
+    - `FlowRouter.reactiveCurrent()`
+    - Middlewares
+    - `FlowRouter.current().params.query`
+* Follow the [migration guide](https://github.com/kadirahq/flow-router#migrating-into-20) for more information.
+
 ### v1.18.0
 
 * Implement idempotant routing on withReplaceState. See [#197](https://github.com/meteorhacks/flow-router/issues/197)
