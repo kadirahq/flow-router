@@ -1,4 +1,4 @@
-# Flow Router [![Build Status](https://travis-ci.org/meteorhacks/flow-router.svg?branch=master)](https://travis-ci.org/meteorhacks/flow-router) [![Stories in Ready](https://badge.waffle.io/meteorhacks/flow-router.svg?label=doing&title=Activities)](http://waffle.io/meteorhacks/flow-router)
+# Flow Router [![Build Status](https://travis-ci.org/kadirahq/flow-router.svg?branch=master)](https://travis-ci.org/kadirahq/flow-router) [![Stories in Ready](https://badge.waffle.io/kadirahq/flow-router.svg?label=doing&title=Activities)](http://waffle.io/kadirahq/flow-router)
 
 
 Carefully Designed Client Side Router for Meteor. 
