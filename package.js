@@ -1,8 +1,8 @@
 Package.describe({
-  name: 'meteorhacks:flow-router-ssr',
-  summary: 'Carefully Designed Client Side Router for Meteor',
-  version: '2.0.1',
-  git: 'https://github.com/meteorhacks/flow-router.git'
+  name: 'kadira:flow-router-ssr',
+  summary: 'Same as kadira:flow-router, but with SSR support',
+  version: '3.0.0',
+  git: 'https://github.com/kadirahq/flow-router.git'
 });
 
 Npm.depends({
@@ -27,7 +27,6 @@ Package.onTest(function(api) {
   api.use('meteorhacks:fast-render');
   api.use('meteorhacks:inject-data');
 
-  api.addFiles('test/common/fast_render_route.js', ['client', 'server']);
 
   api.addFiles('test/client/_helpers.js', 'client');
   api.addFiles('test/server/_helpers.js', 'server');
@@ -40,12 +39,10 @@ Package.onTest(function(api) {
   api.addFiles('test/client/group.spec.js', 'client');
   api.addFiles('test/client/trigger.spec.js', 'client');
   api.addFiles('test/client/triggers.js', 'client');
-
-  api.addFiles('test/server/plugins/fast_render.js', 'server');
   
   api.addFiles('test/common/router.path.spec.js', ['client', 'server']);
+  api.addFiles('test/common/route.spec.js', ['client', 'server']);
 });
-
 
 function configure(api) {
   api.versionsFrom('1.0');
@@ -56,7 +53,7 @@ function configure(api) {
   api.use('reactive-var');
 
   api.use('meteorhacks:fast-render@2.7.1', ['client', 'server']);
-  api.use('cosmos:browserify@0.3.0', 'client');
+  api.use('cosmos:browserify@0.5.0', 'client');
   api.use('meteorhacks:picker@1.0.3', 'server');
   api.use('meteorhacks:inject-data@1.3.0');
 
@@ -73,6 +70,5 @@ function configure(api) {
   api.addFiles('server/ssr_context.js', 'server');
   api.addFiles('server/_init.js', 'server');
 
-  api.addFiles('server/plugins/fast_render.js', 'server');
   api.addFiles('server/plugins/ssr_data.js', 'server');
 }

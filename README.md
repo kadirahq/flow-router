@@ -1,29 +1,43 @@
-# Flow Router [![Build Status](https://travis-ci.org/meteorhacks/flow-router.svg?branch=master)](https://travis-ci.org/meteorhacks/flow-router) [![Stories in Ready](https://badge.waffle.io/meteorhacks/flow-router.svg?label=doing&title=Activities)](http://waffle.io/meteorhacks/flow-router)
+# Flow Router [![Build Status](https://travis-ci.org/kadirahq/flow-router.svg?branch=master)](https://travis-ci.org/kadirahq/flow-router) [![Stories in Ready](https://badge.waffle.io/kadirahq/flow-router.svg?label=doing&title=Activities)](http://waffle.io/kadirahq/flow-router)
 
 
 Carefully Designed Client Side Router for Meteor. 
 
-Flow Router is a minimalistic router which only handles routing and subscriptions. You can't have any kind of reactive code inside the router. But there is a rich reactive API to watch changes in the routes.
+FlowRouter is a very simple router for Meteor. It does routing for client-side apps and does not handle rendering itself.
+
+It exposes a great API for changing the URL and reactively getting data from the URL. However, inside the router, it's not reactive. Most importantly, FlowRouter is designed with performance in mind and it focuses on what it does best: **routing**.
+
+> We've released 2.0 and follow this [migration guide](#migrating-into-20) if you are already using FlowRouter.
 
 ## TOC
 
+* [Meteor Routing Guide](#meteor-routing-guide)
 * [Getting Started](#getting-started)
 * [Routes Definition](#routes-definition)
-* [Subscription Management](#subscription-management)
 * [Rendering and Layout Management](#rendering-and-layout-management)
 * [Triggers](#triggers)
-* [Middlewares](#middlewares)
 * [Not Found Routes](#not-found-routes)
 * [API](#api)
+* [Subscription Management](#subscription-management)
 * [Difference with Iron Router](#difference-with-iron-router)
+<<<<<<< HEAD
 * [SSR](#ssr)
+=======
+* [Migrating into 2.0](#migrating-into-20)
+
+## Meteor Routing Guide
+
+[Meteor Routing Guide](https://kadira.io/academy/meteor-routing-guide) is a completed guide into **routing** and related topics in Meteor. It talks about how to use FlowRouter properly and use it with **Blaze and React**. It also shows how to manage **subscriptions** and implement **auth logic** in the view layer.
+
+[![Meteor Routing Guide](https://cldup.com/AxlPfoxXmR.png)](https://kadira.io/academy/meteor-routing-guide)
+>>>>>>> master
 
 ## Getting Started
 
 Add Flow Router to your app:
 
 ~~~shell
-meteor add meteorhacks:flow-router
+meteor add kadira:flow-router
 ~~~
 
 Let's write our first route (add this file to `lib/router.js`):
@@ -56,14 +70,6 @@ Here's the syntax for a simple route:
 
 ~~~js
 FlowRouter.route('/blog/:postId', {
-    // an array of middlewares (we'll discuss about this later on)
-    middlewares: [],
-
-    // define your subscriptions
-    subscriptions: function(params, queryParams) {
-       
-    },
-
     // do some action for this route
     action: function(params, queryParams) {
         console.log("Params:", params);
@@ -87,7 +93,7 @@ Params: {postId: "my-post"}
 Query Params: {comments: "on", color: "dark"}
 ~~~
 
-For a single interaction, the router only runs once. That means, after you've visit a route, first it will call `middlewares`, then `subscriptions` and finally `action`. After that happens, none of those methods will be called again for that route visit.
+For a single interaction, the router only runs once. That means, after you've visit a route, first it will call `triggers`, then `subscriptions` and finally `action`. After that happens, none of those methods will be called again for that route visit.
 
 You can define routes anywhere in the `client` directory. But, we recommend to add them in the `lib` directory. Then `fast-render` can detect subscriptions and send them for you (we'll talk about this is a moment).
 
@@ -98,12 +104,9 @@ You can group routes for better route organization. Here's an example:
 ~~~js
 var adminRoutes = FlowRouter.group({
   prefix: '/admin',
-  subscriptions: function() {
-    this.register('adminSettings', Meteor.subscribe('settings', {admin: true}));
-  },
-  middlewares: [
+  triggersEnter: [
     function(path, next) {
-      console.log('running group middleware');
+      console.log('running group triggers');
       next();
     }
   ]
@@ -114,9 +117,9 @@ adminRoutes.route('/', {
   action: function() {
     FlowLayout.render('componentLayout', {content: 'admin'});
   },
-  middlewares: [
+  triggersEnter: [
     function(path, next) {
-      console.log('running /admin middleware');
+      console.log('running /admin trigger');
       next();
     }
   ]
@@ -151,95 +154,19 @@ superAdminRoutes.route('/post', {
 });
 ~~~
 
-## Subscription Management 
-
-Flow Router does only registration of subscriptions. It does not wait until subscription became ready. This is how to register a subscription.
-
-~~~js
-FlowRouter.route('/blog/:postId', {
-    subscriptions: function(params, queryParams) {
-        this.register('myPost', Meteor.subscribe('blogPost', params.postId));
-    }
-});
-~~~
-
-We can also register global subscriptions like this:
-
-~~~js
-FlowRouter.subscriptions = function() {
-  this.register('myCourses', Meteor.subscribe('courses'));
-};
-~~~
-
-All these global subscriptions run on every route. So, pay special attention to names when registering subscriptions.
-
-After you've registered your subscriptions, you can reactively check for the status of those subscriptions like this:
-
-~~~js
-Tracker.autorun(function() {
-    console.log("Is myPost ready?:", FlowRouter.subsReady("myPost"));
-    console.log("Does all subscriptions ready?:", FlowRouter.subsReady());
-});
-~~~
-
-So, you can use `FlowRouter.subsReady` inside template helpers to show the loading status and act accordingly.
-
-### FlowRouter.subsReady() with a callback
-
-Sometimes, we need to use `FlowRouter.subsReady()` in places where an autorun is not available. One such example is inside an event handler. For such places, we can use the callback API of `FlowRouter.subsReady()`.
-
-~~~js
-Template.myTemplate.events(
-   "click #id": function(){
-      FlowRouter.subsReady("myPost", function() {
-         // do something
-      });
-  }
-);
-~~~
-
-> Arunoda has discussed more about Subscription Management in Flow Router in [this](https://meteorhacks.com/flow-router-and-subscription-management.html#subscription-management) blog post about [Flow Router and Subscription Management](https://meteorhacks.com/flow-router-and-subscription-management.html).
-
-> He's showing how to build an app like this:
-
->![FlowRouter's Subscription Management](https://cldup.com/esLzM8cjEL.gif)
-
-#### Fast Render
-Flow Router has built in support for [Fast Render](https://github.com/meteorhacks/fast-render). 
-
-- `meteor add meteorhacks:fast-render`
-- Put `router.js` in a shared location. We suggest `lib/router.js`.
-
-You can exclude Fast Render support by wrapping the subscription registration in an `isClient` block:
-
-~~~js
-FlowRouter.route('/blog/:postId', {
-    subscriptions: function(params, queryParams) {
-        // using Fast Render
-        this.register('myPost', Meteor.subscribe('blogPost', params.postId));
-
-        // not using Fast Render
-        if(Meteor.isClient) {
-            this.register('data', Meteor.subscribe('bootstrap-data');
-        }
-    }
-});
-~~~
-
-#### Subscription Caching
-
-You can also use [Subs Manager](https://github.com/meteorhacks/subs-manager) for caching subscriptions on the client. We haven't done anything special to make it work. It should work as it works with other routers.
-
 ## Rendering and Layout Management
 
-Flow Router does not handle rendering or layout management. For that, you can use [Flow Layout](https://github.com/meteorhacks/flow-layout).
+Flow Router does not handle rendering or layout management. For that, you can use:
+
+  * [Blaze Layout for Blaze](https://github.com/kadirahq/blaze-layout)
+  * [React Layout for React](https://github.com/kadirahq/meteor-react-layout)
 
 Then you can invoke the layout manager inside the `action` method in the router.
 
 ~~~js
 FlowRouter.route('/blog/:postId', {
     action: function(params) {
-        FlowLayout.render("mainLayout", {area: "blog"});
+        BlazeLayout.render("mainLayout", {area: "blog"});
     }
 });
 ~~~
@@ -281,9 +208,6 @@ This is how you can define triggers to a group definition.
 ~~~js
 var adminRoutes = FlowRouter.group({
   prefix: '/admin',
-  subscriptions: function() {
-    this.register('adminSettings', Meteor.subscribe('settings', {admin: true}));
-  },
   triggersEnter: [trackRouteEntry],
   triggersExit: [trackRouteEntry]
 });
@@ -330,49 +254,6 @@ Every trigger callback comes with a second argument. It's a function where you c
 * redirect cannot be called multiple times
 
 Check this [PR](https://github.com/meteorhacks/flow-router/pull/172) to learn more about our redirect API.
-
-## Middlewares
-
-> Right now middlewares are deprecated. Use triggers instead. <br>
-> Triggers are very similar to middlewares, but triggers don't have a `next()` argument. So, you've no way to block or wait the route.
-
-Sometimes, you need to invoke some tasks just before entering the route. That's where middlewares come in. Here are some of the use cases for middlewares:
-
-* Route redirecting
-* Analytics
-* Initialization tasks
-
-Below is an example of implementing simple redirection logic with middlewares. It will redirect a user to the sign-in page if they are not logged in.
-
-~~~js
-
-FlowRouter.route('/apps/:appId', {
-    middlewares: [requiredLogin],
-    subscriptions: function(params) {
-        
-    },
-    action: function(params) {
-
-    }
-});
-
-function requiredLogin(path, next) {
-  // this works only because the use of Fast Render
-  var redirectPath = (!Meteor.userId())? "/sign-in" : null;
-  next(redirectPath);
-}
-~~~
-
-You can also write global middlewares like this:
-
-~~~js
-FlowRouter.middleware(trackingMiddleware);
-
-function trackingMiddleware(path, next) {
-    console.log("tracking path:", path);
-    next();
-}
-~~~
 
 ## Not Found Routes
 
@@ -534,10 +415,6 @@ Tracker.autorun(function() {
 });
 ~~~
 
-#### FlowRouter.reactiveCurrent() [Deprecated]
-
-This API is deprecated. Use `FlowRouter.watchPathChange` instead. This API won't included in the next major release. (2.x.x)
-
 #### FlowRouter.withReplaceState(fn)
 Normally, all the route changes made via APIs like `FlowRouter.go` and `FlowRouter.setParams()` add a URL item to the browser history. For example, run the following code:
 
@@ -587,6 +464,89 @@ WhenEverYourAppIsReady(function() {
 
 For more information visit [issue #180](https://github.com/meteorhacks/flow-router/issues/180).
 
+## Subscription Management 
+
+For Subscription Management, we highly sugggest you to follow [Template/Component level subscriptions](https://kadira.io/academy/meteor-routing-guide/content/subscriptions-and-data-management). Visit this [guide](https://kadira.io/academy/meteor-routing-guide/content/subscriptions-and-data-management) for that.
+
+FlowRouter also has it's own subscription registration machanism. We will remove this in version 3.0. We don't remove or deprecate it in version 2.x because this is the easiest way to implement FastRender support for your app. In 3.0 we've better support for FastRender with Server Side Rendering.
+
+Flow Router does only registration of subscriptions. It does not wait until subscription became ready. This is how to register a subscription.
+
+~~~js
+FlowRouter.route('/blog/:postId', {
+    subscriptions: function(params, queryParams) {
+        this.register('myPost', Meteor.subscribe('blogPost', params.postId));
+    }
+});
+~~~
+
+We can also register global subscriptions like this:
+
+~~~js
+FlowRouter.subscriptions = function() {
+  this.register('myCourses', Meteor.subscribe('courses'));
+};
+~~~
+
+All these global subscriptions run on every route. So, pay special attention to names when registering subscriptions.
+
+After you've registered your subscriptions, you can reactively check for the status of those subscriptions like this:
+
+~~~js
+Tracker.autorun(function() {
+    console.log("Is myPost ready?:", FlowRouter.subsReady("myPost"));
+    console.log("Does all subscriptions ready?:", FlowRouter.subsReady());
+});
+~~~
+
+So, you can use `FlowRouter.subsReady` inside template helpers to show the loading status and act accordingly.
+
+### FlowRouter.subsReady() with a callback
+
+Sometimes, we need to use `FlowRouter.subsReady()` in places where an autorun is not available. One such example is inside an event handler. For such places, we can use the callback API of `FlowRouter.subsReady()`.
+
+~~~js
+Template.myTemplate.events(
+   "click #id": function(){
+      FlowRouter.subsReady("myPost", function() {
+         // do something
+      });
+  }
+);
+~~~
+
+> Arunoda has discussed more about Subscription Management in Flow Router in [this](https://meteorhacks.com/flow-router-and-subscription-management.html#subscription-management) blog post about [Flow Router and Subscription Management](https://meteorhacks.com/flow-router-and-subscription-management.html).
+
+> He's showing how to build an app like this:
+
+>![FlowRouter's Subscription Management](https://cldup.com/esLzM8cjEL.gif)
+
+#### Fast Render
+Flow Router has built in support for [Fast Render](https://github.com/meteorhacks/fast-render). 
+
+- `meteor add meteorhacks:fast-render`
+- Put `router.js` in a shared location. We suggest `lib/router.js`.
+
+You can exclude Fast Render support by wrapping the subscription registration in an `isClient` block:
+
+~~~js
+FlowRouter.route('/blog/:postId', {
+    subscriptions: function(params, queryParams) {
+        // using Fast Render
+        this.register('myPost', Meteor.subscribe('blogPost', params.postId));
+
+        // not using Fast Render
+        if(Meteor.isClient) {
+            this.register('data', Meteor.subscribe('bootstrap-data');
+        }
+    }
+});
+~~~
+
+#### Subscription Caching
+
+You can also use [Subs Manager](https://github.com/meteorhacks/subs-manager) for caching subscriptions on the client. We haven't done anything special to make it work. It should work as it works with other routers.
+
 ## Difference with Iron Router
 
 Flow Router and Iron Router are two different routers. Iron Router tries to be a full featured solution. It tries to do everything including routing, subscriptions, rendering and layout management.
@@ -597,11 +557,11 @@ Let's learn more about the differences:
 
 ### Rendering 
 
-Flow Router doesn't handle rendering. By decoupling rendering from the router it's possible to use any rendering framework, such as [Flow Layout](https://github.com/meteorhacks/flow-layout) to render with Blaze's Dynamic Templates, React, or Polymer. Rendering calls are made in the the route's action. 
+Flow Router doesn't handle rendering. By decoupling rendering from the router it's possible to use any rendering framework, such as [Blaze Layout](https://github.com/kadirahq/blaze-layout) to render with Blaze's Dynamic Templates. Rendering calls are made in the the route's action. We've layout manager for [React](https://github.com/kadirahq/meteor-react-layout) as well.
 
 ### Subscriptions
 
-With Flow Router, you can register subscriptions, but there is no concept like Iron Router's **waitOn**. Instead Flow Router provides a [reactive API](#subscription-management) to check the state of subscriptions. You can use that to achieve similar functionality in the template layer. 
+With Flow Router, we highly suggest to use template/component layer subscriptions. But, if you need to do routing in the router layer, FlowRouter has [subscription registration](#subscription-management) machanism. Even with that, FlowRouter never wait for the subscriptions and view layer to do it.
 
 ### Reactive Content
 
@@ -669,10 +629,39 @@ Also, in the server we need look for different things compared with the client. 
 
 So, it's better to use a dedicated server-side router like [`meteorhacks:picker`](https://github.com/meteorhacks/picker). It supports connect and express middlewares and has a very easy to use route syntax.
 
-#### Server Side Rendering (SSR)
+### Server Side Rendering
 
-Although, we don't have server side routes, we **will** have server side rendering support. We've some initial plans to achieve SSR and it's the main feature of version 3.0.
+Flow Router 3.0 will have server side rendering support. We've already started the initial version and check our [`ssr`](https://github.com/meteorhacks/flow-router/tree/ssr) branch for that.
 
+It's currently very usable and Kadira already using it for <https://kadira.io>
+
+### Better Initial Loading Support
+
+In Meteor, we've to wait until all the JS and other resources before rendering anything. This is an issue. In 3.0, with the support from Server Side Rendering we are going to fix it.
+`
+## Migrating into 2.0
+
+Migrating into version 2.0 is easy and you don't need to change any application code since you are already using 2.0 features and the APIs. In 2.0, we've changed names and removed some deprecated APIs.
+
+Here are the steps to migrate your app into 2.0.
+
+#### Use the New FlowRouter Package
+* Now FlowRouter comes as `kadira:flow-router`
+* So, remove `meteorhacks:flow-router` with : `meteor remove meteorhacks:flow-router`
+* Then, add `kadira:flow-router` with `kadira:flow-router`
+
+#### Change FlowLayout into BlazeLayout
+* We've also renamed FlowLayout as [BlazeLayout](https://github.com/kadirahq/blaze-layout).
+* So, remove `meteorhacks:flow-layout` and add `kadira:blaze-layout` instead.
+* You need to use `BlazeLayout.render()` instead of `FlowLayout.render()`
+
+#### Stop using deprecated Apis
+* There is no middleware support. Use triggers instead.
+* There is no API called `.reactiveCurrent()`, use `.watchPathChange()` instead.
+* Earlier, you can access query params with `FlowRouter.current().params.query`. But, now you can't do that. Use `FlowRouter.current().queryParams` instead.
+
+
+<<<<<<< HEAD
 We may have our own initial HTML rendering system to allow SSR bypassing meteor's default layout.
 
 ## SSR
@@ -684,3 +673,5 @@ Current SSR is in alpha stage. Here are some APIs.
 We cache generated pages so, we don't need to render them again and again. This is performance improvement to deal with commonly requested pages. That's because React SSR on the server is very costly.
 
 Anyway, you can turn this off by setting the timeout to `0`
+=======
+>>>>>>> master

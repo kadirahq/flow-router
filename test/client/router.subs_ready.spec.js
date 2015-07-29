@@ -218,24 +218,3 @@ Tinytest.addAsync('Client - Router - subsReady - no subscriptions - simple', fun
     next();
   }, 100);
 });
-
-Tinytest.addAsync('Client - Router - ready - deperearted, but still supports', function (test, next) {
-  var rand = Random.id();
-  FlowRouter.route('/' + rand, {
-    subscriptions: function(params) {
-      this.register('bar', Meteor.subscribe('bar'));
-      this.register('foo', Meteor.subscribe('foo'));
-    }
-  });
-
-  FlowRouter.subscriptions = function () {
-    this.register('baz', Meteor.subscribe('baz'));
-  };
-
-  FlowRouter.go('/' + rand);
-  setTimeout(function() {
-    test.isTrue(!!FlowRouter.ready('foo', 'baz'));
-    FlowRouter.subscriptions = Function.prototype;
-    next();
-  }, 100);
-});

@@ -1,6 +1,7 @@
 Route = function(router, path, options, group) {
   options = options || {};
 
+  this.options = options;
   this.path = path;
   if (options.name) {
     this.name = options.name;
@@ -10,7 +11,6 @@ Route = function(router, path, options, group) {
   this._subscriptions = options.subscriptions || Function.prototype;
   this._triggersEnter = options.triggersEnter || [];
   this._triggersExit = options.triggersExit || [];
-  this._middlewares = options.middlewares || [];
   this._subsMap = {};
   this._router = router;
 
@@ -42,34 +42,9 @@ Route.prototype.getAllSubscriptions = function() {
   return this._subsMap;
 };
 
-Route.prototype._processMiddlewares = function(context, after) {
-  var currentIndex = 0;
-  var self = this;
-
-  runMiddleware();
-  function runMiddleware() {
-    var fn = self._middlewares[currentIndex++];
-    if(fn) {
-      console.warn("'middleware' is deprecated. Use 'triggers' instead");
-      fn(context.path, function(redirectPath) {
-        if(redirectPath) {
-          return self._router.redirect(redirectPath);
-        } else {
-          runMiddleware();
-        }
-      });
-    } else {
-      after();
-    }
-  }
-};
-
 Route.prototype.callAction = function(current) {
   var self = this;
-
-  self._processMiddlewares(current.context, function() {
-    self._action(current.params, current.queryParams);
-  });
+  self._action(current.params, current.queryParams);
 };
 
 Route.prototype.callSubscriptions = function(current) {

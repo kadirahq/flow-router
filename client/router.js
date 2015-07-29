@@ -1,4 +1,5 @@
 Router = function () {
+  var self = this;
   this.globals = [];
   this.subscriptions = Function.prototype;
 
@@ -17,7 +18,6 @@ Router = function () {
   this._initialized = false;
   this._triggersEnter = [];
   this._triggersExit = [];
-  this._middleware = [];
   this._routes = [];
   this._routesMap = {};
   this._updateCallbacks();
@@ -31,10 +31,16 @@ Router = function () {
 
   this.env = {
     replaceState: new Meteor.EnvironmentVariable(),
-    reload: new Meteor.EnvironmentVariable()
+    reload: new Meteor.EnvironmentVariable(),
+    trailingSlash: new Meteor.EnvironmentVariable()
   };
 
-  this._redirectFn = _.bind(this._page.redirect, this._page);
+  // redirect function used inside triggers
+  this._redirectFn = function(pathDef, fields, queryParams) {
+    self.withReplaceState(function() {
+      self.go(pathDef, fields, queryParams);
+    });
+  };
   this._initTriggersAPI();
 };
 
@@ -67,9 +73,6 @@ Router.prototype.route = function(path, options, group) {
       route: route,
       oldRoute: oldRoute
     };
-
-    // to backward compatibility
-    self._current.params.query = self._current.queryParams;
 
     // we need to invalidate if all the triggers have been completed
     // if not that means, we've been redirected to another path
@@ -139,6 +142,11 @@ Router.prototype.path = function(pathDef, fields, queryParams) {
   // but keep the root slash if it's the only one
   path = path.match(/^\/{1}$/) ? path: path.replace(/\/$/, "");
 
+  // explictly asked to add a trailing slash
+  if(this.env.trailingSlash.get() && _.last(path) !== "/") {
+    path += "/";
+  }
+
   var strQueryParams = this._qs.stringify(queryParams || {});
   if(strQueryParams) {
     path += "?" + strQueryParams;
@@ -152,7 +160,7 @@ Router.prototype.go = function(pathDef, fields, queryParams) {
   
   var useReplaceState = this.env.replaceState.get();
   if(useReplaceState) {
-    this._page.redirect(path);
+    this._page.replace(path);
   } else {
     this._page(path);
   }
@@ -212,16 +220,6 @@ Router.prototype.current = function() {
   return this._current;
 };
 
-Router.prototype.reactiveCurrent = function() {
-  var warnMessage = 
-    ".reactiveCurrent() is deprecated. " +
-    "Use .watchPathChange() instead";
-  console.warn(warnMessage);
-  
-  this.watchPathChange();
-  return this.current();
-};
-
 // Implementing Reactive APIs
 var reactiveApis = [
   'getParam', 'getQueryParam', 
@@ -242,35 +240,6 @@ reactiveApis.forEach(function(api) {
     return currentRoute[api].call(currentRoute, arg1);
   };
 });
-
-Router.prototype.middleware = function(middlewareFn) {
-  console.warn("'middleware' is deprecated. Use 'triggers' instead");
-  var self = this;
-  var mw = function(ctx, next) {
-    // make sure middlewars run after Meteor has been initialized
-    // this is very important for specially for fast render and Meteor.user()
-    // availability
-    Meteor.startup(function() {
-      middlewareFn(ctx.pathname, processNext);
-    });
-
-    function processNext(path) {
-      if(path) {
-        return self._page.redirect(path);
-      }
-      next();
-    }
-  };
-
-  this._middleware.push(mw);
-  this._updateCallbacks();
-  return this;
-};
-
-Router.prototype.ready = function() {
-  console.warn("'FlowRouter.ready()' is deprecated. Use 'FlowRouter.subsReady()' instead");
-  return this.subsReady.apply(this, arguments);
-};
 
 Router.prototype.subsReady = function() {
   var callback = null;
@@ -325,6 +294,10 @@ Router.prototype.withReplaceState = function(fn) {
   return this.env.replaceState.withValue(true, fn);
 };
 
+Router.prototype.withTrailingSlash = function(fn) {
+  return this.env.trailingSlash.withValue(true, fn);
+};
+
 Router.prototype._notfoundRoute = function(context) {
   this._current = {
     path: context.path,
@@ -358,16 +331,20 @@ Router.prototype.initialize = function() {
   // It is impossible to bypass exit triggers,
   // becuase they execute before the handler and
   // can not know what the next path is, inside exit trigger.
-  var originalShow = this._page.show;
+  //
+  // we need override both show, replace to make this work
+  // since we use redirect when we are talking about withReplaceState 
+  _.each(['show', 'replace'], function(fnName) {
+    var original = self._page[fnName];
+    self._page[fnName] = function(path, state, dispatch, push) {
+      var reload = self.env.reload.get();
+      if (!reload && self._current.path === path) {
+        return;
+      }
 
-  this._page.show = function(path, state, dispatch, push) {
-    var reload = self.env.reload.get();
-    if (!reload && self._current.path === path) {
-      return;
-    }
-
-    originalShow.call(this, path, state, dispatch, push);
-  };
+      original.call(this, path, state, dispatch, push);
+    };
+  });
 
   // this is very ugly part of pagejs and it does decoding few times
   // in unpredicatable manner. See #168
@@ -442,6 +419,7 @@ Router.prototype._buildTracker = function() {
 };
 
 Router.prototype._invalidateTracker = function() {
+  var self = this;
   this.safeToRun++;
   this._tracker.invalidate();
   // After the invalidation we need to flush to make changes imediately
@@ -459,7 +437,34 @@ Router.prototype._invalidateTracker = function() {
     try {
       Tracker.flush();
     } catch(ex) {
+      // only handling "while flushing" errors
+      if(!/Tracker\.flush while flushing/.test(ex.message)) {
+        return;
+      }
 
+      // XXX: fix this with a proper solution by removing subscription mgt.
+      // from the router. Then we don't need to run invalidate using a tracker
+
+      // this happens when we are trying to invoke a route change 
+      // with inside a route chnage. (eg:- Template.onCreated)
+      // Since we use page.js and tracker, we don't have much control 
+      // over this process.
+      // only solution is to defer route execution.
+
+      // It's possible to have more than one path want to defer
+      // But, we only need to pick the last one.
+      self._nextPath = self._current.path;
+      Meteor.defer(function() {
+        var path = self._nextPath;
+        if(!path) {
+          return;
+        }
+
+        delete self._nextPath;
+        self.env.reload.withValue(true, function() {
+          self.go(path);
+        });
+      });
     }
   }
 };
@@ -469,11 +474,6 @@ Router.prototype._updateCallbacks = function () {
 
   self._page.callbacks = [];
   self._page.exits = [];
-
-  // add global middleware
-  _.each(self._middleware, function(fn) {
-    self._page("*", fn);
-  });
 
   _.each(self._routes, function(route) {
     self._page(route.path, route._actionHandle);

@@ -1,8 +1,26 @@
 # Change Log
-### v2.0.1
+### v3.0.1
 
 * Add initial SSR support
 * It's implemented as extendable manner. Currently ReactLayout supports it.
+
+### v2.0.0 
+
+* Released 2.0  :)
+* Now flow-router comes as `kadira:flow-router`
+* Remove deprecated APIs
+    - `FlowRouter.reactiveCurrent()`
+    - Middlewares
+    - `FlowRouter.current().params.query`
+* Follow the [migration guide](https://github.com/kadirahq/flow-router#migrating-into-20) for more information.
+
+### v1.18.0
+
+* Implement idempotant routing on withReplaceState. See [#197](https://github.com/meteorhacks/flow-router/issues/197)
+* Add an [API](https://github.com/meteorhacks/flow-router#flowrouterwithtrailingslashfn) to set trailing slashes.
+
+### v1.17.2
+* Fix [#182](https://github.com/meteorhacks/flow-router/issues/182) - Now trigger's redirect function support `FlowRouter.go()` syntax.
 
 ### v1.17.1
 

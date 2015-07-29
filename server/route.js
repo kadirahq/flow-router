@@ -3,6 +3,7 @@ var Url = Npm.require('url');
 Route = function(router, path, options) {
   var self = this;
   options = options || {};
+  this.options = options;
 
   this.path = path;
   this.name = options.name;

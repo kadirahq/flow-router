@@ -1,10 +1,12 @@
 Router = FlowRouter.Router;
 
-Tinytest.add('Common - Router - validate path definition', function (test, next) {
+Tinytest.addAsync('Common - Router - validate path definition', function (test, next) {
   // path must start with '/'
-  test.throws(function() {
+  try {
     FlowRouter.route(Random.id());
-  });
+  } catch(ex) {
+    next();
+  }
 });
 
 Tinytest.add('Common - Router - path - generic', function (test) {
