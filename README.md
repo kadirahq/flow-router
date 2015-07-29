@@ -24,7 +24,7 @@ You need to write your app with FlowRouter and [ReactLayout](https://github.com/
 
 Rendering React Components are extremely [CPU intensive](https://twitter.com/kadirahq/status/620467416749838336) on the server. We can't really expect that for a production app.
 
-So, we must run some sort of caching layer. So, FlowRouter by default has a 30 sec cache for all the pages. We define page by a unique URL. (not for a route) Currently now it's set globally. You can change it with:
+So, we must run some sort of caching layer. So, FlowRouter by default has a 30 sec cache for all the pages. We define page by a unique URL. Currently cache timeout is set globally. You can change it with:
 
 ~~~js
 if(Meteor.isServer) {
@@ -35,13 +35,13 @@ if(Meteor.isServer) {
 
 > Use `0` as `timeInMillis` to turn off caching
 
-This is a smart cache and once your DDP connection sends actual data, cache will get invalidated. 
+This is a smart cache and once your DDP connection sends actual data, cache will get invalidated locally.
 
 ## Defer Script Loading
 
 In a normal Meteor app we need to load 500KB - 2MB JavaScript and run those JavaScript before the browser start to render anything. So, JavaScript blocks the rendering.
 
-FlowRouter has an option which defer script loading. Then once the browser gots the html it can render without waiting for JavaScript. 
+FlowRouter has an option which defer script loading. Then once the browser received the html it can render without waiting for JavaScript. 
 
 This is a huge improvement and works even with very slow internet connections. To experience this just visit <https://kadira.io>
 
