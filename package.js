@@ -9,7 +9,8 @@ Npm.depends({
   'page':'1.6.3',
   'qs':'3.1.0',
   'deepmerge': '0.2.10',
-  "connect": "2.13.0"
+  "connect": "2.13.0",
+  'cheerio': '0.19.0'
 });
 
 Package.onUse(function(api) {

@@ -120,3 +120,7 @@ Router.prototype.wait = function() {
 Router.prototype.watchPathChange = function () {
 
 };
+
+Router.prototype.setDeferScriptLoading = function(defer) {
+  this.deferScriptLoading = defer;
+};
