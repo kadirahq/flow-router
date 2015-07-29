@@ -24,9 +24,9 @@ It exposes a great API for changing the URL and reactively getting data from the
 
 ## Meteor Routing Guide
 
-[Meteor Routing Guide](https://kadira.io/academy/meteor-routing-guide/content/introduction-to-flow-router) is a completed guide into **routing** and related topics in Meteor. It talks about how to use FlowRouter properly and use it with **Blaze and React**. It also shows how to manage **subscriptions** and implement **auth logic** in the view layer.
+[Meteor Routing Guide](https://kadira.io/academy/meteor-routing-guide) is a completed guide into **routing** and related topics in Meteor. It talks about how to use FlowRouter properly and use it with **Blaze and React**. It also shows how to manage **subscriptions** and implement **auth logic** in the view layer.
 
-[![Meteor Routing Guide](https://cldup.com/AxlPfoxXmR.png)](https://kadira.io/academy/meteor-routing-guide/content/introduction-to-flow-router)
+[![Meteor Routing Guide](https://cldup.com/AxlPfoxXmR.png)](https://kadira.io/academy/meteor-routing-guide)
 
 ## Getting Started
 
