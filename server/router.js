@@ -10,10 +10,6 @@ Router = function () {
   this.pageCacheTimeout = 1000 * 30;
 };
 
-Router.prototype.setPageCacheTimeout = function(timeout) {
-  this._pageCacheTimeout = timeout;
-};
-
 Router.prototype.route = function(path, options) {
   if (!/^\/.*/.test(path)) {
     var message = "route's path must start with '/'";
@@ -123,4 +119,8 @@ Router.prototype.watchPathChange = function () {
 
 Router.prototype.setDeferScriptLoading = function(defer) {
   this.deferScriptLoading = defer;
+};
+
+Router.prototype.setPageCacheTimeout = function(timeout) {
+  this._pageCacheTimeout = timeout;
 };

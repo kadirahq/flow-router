@@ -37,6 +37,24 @@ if(Meteor.isServer) {
 
 This is a smart cache and once your DDP connection sends actual data, cache will get invalidated. 
 
+## Defer Script Loading
+
+In a normal Meteor app we need to load 500KB - 2MB JavaScript and run those JavaScript before the browser start to render anything. So, JavaScript blocks the rendering.
+
+FlowRouter has an option which defer script loading. Then once the browser gots the html it can render without waiting for JavaScript. 
+
+This is a huge improvement and works even with very slow internet connections. To experience this just visit <https://kadira.io>
+
+To enable this, simply apply following:
+
+~~~js
+if(Meteor.isServer) {
+  FlowRouter.setDeferScriptLoading(true);
+}
+~~~
+
+> This cool feature was introduced by [@johanholmerin](https://github.com/johanholmerin)
+
 ## Can I use this on Production?
 
 It's depend on how you write your app. We are 80% feature complete and now we can call this is in alplha stage. At Kadira we use this in production for our main site. <https://kadira.io>.
