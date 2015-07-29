@@ -638,7 +638,7 @@ Here are the steps to migrate your app into 2.0.
 #### Use the New FlowRouter Package
 * Now FlowRouter comes as `kadira:flow-router`
 * So, remove `meteorhacks:flow-router` with : `meteor remove meteorhacks:flow-router`
-* Then, add `kadira:flow-router` with `kadira:flow-router`
+* Then, add `kadira:flow-router` with `meteor add kadira:flow-router`
 
 #### Change FlowLayout into BlazeLayout
 * We've also renamed FlowLayout as [BlazeLayout](https://github.com/kadirahq/blaze-layout).
