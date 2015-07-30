@@ -40,11 +40,7 @@ Let's write our first route (add this file to `lib/router.js`):
 
 ~~~js
 FlowRouter.route('/blog/:postId', {
-    subscriptions: function(params) {
-        console.log("subscribe and register this subscription as 'myPost'");
-        this.register('myPost', Meteor.subscribe('blogPost', params.postId));
-    },
-    action: function(params) {
+    action: function(params, queryParams) {
         console.log("Yeah! We are on the post:", params.postId);
     }
 });
