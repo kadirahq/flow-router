@@ -1,5 +1,10 @@
 # Change Log
 
+### v2.0.1
+
+* Use pagejs.redirect() for our redirection process.
+* Above fixes [#239](https://github.com/kadirahq/flow-router/issues/239)
+
 ### v2.0.0 
 
 * Released 2.0  :)
