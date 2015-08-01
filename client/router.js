@@ -38,7 +38,8 @@ Router = function () {
   // redirect function used inside triggers
   this._redirectFn = function(pathDef, fields, queryParams) {
     self.withReplaceState(function() {
-      self.go(pathDef, fields, queryParams);
+      var path = FlowRouter.path(pathDef, fields, queryParams);
+      self._page.redirect(path);
     });
   };
   this._initTriggersAPI();
@@ -453,7 +454,7 @@ Router.prototype._invalidateTracker = function() {
 
       // It's possible to have more than one path want to defer
       // But, we only need to pick the last one.
-      self._nextPath = self._current.path;
+      // self._nextPath = self._current.path;
       Meteor.defer(function() {
         var path = self._nextPath;
         if(!path) {
