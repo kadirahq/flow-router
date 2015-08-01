@@ -40,11 +40,7 @@ Let's write our first route (add this file to `lib/router.js`):
 
 ~~~js
 FlowRouter.route('/blog/:postId', {
-    subscriptions: function(params) {
-        console.log("subscribe and register this subscription as 'myPost'");
-        this.register('myPost', Meteor.subscribe('blogPost', params.postId));
-    },
-    action: function(params) {
+    action: function(params, queryParams) {
         console.log("Yeah! We are on the post:", params.postId);
     }
 });
@@ -100,12 +96,9 @@ You can group routes for better route organization. Here's an example:
 ~~~js
 var adminRoutes = FlowRouter.group({
   prefix: '/admin',
-  triggersEnter: [
-    function(path, next) {
-      console.log('running group triggers');
-      next();
-    }
-  ]
+  triggersEnter: [function(context, redirect) {
+    console.log('running group triggers');
+  }]
 });
 
 // handling /admin route
@@ -113,12 +106,9 @@ adminRoutes.route('/', {
   action: function() {
     FlowLayout.render('componentLayout', {content: 'admin'});
   },
-  triggersEnter: [
-    function(path, next) {
-      console.log('running /admin trigger');
-      next();
-    }
-  ]
+  triggersEnter: [function(context, redirect) {
+    console.log('running /admin trigger');
+  }]
 });
 
 // handling /admin/posts
@@ -644,7 +634,7 @@ Here are the steps to migrate your app into 2.0.
 #### Use the New FlowRouter Package
 * Now FlowRouter comes as `kadira:flow-router`
 * So, remove `meteorhacks:flow-router` with : `meteor remove meteorhacks:flow-router`
-* Then, add `kadira:flow-router` with `kadira:flow-router`
+* Then, add `kadira:flow-router` with `meteor add kadira:flow-router`
 
 #### Change FlowLayout into BlazeLayout
 * We've also renamed FlowLayout as [BlazeLayout](https://github.com/kadirahq/blaze-layout).
