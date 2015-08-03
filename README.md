@@ -104,7 +104,7 @@ var adminRoutes = FlowRouter.group({
 // handling /admin route
 adminRoutes.route('/', {
   action: function() {
-    FlowLayout.render('componentLayout', {content: 'admin'});
+    BlazeLayout.render('componentLayout', {content: 'admin'});
   },
   triggersEnter: [function(context, redirect) {
     console.log('running /admin trigger');
@@ -114,7 +114,7 @@ adminRoutes.route('/', {
 // handling /admin/posts
 adminRoutes.route('/posts', {
   action: function() {
-    FlowLayout.render('componentLayout', {content: 'posts'});
+    BlazeLayout.render('componentLayout', {content: 'posts'});
   }
 });
 ~~~
