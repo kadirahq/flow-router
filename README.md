@@ -54,6 +54,12 @@ FlowRouter.go('/blog/my-post-id');
 
 Then you can see some messages printed in the console.
 
+## Enabling IE9 support
+You need to add html5 history polyfill to enable IE9 support.
+~~~shell
+meteor add tmeasday:html5-history-api
+~~~
+
 ## Routes Definition
 
 Flow Router routes are very simple and based on the syntax of [path-to-regexp](https://github.com/pillarjs/path-to-regexp) which is used in both [Express](http://expressjs.com/) and `iron:router`.

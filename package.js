@@ -6,7 +6,7 @@ Package.describe({
 });
 
 Npm.depends({
-  'page':'1.6.3',
+  'page':'https://github.com/kadirahq/page.js/archive/8d81513251c5a2efccffd2b4fbe39e6b837982ce.tar.gz',
     'qs':'3.1.0'
 });
 
@@ -23,6 +23,7 @@ Package.onTest(function(api) {
   api.use('practicalmeteor:sinon');
   api.use('meteorhacks:fast-render');
   api.use('meteorhacks:inject-data');
+  api.use('tmeasday:html5-history-api');
 
   api.addFiles('test/common/fast_render_route.js', ['client', 'server']);
 
