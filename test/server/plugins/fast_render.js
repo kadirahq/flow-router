@@ -7,6 +7,19 @@ Tinytest.add('Server - Fast Render - fast render supproted route', function (tes
   test.equal(data.collectionData['fast-render-coll'], expectedFastRenderCollData);
 });
 
+Tinytest.add('Server - Fast Render - fast render supproted route with params', function (test) {
+  var expectedFastRenderCollData = [
+    [{
+      _id: "one", 
+      params: {id: 'the-id'},
+      queryParams: {aa: "20"}
+    }]
+  ];
+
+  var data = GetFRData('/the-fast-render-route-params/the-id?aa=20');
+  test.equal(data.collectionData['fast-render-coll'], expectedFastRenderCollData);
+});
+
 Tinytest.add('Server - Fast Render - no fast render supproted route', function (test) {
   var data = GetFRData('/no-fast-render');
   test.equal(data.collectionData, {});
