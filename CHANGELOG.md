@@ -1,5 +1,10 @@
 # Change Log
 
+### v2.0.2
+
+* Add missing queryParams object in the subscriptions method (with FR on the server)
+* With that, [#237](https://github.com/kadirahq/flow-router/issues/237) is partially fixed.
+
 ### v2.0.1
 
 * Use pagejs.redirect() for our redirection process.
