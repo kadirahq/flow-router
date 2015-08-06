@@ -12,11 +12,14 @@ Tinytest.addAsync('Client - Router - subsReady - with no args - all subscription
   };
 
   FlowRouter.go('/' + rand);
-  setTimeout(function() {
-    test.isTrue(!!FlowRouter.subsReady());
-    FlowRouter.subscriptions = Function.prototype;
-    next();
-  }, 500);
+
+  Tracker.autorun(function(c) {
+    if(FlowRouter.subsReady()) {
+      FlowRouter.subscriptions = Function.prototype;
+      next();
+      c.stop();
+    }
+  });
 });
 
 Tinytest.addAsync('Client - Router - subsReady - with no args - all subscriptions does not ready', function (test, next) {
@@ -95,11 +98,13 @@ Tinytest.addAsync('Client - Router - subsReady - with args - all subscriptions r
   };
 
   FlowRouter.go('/' + rand);
-  setTimeout(function() {
-    test.isTrue(!!FlowRouter.subsReady('foo', 'baz'));
-    FlowRouter.subscriptions = Function.prototype;
-    next();
-  }, 500);
+  Tracker.autorun(function(c) {
+    if(FlowRouter.subsReady('foo', 'baz')) {
+      FlowRouter.subscriptions = Function.prototype;
+      next();
+      c.stop();
+    }
+  });
 });
 
 Tinytest.addAsync('Client - Router - subsReady - with args - all subscriptions does not ready', function (test, next) {
