@@ -19,6 +19,7 @@ It exposes a great API for changing the URL and reactively getting data from the
 * [Not Found Routes](#not-found-routes)
 * [API](#api)
 * [Subscription Management](#subscription-management)
+* [IE9 Support](#ie9-support)
 * [Difference with Iron Router](#difference-with-iron-router)
 * [Migrating into 2.0](#migrating-into-20)
 
@@ -532,6 +533,17 @@ FlowRouter.route('/blog/:postId', {
 #### Subscription Caching
 
 You can also use [Subs Manager](https://github.com/meteorhacks/subs-manager) for caching subscriptions on the client. We haven't done anything special to make it work. It should work as it works with other routers.
+
+## IE9 Support
+
+FlowRouter has the IE9 support. But it does not ship the **HTML5 history polyfill** out of the box. That's because most of the apps do not require it.
+
+If you need to support IE9, add the **HTML5 history polyfill** with the following package.
+
+~~~shell
+meteor add tmeasday:html5-history-api
+~~~
+
 
 ## Difference with Iron Router
 

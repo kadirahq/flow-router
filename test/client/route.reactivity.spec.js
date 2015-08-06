@@ -114,7 +114,7 @@ Tinytest.addAsync('Client - Route - Reactivity - watchPathChange when routeChang
 
   setTimeout(function() {
     r.registerRouteChange(context);
-    setTimeout(checkAfterNormalRouteChange, 10);
+    setTimeout(checkAfterNormalRouteChange, 50);
   }, 10);
 
   function checkAfterNormalRouteChange() {

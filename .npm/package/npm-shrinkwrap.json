@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "page": {
-      "version": "1.6.3",
+      "version": "https://github.com/kadirahq/page.js/archive/8d81513251c5a2efccffd2b4fbe39e6b837982ce.tar.gz",
       "dependencies": {
         "path-to-regexp": {
           "version": "1.0.3",
