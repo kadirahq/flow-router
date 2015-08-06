@@ -1,7 +1,7 @@
 Package.describe({
   name: 'kadira:flow-router',
   summary: 'Carefully Designed Client Side Router for Meteor',
-  version: '2.0.2',
+  version: '2.1.0',
   git: 'https://github.com/kadirahq/flow-router.git'
 });
 
