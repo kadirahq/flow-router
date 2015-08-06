@@ -6,7 +6,6 @@ Router = function () {
   this.subscriptions = Function.prototype;
 };
 
-
 Router.prototype.route = function(path, options) {
   if (!/^\/.*/.test(path)) {
     var message = "route's path must start with '/'";
