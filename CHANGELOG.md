@@ -1,5 +1,8 @@
 # Change Log
 
+### v2.1.1
+* There was an issue in IE9 support. We fix it with this version.
+
 ### v2.1.0
 * Add IE9 Support. See this issue [#111](https://github.com/kadirahq/flow-router/issues/111) for more info.
 
