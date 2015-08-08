@@ -435,7 +435,7 @@ So, if you really need to reload the route, this is the API you want.
 
 #### FlowRouter.wait() and FlowRouter.initialize()
 
-By default, Flow Router initilize the routing process in a `Meteor.startup()` callback. This works for most of the apps. But, some apps have custom initializations and FlowRouter needs to initialize after that.
+By default, Flow Router initialize the routing process in a `Meteor.startup()` callback. This works for most of the apps. But, some apps have custom initializations and FlowRouter needs to initialize after that.
 
 So, that's where `FlowRouter.wait()` comes to save you. You need to call it directly inside your JavaScript file. After that, whenever your app is ready call `FlowRouter.initialize()`.
 
@@ -453,9 +453,9 @@ For more information visit [issue #180](https://github.com/meteorhacks/flow-rout
 
 ## Subscription Management 
 
-For Subscription Management, we highly sugggest you to follow [Template/Component level subscriptions](https://kadira.io/academy/meteor-routing-guide/content/subscriptions-and-data-management). Visit this [guide](https://kadira.io/academy/meteor-routing-guide/content/subscriptions-and-data-management) for that.
+For Subscription Management, we highly suggest you to follow [Template/Component level subscriptions](https://kadira.io/academy/meteor-routing-guide/content/subscriptions-and-data-management). Visit this [guide](https://kadira.io/academy/meteor-routing-guide/content/subscriptions-and-data-management) for that.
 
-FlowRouter also has it's own subscription registration machanism. We will remove this in version 3.0. We don't remove or deprecate it in version 2.x because this is the easiest way to implement FastRender support for your app. In 3.0 we've better support for FastRender with Server Side Rendering.
+FlowRouter also has it's own subscription registration mechanism. We will remove this in version 3.0. We don't remove or deprecate it in version 2.x because this is the easiest way to implement FastRender support for your app. In 3.0 we've better support for FastRender with Server Side Rendering.
 
 Flow Router does only registration of subscriptions. It does not wait until subscription became ready. This is how to register a subscription.
 
@@ -559,7 +559,7 @@ Flow Router doesn't handle rendering. By decoupling rendering from the router it
 
 ### Subscriptions
 
-With Flow Router, we highly suggest to use template/component layer subscriptions. But, if you need to do routing in the router layer, FlowRouter has [subscription registration](#subscription-management) machanism. Even with that, FlowRouter never wait for the subscriptions and view layer to do it.
+With Flow Router, we highly suggest to use template/component layer subscriptions. But, if you need to do routing in the router layer, FlowRouter has [subscription registration](#subscription-management) mechanism. Even with that, FlowRouter never wait for the subscriptions and view layer to do it.
 
 ### Reactive Content
 
@@ -613,7 +613,7 @@ For more information check [docs](#fast-render).
 
 ### Server Side Routing
 
-Flow Router is a client side router and it **does not** support sever side routing at all. But `subscriptions` run on the server to enabled Fast Render support.
+Flow Router is a client side router and it **does not** support server side routing at all. But `subscriptions` run on the server to enabled Fast Render support.
 
 #### Reason behind that
 
@@ -636,7 +636,7 @@ It's currently very usable and Kadira already using it for <https://kadira.io>
 ### Better Initial Loading Support
 
 In Meteor, we've to wait until all the JS and other resources before rendering anything. This is an issue. In 3.0, with the support from Server Side Rendering we are going to fix it.
-`
+
 ## Migrating into 2.0
 
 Migrating into version 2.0 is easy and you don't need to change any application code since you are already using 2.0 features and the APIs. In 2.0, we've changed names and removed some deprecated APIs.
