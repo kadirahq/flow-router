@@ -1,8 +1,27 @@
 # Change Log
+
 ### v3.0.1
 
 * Add initial SSR support
 * It's implemented as extendable manner. Currently ReactLayout supports it.
+
+------------
+
+### v2.1.1
+* There was an issue in IE9 support. We fix it with this version.
+
+### v2.1.0
+* Add IE9 Support. See this issue [#111](https://github.com/kadirahq/flow-router/issues/111) for more info.
+
+### v2.0.2
+
+* Add missing queryParams object in the subscriptions method (with FR on the server)
+* With that, [#237](https://github.com/kadirahq/flow-router/issues/237) is partially fixed.
+
+### v2.0.1
+
+* Use pagejs.redirect() for our redirection process.
+* Above fixes [#239](https://github.com/kadirahq/flow-router/issues/239)
 
 ### v2.0.0 
 

@@ -6,6 +6,12 @@ FlowRouter.route('/the-fast-render-route', {
   }
 });
 
+FlowRouter.route('/the-fast-render-route-params/:id', {
+  subscriptions: function(params, queryParams) {
+    this.register('data', Meteor.subscribe('fast-render-data-params', params, queryParams));
+  }
+});
+
 FlowRouter.route('/no-fast-render', {
   subscriptions: function() {
     if(Meteor.isClient) {
@@ -32,5 +38,11 @@ if(Meteor.isServer) {
 
   Meteor.publish('fast-render-data', function() {
     return FastRenderColl.find({}, {sort: {aa: -1}});
+  });
+
+  Meteor.publish('fast-render-data-params', function(params, queryParams) {
+    var fields = {params: params, queryParams: queryParams};
+    this.added('fast-render-coll', 'one', fields);
+    this.ready();
   });
 }

@@ -6,11 +6,13 @@ Package.describe({
 });
 
 Npm.depends({
-  'page':'1.6.3',
-  'qs':'3.1.0',
   'deepmerge': '0.2.10',
   "connect": "2.13.0",
-  'cheerio': '0.19.0'
+  'cheerio': '0.19.0',
+  // In order to support IE9, we had to fork pagejs and apply
+  // this PR: https://github.com/visionmedia/page.js/pull/288
+  'page':'https://github.com/kadirahq/page.js/archive/f29d4d4491178b285b9058c32d74975a4f945dea.tar.gz',
+  'qs':'3.1.0'
 });
 
 Package.onUse(function(api) {
@@ -27,6 +29,7 @@ Package.onTest(function(api) {
   api.use('practicalmeteor:sinon');
   api.use('meteorhacks:fast-render');
   api.use('meteorhacks:inject-data');
+  api.use('tmeasday:html5-history-api');
 
 
   api.addFiles('test/client/_helpers.js', 'client');
