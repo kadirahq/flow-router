@@ -37,23 +37,12 @@ SsrContext.prototype.addSubscription = function(name, params) {
   var pub = Meteor.default_server.publish_handlers[name];
   var fastRenderContext = FastRender.frContext.get();
   var args = [name].concat(params);
-  fastRenderContext.subscribe.apply(fastRenderContext, args);
+  var data = fastRenderContext.subscribe.apply(fastRenderContext, args);
 
-  // XXX run the publication via the fast-render context 
-  // and get data from it
-  // we may need to change FR apis a bit for this
-  var cursors = pub.apply({}, params);
-  if(cursors && !(cursors instanceof Array)) {
-    cursors = [cursors];
-  }
-
-  if(cursors) {
-    cursors.forEach(function(cursor) {
-      var collName = cursor._cursorDescription.collectionName;
-      var collection = self.getCollection(collName);
-
-      cursor.fetch().forEach(function(item) {
-        // we need to merge data here
+  _.each(data, function(collDataCollection, collectionName) {
+    var collection = self.getCollection(collectionName);
+    collDataCollection.forEach(function(collData) {
+      collData.forEach(function(item) {
         var existingDoc = collection.findOne(item._id);
         if(existingDoc) {
           var newDoc = deepMerge(existingDoc, item);
@@ -64,5 +53,5 @@ SsrContext.prototype.addSubscription = function(name, params) {
         }
       });
     });
-  }
+  });
 };
