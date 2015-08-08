@@ -1,5 +1,11 @@
 # Change Log
 
+### v3.1.0
+
+* Support null publications and custom publications with `this.xxx` apis
+* Support server side login state
+* Get the changes from v2.1.1
+
 ### v3.0.1
 
 * Add initial SSR support
