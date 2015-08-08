@@ -202,7 +202,7 @@ var adminRoutes = FlowRouter.group({
 
 > You can add triggers to individual routes in the group too.
 
-#### Defining Trigges Globally
+#### Defining Triggers Globally
 
 You can also define triggers globally. Here's how to do it:
 
