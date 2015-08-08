@@ -1,6 +1,7 @@
 
 # Todo
 
+* Send the FR data in the bottom too
 * Send actual FR subscription state to the server, and make the sub handler api to be ready with the actual
 * Add per route based page caching timeout
 * Turn off SSR totally and per route basis

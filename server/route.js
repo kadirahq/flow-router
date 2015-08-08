@@ -61,19 +61,19 @@ Route = function(router, path, options) {
               data = moveScripts(data);
             }
             data = data.replace('<body>', '<body>' + reactRoot);
+
+            var pageInfo = {
+              frData: res.getData("fast-render-data"),
+              html: data
+            };
+
+            // cache the page if mentioned a timeout
+            if(router.pageCacheTimeout) {
+              self._cachePage(req.url, pageInfo, router.pageCacheTimeout);
+            }
           }
+          
           originalWrite.call(this, data);
-
-          var pageInfo = {
-            frData: res.getData("fast-render-data"),
-            head: head,
-            body: reactRoot
-          };
-
-          // cache the page if mentioned a timeout
-          if(router.pageCacheTimeout) {
-            self._cachePage(req.url, pageInfo, router.pageCacheTimeout);
-          }
         };
       });
     }
@@ -81,12 +81,7 @@ Route = function(router, path, options) {
     function processFromCache(page) {
       var originalWrite = res.write;
       res.write = function(data) {
-        data = data.replace('</head>', page.head + '\n</head>');
-        if (FlowRouter.deferScriptLoading) {
-          data = moveScripts(data);
-        }
-        data = data.replace('<body>', '<body>' + page.body);
-        originalWrite.call(this, data);
+        originalWrite.call(this, page.html);
       }
 
       res.pushData('fast-render-data', page.frData);
