@@ -9,11 +9,14 @@ Route = function(router, path, options) {
   this.path = path;
   this.name = options.name;
   this.action = options.action || Function.prototype;
+  this._router = router;
   this.subscriptions = options.subscriptions || Function.prototype;
   this._subsMap = {};
   this._cache = {};
 
   Picker.middleware(Npm.require('connect').cookieParser());
+  // process null subscriptions with FR support
+  Picker.middleware(FastRender.handleOnAllRoutes);
   Picker.route(path, function(params, req, res, next) {
 
     if(!self.isHtmlPage(req.url)) {
@@ -22,83 +25,92 @@ Route = function(router, path, options) {
 
     var cachedPage = self._lookupCachedPage(req.url);
     if(cachedPage) {
-      return processFromCache(cachedPage);
+      return self._processFromCache(cachedPage, res, next);
     }
 
+    var processFromSsr = self._processFromSsr.bind(self, params, req, res);
     FastRender.handleRoute(processFromSsr, params, req, res, function(data) {
       next();
+    }); 
+  });
+};
+
+Route.prototype._processFromSsr = function (params, req, res) {
+  var self = this;
+  var ssrContext = new SsrContext();
+  self._router.ssrContext.withValue(ssrContext, function() {
+    var context = self._buildContext(req.url, params);
+    self._router.currentRoute.withValue(context, function () {
+      try {
+        // get the data for null subscriptions and add them to the
+        // ssrContext
+        var frData = res.getData("fast-render-data");
+        if(frData) {
+          ssrContext.addData(frData.collectionData);
+        }
+
+        if(self.options.subscriptions) {
+          self.options.subscriptions.call(self, params);
+        }
+
+        if(self.options.action) {
+          self.options.action.call(self, params);
+        }
+      } catch(ex) {
+        console.error("Error when doing SSR. path:", req.url, " ", ex.message);
+        console.error(ex.stack);
+      }
     });
 
-    function processFromSsr() {
-      var ssrContext = new SsrContext();
-      router.ssrContext.withValue(ssrContext, function() {
-        var context = self._buildContext(req.url, params);
-        router.currentRoute.withValue(context, function () {
-          try {
-            if(options.subscriptions) {
-              options.subscriptions.call(self, params);
-            }
+    var originalWrite = res.write;
+    res.write = function(data) {
+      if(typeof data === 'string') {
+        var head = ssrContext.getHead();
+        if(head && head.trim() !== "") {
+          data = data.replace('</head>', head + '\n</head>');
+        }
 
-            if(options.action) {
-              options.action.call(self, params);
-            }
-          } catch(ex) {
-            console.error("Error when doing SSR. path:", req.url, " ", ex.message);
-            console.error(ex.stack);
-          }
-        });
+        var reactRoot = "<div id='react-root'>" + ssrContext.getHtml() + "</div>";
+        if (self._router.deferScriptLoading) {
+          data = moveScripts(data);
+        }
+        data = data.replace('<body>', '<body>' + reactRoot);
 
-        var originalWrite = res.write;
-        res.write = function(data) {
-          if(typeof data === 'string') {
-            var head = ssrContext.getHead();
-            if(head && head.trim() !== "") {
-              data = data.replace('</head>', head + '\n</head>');
-            }
-
-            var reactRoot = "<div id='react-root'>" + ssrContext.getHtml() + "</div>";
-            if (FlowRouter.deferScriptLoading) {
-              data = moveScripts(data);
-            }
-            data = data.replace('<body>', '<body>' + reactRoot);
-
-            var pageInfo = {
-              frData: res.getData("fast-render-data"),
-              html: data
-            };
-
-            // cache the page if mentioned a timeout
-            if(router.pageCacheTimeout) {
-              self._cachePage(req.url, pageInfo, router.pageCacheTimeout);
-            }
-          }
-          
-          originalWrite.call(this, data);
+        var pageInfo = {
+          frData: res.getData("fast-render-data"),
+          html: data
         };
-      });
-    }
 
-    function processFromCache(page) {
-      var originalWrite = res.write;
-      res.write = function(data) {
-        originalWrite.call(this, page.html);
+        // cache the page if mentioned a timeout
+        if(self._router.pageCacheTimeout) {
+          self._cachePage(req.url, pageInfo, self._router.pageCacheTimeout);
+        }
       }
-
-      res.pushData('fast-render-data', page.frData);
-      next();
-    }
-
-    function moveScripts(data) {
-      var $ = Cheerio.load(data);
-      var heads = $('head script');
-      $('body').append(heads);
-
-      // Remove empty lines caused by removing scripts
-      $('head').html($('head').html().replace(/(^[ \t]*\n)/gm, ''));
-
-      return $.html();
-    }
+      
+      originalWrite.call(this, data);
+    };
   });
+
+  function moveScripts(data) {
+    var $ = Cheerio.load(data);
+    var heads = $('head script');
+    $('body').append(heads);
+
+    // Remove empty lines caused by removing scripts
+    $('head').html($('head').html().replace(/(^[ \t]*\n)/gm, ''));
+
+    return $.html();
+  }
+};
+
+Route.prototype._processFromCache = function(pageInfo, res, next) {
+  var originalWrite = res.write;
+  res.write = function(data) {
+    originalWrite.call(this, pageInfo.html);
+  }
+
+  res.pushData('fast-render-data', pageInfo.frData);
+  next();
 };
 
 Route.prototype._buildContext = function(url, params) {

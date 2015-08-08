@@ -33,12 +33,15 @@ SsrContext.prototype.getHead = function() {
 };
 
 SsrContext.prototype.addSubscription = function(name, params) {
-  var self = this;
   var pub = Meteor.default_server.publish_handlers[name];
   var fastRenderContext = FastRender.frContext.get();
   var args = [name].concat(params);
   var data = fastRenderContext.subscribe.apply(fastRenderContext, args);
+  this.addData(data);  
+};
 
+SsrContext.prototype.addData = function(data) {
+  var self = this;
   _.each(data, function(collDataCollection, collectionName) {
     var collection = self.getCollection(collectionName);
     collDataCollection.forEach(function(collData) {
