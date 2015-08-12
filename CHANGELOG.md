@@ -1,5 +1,8 @@
 # Change Log
 
+### v2.2.0
+* Add the first addOn api: FlowRouter.onRouteRegister(cb)
+
 ### v2.1.1
 * There was an issue in IE9 support. We fix it with this version.
 
