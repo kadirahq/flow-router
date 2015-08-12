@@ -1,7 +1,7 @@
 Route = function(router, path, options) {
   options = options || {};
   this.options = options;
-
+  this.name = options.name;
   this.path = path;
   this.action = options.action || Function.prototype;
   this.subscriptions = options.subscriptions || Function.prototype;

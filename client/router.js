@@ -11,6 +11,9 @@ Router = function () {
 
   this._globalRoute = new Route(this);
 
+  // holds onRoute callbacks
+  this._onRouteCallbacks = [];
+
   // if _askedToWait is true. We don't automatically start the router 
   // in Meteor.startup callback. (see client/_init.js)
   // Instead user need to call `.initialize()
@@ -108,6 +111,7 @@ Router.prototype.route = function(path, options, group) {
   }
 
   this._updateCallbacks();
+  this._triggerRouteRegister(route);
 
   return route;
 };
@@ -511,6 +515,26 @@ Router.prototype.wait = function() {
   }
 
   this._askedToWait = true;
+};
+
+Router.prototype.onRouteRegister = function(cb) {
+  this._onRouteCallbacks.push(cb);
+};
+
+Router.prototype._triggerRouteRegister = function(currentRoute) {
+  // We should only need to send a safe set of fields on the route
+  // object.
+  // This is not to hide what's inside the route object, but to show 
+  // these are the public APIs
+  var routePublicApi = _.pick(currentRoute, 'name', 'path');
+  var omittingOptionFields = [
+    'triggersEnter', 'triggersExit', 'action', 'subscriptions'
+  ];
+  routePublicApi.options = _.omit(currentRoute.options, omittingOptionFields);
+
+  _.each(this._onRouteCallbacks, function(cb) {
+    cb(routePublicApi);
+  });
 };
 
 Router.prototype._page = page;

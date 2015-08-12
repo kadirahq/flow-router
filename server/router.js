@@ -4,6 +4,9 @@ Router = function () {
   this._routes = [];
   this._routesMap = {};
   this.subscriptions = Function.prototype;
+
+  // holds onRoute callbacks
+  this._onRouteCallbacks = [];
 };
 
 Router.prototype.route = function(path, options) {
@@ -20,6 +23,7 @@ Router.prototype.route = function(path, options) {
     this._routesMap[options.name] = route;
   }
 
+  this._triggerRouteRegister(route);
   return route;
 };
 
@@ -56,6 +60,26 @@ Router.prototype.path = function(pathDef, fields, queryParams) {
   }
 
   return path;
+};
+
+Router.prototype.onRouteRegister = function(cb) {
+  this._onRouteCallbacks.push(cb);
+};
+
+Router.prototype._triggerRouteRegister = function(currentRoute) {
+  // We should only need to send a safe set of fields on the route
+  // object.
+  // This is not to hide what's inside the route object, but to show 
+  // these are the public APIs
+  var routePublicApi = _.pick(currentRoute, 'name', 'path');
+  var omittingOptionFields = [
+    'triggersEnter', 'triggersExit', 'action', 'subscriptions'
+  ];
+  routePublicApi.options = _.omit(currentRoute.options, omittingOptionFields);
+
+  _.each(this._onRouteCallbacks, function(cb) {
+    cb(routePublicApi);
+  });
 };
 
 
