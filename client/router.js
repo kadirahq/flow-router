@@ -528,7 +528,7 @@ Router.prototype._triggerRouteRegister = function(currentRoute) {
   // these are the public APIs
   var routePublicApi = _.pick(currentRoute, 'name', 'path');
   var omittingOptionFields = [
-    'triggersEnter', 'triggersExit', 'action', 'subscriptions'
+    'triggersEnter', 'triggersExit', 'action', 'subscriptions', 'name'
   ];
   routePublicApi.options = _.omit(currentRoute.options, omittingOptionFields);
 

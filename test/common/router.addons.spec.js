@@ -9,7 +9,7 @@ Tinytest.addAsync('Common - Addons - onRouteRegister basic usage', function (tes
     test.equal(route, {
       path: path,
       name: name,
-      options: {customField: customField, name: name}
+      options: {customField: customField}
     });  
     FlowRouter._onRouteCallbacks = [];
     done();

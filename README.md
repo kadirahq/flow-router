@@ -451,6 +451,42 @@ WhenEverYourAppIsReady(function() {
 
 For more information visit [issue #180](https://github.com/meteorhacks/flow-router/issues/180).
 
+#### FlowRouter.onRouteRegister(cb)
+
+This is API specially, designed for addon developers. They can listen for any registered route and add custom functionality to flow-router. This works on both server and client alike.
+
+~~~js
+FlowRouter.onRouteRegister(function(route) {
+  // do anything with the route object
+  console.log(route);
+});
+~~~
+
+Let's say a user defined a route like this:
+
+~~~js
+FlowRouter.route('/blog/:post', {
+  name: 'postList',
+  triggersEnter: [function() {}],
+  subscriptions: function() {},
+  action: function() {},
+  triggersExit: [function() {}],
+  customeField: 'customName'
+});
+~~~
+
+Then the route object will be something like this:
+
+~~~js
+{
+  path: '/blog/:post',
+  name: 'postList',
+  options: {customeField: 'customName'}
+}
+~~~
+
+So, it's not the internal route object we are using.
+
 ## Subscription Management 
 
 For Subscription Management, we highly suggest you to follow [Template/Component level subscriptions](https://kadira.io/academy/meteor-routing-guide/content/subscriptions-and-data-management). Visit this [guide](https://kadira.io/academy/meteor-routing-guide/content/subscriptions-and-data-management) for that.
