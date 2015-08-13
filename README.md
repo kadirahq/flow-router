@@ -20,6 +20,7 @@ It exposes a great API for changing the URL and reactively getting data from the
 * [API](#api)
 * [Subscription Management](#subscription-management)
 * [IE9 Support](#ie9-support)
+* [Addons](#addons)
 * [Difference with Iron Router](#difference-with-iron-router)
 * [Migrating into 2.0](#migrating-into-20)
 
@@ -580,6 +581,17 @@ If you need to support IE9, add the **HTML5 history polyfill** with the followin
 meteor add tmeasday:html5-history-api
 ~~~
 
+## Addons
+
+Router is a base package for an app. Other projects like [useraccounts](http://useraccounts.meteor.com/)  should have support for the Router. Otherwise, it's hard to use the Router in a real project. Now a lot of packages [started to support FlowRouter](https://kadira.io/blog/meteor/addon-packages-for-flowrouter). 
+
+So, you can use your your favorite package with FlowRouter as well. If not, there is an [easy process](https://kadira.io/blog/meteor/addon-packages-for-flowrouter#what-if-project-xxx-still-doesn-t-support-flowrouter-) to convert them to FlowRouter.
+
+**Addon API**
+
+We've also released a [new API](https://github.com/kadirahq/flow-router#flowrouteronrouteregistercb) to support addon developers. With that addon packages can get a notification, when the user created a route in their app.
+
+If you've more ideas for the addon API, [let us know](https://github.com/kadirahq/flow-router/issues).
 
 ## Difference with Iron Router
 
