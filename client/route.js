@@ -1,8 +1,12 @@
-Route = function(router, path, options, group) {
+Route = function(router, pathDef, options, group) {
   options = options || {};
 
   this.options = options;
-  this.path = path;
+  this.pathDef = pathDef
+
+  // Route.path is deprecated and will be removed in 3.0
+  this.path = pathDef;
+
   if (options.name) {
     this.name = options.name;
   }

@@ -9,14 +9,14 @@ Router = function () {
   this._onRouteCallbacks = [];
 };
 
-Router.prototype.route = function(path, options) {
-  if (!/^\/.*/.test(path)) {
+Router.prototype.route = function(pathDef, options) {
+  if (!/^\/.*/.test(pathDef)) {
     var message = "route's path must start with '/'";
     throw new Error(message);
   }
   
   options = options || {};
-  var route = new Route(this, path, options);
+  var route = new Route(this, pathDef, options);
   this._routes.push(route);
 
   if (options.name) {
@@ -71,7 +71,7 @@ Router.prototype._triggerRouteRegister = function(currentRoute) {
   // object.
   // This is not to hide what's inside the route object, but to show 
   // these are the public APIs
-  var routePublicApi = _.pick(currentRoute, 'name', 'path');
+  var routePublicApi = _.pick(currentRoute, 'name', 'pathDef', 'path');
   var omittingOptionFields = [
     'triggersEnter', 'triggersExit', 'action', 'subscriptions', 'name'
   ];

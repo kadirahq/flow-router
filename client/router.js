@@ -48,15 +48,15 @@ Router = function () {
   this._initTriggersAPI();
 };
 
-Router.prototype.route = function(path, options, group) {
-  if (!/^\/.*/.test(path)) {
+Router.prototype.route = function(pathDef, options, group) {
+  if (!/^\/.*/.test(pathDef)) {
     var message = "route's path must start with '/'";
     throw new Error(message);
   }
 
   options = options || {};
   var self = this;
-  var route = new Route(this, path, options, group);
+  var route = new Route(this, pathDef, options, group);
 
   // calls when the page route being activates
   route._actionHandle = function (context, next) {
@@ -122,7 +122,7 @@ Router.prototype.group = function(options) {
 
 Router.prototype.path = function(pathDef, fields, queryParams) {
   if (this._routesMap[pathDef]) {
-    pathDef = this._routesMap[pathDef].path;
+    pathDef = this._routesMap[pathDef].pathDef;
   }
 
   fields = fields || {};
@@ -186,7 +186,7 @@ Router.prototype.redirect = function(path) {
 Router.prototype.setParams = function(newParams) {
   if(!this._current.route) {return false;}
 
-  var pathDef = this._current.route.path;
+  var pathDef = this._current.route.pathDef;
   var existingParams = this._current.params;
   var params = {};
   _.each(_.keys(existingParams), function(key) {
@@ -212,7 +212,7 @@ Router.prototype.setQueryParams = function(newParams) {
     }
   }
 
-  var pathDef = this._current.route.path;
+  var pathDef = this._current.route.pathDef;
   var params = this._current.params;
   this.go(pathDef, params, queryParams);
   return true;
@@ -481,8 +481,8 @@ Router.prototype._updateCallbacks = function () {
   self._page.exits = [];
 
   _.each(self._routes, function(route) {
-    self._page(route.path, route._actionHandle);
-    self._page.exit(route.path, route._exitHandle);
+    self._page(route.pathDef, route._actionHandle);
+    self._page.exit(route.pathDef, route._exitHandle);
   });
 
   self._page("*", function(context) {
@@ -526,7 +526,7 @@ Router.prototype._triggerRouteRegister = function(currentRoute) {
   // object.
   // This is not to hide what's inside the route object, but to show 
   // these are the public APIs
-  var routePublicApi = _.pick(currentRoute, 'name', 'path');
+  var routePublicApi = _.pick(currentRoute, 'name', 'pathDef', 'path');
   var omittingOptionFields = [
     'triggersEnter', 'triggersExit', 'action', 'subscriptions', 'name'
   ];

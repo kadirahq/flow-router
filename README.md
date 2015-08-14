@@ -386,7 +386,7 @@ console.log(current);
 //     path: "/apps/this-is-my-app?show=yes&color=red",
 //     params: {appId: "this-is-my-app"},
 //     queryParams: {show: "yes", color: "red"}
-//     route: {name: "name-of-the-route"}
+//     route: {pathDef: "/apps/:appId", name: "name-of-the-route"}
 // }
 ~~~
 
@@ -480,7 +480,7 @@ Then the route object will be something like this:
 
 ~~~js
 {
-  path: '/blog/:post',
+  pathDef: '/blog/:post',
   name: 'postList',
   options: {customeField: 'customName'}
 }
