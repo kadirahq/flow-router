@@ -22,16 +22,16 @@ Group = function(router, options, parent) {
   }
 };
 
-Group.prototype.route = function(path, options, group) {
+Group.prototype.route = function(pathDef, options, group) {
   options = options || {};
 
-  if (!/^\/.*/.test(path)) {
+  if (!/^\/.*/.test(pathDef)) {
     var message = "route's path must start with '/'";
     throw new Error(message);
   }
 
   group = group || this;
-  path = this.prefix + path;
+  pathDef = this.prefix + pathDef;
 
   var triggersEnter = options.triggersEnter || [];
   options.triggersEnter = this._triggersEnter.concat(triggersEnter);
@@ -39,7 +39,7 @@ Group.prototype.route = function(path, options, group) {
   var triggersExit = options.triggersExit || [];
   options.triggersExit = triggersExit.concat(this._triggersExit);
 
-  return this._router.route(path, options, group);
+  return this._router.route(pathDef, options, group);
 };
 
 Group.prototype.group = function(options) {

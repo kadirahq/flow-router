@@ -13,7 +13,7 @@ Meteor.startup(function () {
 
 function setupFastRender () {
   _.each(FlowRouter._routes, function (route) {
-    FastRender.route(route.path, function (routeParams, path) {
+    FastRender.route(route.pathDef, function (routeParams, path) {
       var self = this;
 
       // anyone using Meteor.subscribe for something else?

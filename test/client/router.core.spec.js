@@ -91,12 +91,12 @@ Tinytest.addAsync('Client - Router - redirect using FlowRouter.go', function (te
 Tinytest.addAsync('Client - Router - get current route path', function (test, next) {
   var value = Random.id();
   var randomValue = Random.id();
-  var routePath = "/" + randomValue + '/:_id';
+  var pathDef = "/" + randomValue + '/:_id';
   var path = "/" + randomValue + "/" + value;
 
   var detectedValue = null;
 
-  FlowRouter.route(routePath, {
+  FlowRouter.route(pathDef, {
     action: function(params) {
       detectedValue = params._id;
     }
@@ -348,7 +348,7 @@ Tinytest.addAsync('Client - Router - notFound', function (test, done) {
 
 Tinytest.addAsync('Client - Router - withReplaceState - enabled', 
 function (test, done) {
-  var path = "/" + Random.id() + "/:id";
+  var pathDef = "/" + Random.id() + "/:id";
   var originalRedirect = FlowRouter._page.replace;
   var callCount = 0;
   FlowRouter._page.replace = function(path) {
@@ -356,7 +356,7 @@ function (test, done) {
     originalRedirect.call(FlowRouter._page, path);
   };
 
-  FlowRouter.route(path, {
+  FlowRouter.route(pathDef, {
     name: name,
     action: function(params) {
       test.equal(params.id, "awesome");
@@ -370,13 +370,13 @@ function (test, done) {
   });
 
   FlowRouter.withReplaceState(function() {
-    FlowRouter.go(path, {id: "awesome"});
+    FlowRouter.go(pathDef, {id: "awesome"});
   });
 });
 
 Tinytest.addAsync('Client - Router - withReplaceState - disabled', 
 function (test, done) {
-  var path = "/" + Random.id() + "/:id";
+  var pathDef = "/" + Random.id() + "/:id";
   var originalRedirect = FlowRouter._page.replace;
   var callCount = 0;
   FlowRouter._page.replace = function(path) {
@@ -384,7 +384,7 @@ function (test, done) {
     originalRedirect.call(FlowRouter._page, path);
   };
 
-  FlowRouter.route(path, {
+  FlowRouter.route(pathDef, {
     name: name,
     action: function(params) {
       test.equal(params.id, "awesome");
@@ -394,7 +394,7 @@ function (test, done) {
     }
   });
 
-  FlowRouter.go(path, {id: "awesome"});
+  FlowRouter.go(pathDef, {id: "awesome"});
 });
 
 Tinytest.addAsync('Client - Router - withTrailingSlash - enabled', function (test, next) {

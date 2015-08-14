@@ -3,11 +3,15 @@ Router = FlowRouter.Router;
 Tinytest.addAsync('Common - Addons - onRouteRegister basic usage', function (test, done) {
   var name = Random.id();
   var customField = Random.id();
-  var path = '/' + name;
+  var pathDef = '/' + name;
   
   FlowRouter.onRouteRegister(function(route) {
     test.equal(route, {
-      path: path,
+      pathDef: pathDef,
+
+      // Route.path is deprecated and will be removed in 3.0
+      path: pathDef,
+
       name: name,
       options: {customField: customField}
     });  
@@ -15,7 +19,7 @@ Tinytest.addAsync('Common - Addons - onRouteRegister basic usage', function (tes
     done();
   });
 
-  FlowRouter.route(path, {
+  FlowRouter.route(pathDef, {
     name: name,
     action: function() {},
     subscriptions: function() {},
