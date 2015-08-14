@@ -1,5 +1,8 @@
 # Change Log
 
+### v2.3.0
+* We've used `path` for both the current path and for the pathDef earlier. Now we differentiate it. See: [#272](https://github.com/kadirahq/flow-router/issues/272) and [#273](https://github.com/kadirahq/flow-router/pull/273) for more information.
+
 ### v2.2.0
 * Add the first addOn api: FlowRouter.onRouteRegister(cb)
 
