@@ -55,6 +55,7 @@ function configure(api) {
   api.use('tracker');
   api.use('reactive-dict');
   api.use('reactive-var');
+  api.use('ddp');
 
   api.use('meteorhacks:fast-render@2.8.1', ['client', 'server']);
   api.use('cosmos:browserify@0.5.0', 'client');

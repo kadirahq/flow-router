@@ -48,3 +48,19 @@ Tracker.autorun = function (fn) {
     return originalAutorun.call(Tracker, fn);
   }
 };
+
+// By default, Meteor[call,apply] also inherit SsrContext
+// So, they can't access the full MongoDB dataset because of that
+// Then, we need to remove the SsrContext within Method calls
+['call', 'apply'].forEach(function(methodName) {
+  var original = Meteor[methodName];
+  Meteor[methodName] = function() {
+    var self = this;
+    var args = arguments;
+    var response = FlowRouter.ssrContext.withValue(null, function() {
+      return original.apply(self, args);
+    });
+
+    return response;
+  };
+});
