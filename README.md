@@ -191,7 +191,7 @@ function trackRouteClose(context) {
 
 #### Defining triggers for a group route
 
-This is how you can define triggers on a group definition.i
+This is how you can define triggers on a group definition.
 
 ~~~js
 var adminRoutes = FlowRouter.group({
