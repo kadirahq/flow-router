@@ -191,7 +191,7 @@ function trackRouteClose(context) {
 
 #### Defining triggers for a group route
 
-This is how you can define triggers to a group definition.
+This is how you can define triggers on a group definition.
 
 ~~~js
 var adminRoutes = FlowRouter.group({
@@ -235,7 +235,7 @@ FlowRouter.route('/', {
 });
 ~~~
 
-Every trigger callback comes with a second argument. It's a function where you can used to redirect to a different route. Redirect also has few properties to make sure it's not blocking the router.
+Every trigger callback comes with a second argument: a function you can use to redirect to a different route. Redirect also has few properties to make sure it's not blocking the router.
 
 * redirect must be called with an URL
 * redirect must be called within the same eventloop cycle (no async or called inside a Tracker)
@@ -436,7 +436,7 @@ So, if you really need to reload the route, this is the API you want.
 
 #### FlowRouter.wait() and FlowRouter.initialize()
 
-By default, FlowRouter initialize the routing process in a `Meteor.startup()` callback. This works for most of the apps. But, some apps have custom initializations and FlowRouter needs to initialize after that.
+By default, FlowRouter initializes the routing process in a `Meteor.startup()` callback. This works for most of the apps. But, some apps have custom initializations and FlowRouter needs to initialize after that.
 
 So, that's where `FlowRouter.wait()` comes to save you. You need to call it directly inside your JavaScript file. After that, whenever your app is ready call `FlowRouter.initialize()`.
 
@@ -454,7 +454,7 @@ For more information visit [issue #180](https://github.com/meteorhacks/flow-rout
 
 #### FlowRouter.onRouteRegister(cb)
 
-This is API specially, designed for addon developers. They can listen for any registered route and add custom functionality to FlowRouter. This works on both server and client alike.
+This API is specially designed for addon developers. They can listen for any registered route and add custom functionality to FlowRouter. This works on both server and client alike.
 
 ~~~js
 FlowRouter.onRouteRegister(function(route) {
@@ -494,7 +494,7 @@ For Subscription Management, we highly suggest you to follow [Template/Component
 
 FlowRouter also has it's own subscription registration mechanism. We will remove this in version 3.0. We don't remove or deprecate it in version 2.x because this is the easiest way to implement FastRender support for your app. In 3.0 we've better support for FastRender with Server Side Rendering.
 
-FlowRouter does only registration of subscriptions. It does not wait until subscription became ready. This is how to register a subscription.
+FlowRouter only deals with registration of subscriptions. It does not wait until subscription becomes ready. This is how to register a subscription.
 
 ~~~js
 FlowRouter.route('/blog/:postId', {
@@ -573,7 +573,7 @@ You can also use [Subs Manager](https://github.com/meteorhacks/subs-manager) for
 
 ## IE9 Support
 
-FlowRouter has the IE9 support. But it does not ship the **HTML5 history polyfill** out of the box. That's because most of the apps do not require it.
+FlowRouter has IE9 support. But it does not ship the **HTML5 history polyfill** out of the box. That's because most apps do not require it.
 
 If you need to support IE9, add the **HTML5 history polyfill** with the following package.
 
@@ -583,13 +583,13 @@ meteor add tmeasday:html5-history-api
 
 ## Addons
 
-Router is a base package for an app. Other projects like [useraccounts](http://useraccounts.meteor.com/)  should have support for the Router. Otherwise, it's hard to use the Router in a real project. Now a lot of packages [started to support FlowRouter](https://kadira.io/blog/meteor/addon-packages-for-flowrouter). 
+Router is a base package for an app. Other projects like [useraccounts](http://useraccounts.meteor.com/)  should have support for FlowRouter. Otherwise, it's hard to use  FlowRouter in a real project. Now a lot of packages have [started to support FlowRouter](https://kadira.io/blog/meteor/addon-packages-for-flowrouter). 
 
 So, you can use your your favorite package with FlowRouter as well. If not, there is an [easy process](https://kadira.io/blog/meteor/addon-packages-for-flowrouter#what-if-project-xxx-still-doesn-t-support-flowrouter-) to convert them to FlowRouter.
 
 **Addon API**
 
-We've also released a [new API](https://github.com/kadirahq/flow-router#flowrouteronrouteregistercb) to support addon developers. With that addon packages can get a notification, when the user created a route in their app.
+We have also released a [new API](https://github.com/kadirahq/flow-router#flowrouteronrouteregistercb) to support addon developers. With that addon packages can get a notification, when the user created a route in their app.
 
 If you've more ideas for the addon API, [let us know](https://github.com/kadirahq/flow-router/issues).
 
@@ -603,21 +603,21 @@ Let's learn more about the differences:
 
 ### Rendering 
 
-FlowRouter doesn't handle rendering. By decoupling rendering from the router it's possible to use any rendering framework, such as [Blaze Layout](https://github.com/kadirahq/blaze-layout) to render with Blaze's Dynamic Templates. Rendering calls are made in the the route's action. We've layout manager for [React](https://github.com/kadirahq/meteor-react-layout) as well.
+FlowRouter doesn't handle rendering. By decoupling rendering from the router it's possible to use any rendering framework, such as [Blaze Layout](https://github.com/kadirahq/blaze-layout) to render with Blaze's Dynamic Templates. Rendering calls are made in the the route's action. We have a layout manager for [React](https://github.com/kadirahq/meteor-react-layout) as well.
 
 ### Subscriptions
 
-With FlowRouter, we highly suggest to use template/component layer subscriptions. But, if you need to do routing in the router layer, FlowRouter has [subscription registration](#subscription-management) mechanism. Even with that, FlowRouter never wait for the subscriptions and view layer to do it.
+With FlowRouter, we highly suggest using template/component layer subscriptions. But, if you need to do routing in the router layer, FlowRouter has [subscription registration](#subscription-management) mechanism. Even with that, FlowRouter never waits for the subscriptions and view layer to do it.
 
 ### Reactive Content
 
-In Iron Router you can use reactive content inside the router, but any hook or method can re-run in unpredictable manner. FlowRouter limits reactive data sources to a single run when it is first called.
+In Iron Router you can use reactive content inside the router, but any hook or method can re-run in an unpredictable manner. FlowRouter limits reactive data sources to a single run; when it is first called.
 
-We think, that's the way to go. Router is just a user action. We can work with reactive content in the rendering layer. 
+We think that's the way to go. Router is just a user action. We can work with reactive content in the rendering layer. 
 
 ### router.current() is evil
 
-`Router.current()` is evil. Why? Let's look at following example. Imagine we've a route like this in our app:
+`Router.current()` is evil. Why? Let's look at following example. Imagine we have a route like this in our app:
 
 ~~~
 /apps/:appId/:section
@@ -634,11 +634,11 @@ Templates['foo'].helpers({
 });
 ~~~
 
-Okay. Let's say we changed `:section` in the route. Oh then above helper also gets rerun. Even if we add a query param to the URL, it gets rerun. That's because `Router.current()` looks for changes in the route(or URL). But in any of above cases, `appId` didn't get changed.
+Let's say we changed `:section` in the route. Then the above helper also gets rerun. If we add a query param to the URL, it gets rerun. That's because `Router.current()` looks for changes in the route(or URL). But in any of above cases, `appId` didn't get changed.
 
-Because of this, a lot parts of our app gets re run and re-rendered. This creates unpredictable rendering behavior in our app.
+Because of this, a lot parts of our app get re-run and re-rendered. This creates unpredictable rendering behavior in our app.
 
-FlowRouter fixes this issue simply by providing the `Router.getParam()` API. See how to use it: 
+FlowRouter fixes this issue by providing the `Router.getParam()` API. See how to use it: 
 
 ~~~js
 Templates['foo'].helpers({
@@ -661,17 +661,17 @@ For more information check [docs](#fast-render).
 
 ### Server Side Routing
 
-FlowRouter is a client side router and it **does not** support server side routing at all. But `subscriptions` run on the server to enabled Fast Render support.
+FlowRouter is a client side router and it **does not** support server side routing at all. But `subscriptions` run on the server to enable Fast Render support.
 
 #### Reason behind that
 
-Meteor is not a traditional framework where you can send HTML directly from the server. Meteor needs to send a special set of HTML to the client initially. So, you can't directly send something to the client your self.
+Meteor is not a traditional framework where you can send HTML directly from the server. Meteor needs to send a special set of HTML to the client initially. So, you can't directly send something to the client yourself.
 
 Also, in the server we need look for different things compared with the client. For example:
 
-* In server we've to deal with headers.
-* In server we've to deal with methods like `GET`, `POST`, etc. 
-* In server we've Cookies
+* In the server we have to deal with headers.
+* In the server we have to deal with methods like `GET`, `POST`, etc. 
+* In the server we have Cookies.
 
 So, it's better to use a dedicated server-side router like [`meteorhacks:picker`](https://github.com/meteorhacks/picker). It supports connect and express middlewares and has a very easy to use route syntax.
 
@@ -683,7 +683,7 @@ It's currently very usable and Kadira already using it for <https://kadira.io>
 
 ### Better Initial Loading Support
 
-In Meteor, we've to wait until all the JS and other resources before rendering anything. This is an issue. In 3.0, with the support from Server Side Rendering we are going to fix it.
+In Meteor, we have to wait until all the JS and other resources send before rendering anything. This is an issue. In 3.0, with the support from Server Side Rendering we are going to fix it.
 
 ## Migrating into 2.0
 
