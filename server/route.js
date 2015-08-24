@@ -92,7 +92,9 @@ Route.prototype._processFromSsr = function (params, req, res) {
   });
 
   function moveScripts(data) {
-    var $ = Cheerio.load(data);
+    var $ = Cheerio.load(data, {
+      decodeEntities: false
+    });
     var heads = $('head script');
     $('body').append(heads);
 
