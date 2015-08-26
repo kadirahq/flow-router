@@ -8,6 +8,7 @@ Group = function(router, options, parent) {
 
   this._router = router;
   this.prefix = options.prefix || '';
+  this.name = options.name;
 
   this._triggersEnter = options.triggersEnter || [];
   this._triggersExit = options.triggersExit || [];
