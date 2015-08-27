@@ -69,3 +69,21 @@ Tinytest.addAsync('Client - Group - subscribe', function (test, next) {
     next();
   }, 100);
 });
+
+
+Tinytest.addAsync('Client - Group - set and retrieve group name', function (test, next) {
+  var rand = Random.id();
+  var name = Random.id();
+
+  var group = FlowRouter.group({
+    name: name
+  });
+
+  group.route('/' + rand);
+
+  FlowRouter.go('/' + rand);
+  setTimeout(function() {
+    test.isTrue(FlowRouter.current().route.group.name === name);
+    next();
+  }, 100);
+});

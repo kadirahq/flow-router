@@ -42,7 +42,7 @@ Package.onTest(function(api) {
   api.addFiles('test/client/triggers.js', 'client');
 
   api.addFiles('test/server/plugins/fast_render.js', 'server');
-  
+
   api.addFiles('test/common/router.path.spec.js', ['client', 'server']);
   api.addFiles('test/common/router.addons.spec.js', ['client', 'server']);
   api.addFiles('test/common/route.spec.js', ['client', 'server']);
