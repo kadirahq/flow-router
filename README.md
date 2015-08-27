@@ -98,6 +98,7 @@ You can group routes for better route organization. Here's an example:
 ~~~js
 var adminRoutes = FlowRouter.group({
   prefix: '/admin',
+  name: 'admin',
   triggersEnter: [function(context, redirect) {
     console.log('running group triggers');
   }]

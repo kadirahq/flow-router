@@ -1,5 +1,9 @@
 # Change Log
 
+### v2.4.0
+
+* Add a name to the route groups. See: [#290](https://github.com/kadirahq/flow-router/pull/290)
+
 ### v2.3.0
 * We've used `path` for both the current path and for the pathDef earlier. Now we differentiate it. See: [#272](https://github.com/kadirahq/flow-router/issues/272) and [#273](https://github.com/kadirahq/flow-router/pull/273) for more information.
 
