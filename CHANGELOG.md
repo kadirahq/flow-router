@@ -1,5 +1,9 @@
 # Change Log
 
+### v3.2.1
+
+* Fix adding support for unicode chars in the head
+
 ### v3.2.0
 
 * Upgrade FastRender for Meteor 1.2 support
