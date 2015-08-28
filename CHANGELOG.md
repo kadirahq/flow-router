@@ -1,5 +1,9 @@
 # Change Log
 
+### v3.2.0
+
+* Upgrade FastRender for Meteor 1.2 support
+
 ### v3.1.0
 
 * Support null publications and custom publications with `this.xxx` apis
