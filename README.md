@@ -1,7 +1,7 @@
 # FlowRouter [![Build Status](https://travis-ci.org/kadirahq/flow-router.svg?branch=master)](https://travis-ci.org/kadirahq/flow-router) [![Stories in Ready](https://badge.waffle.io/kadirahq/flow-router.svg?label=doing&title=Activities)](http://waffle.io/kadirahq/flow-router)
 
 
-Carefully Designed Client Side Router for Meteor. 
+Carefully Designed Client Side Router for Meteor.
 
 FlowRouter is a very simple router for Meteor. It does routing for client-side apps and does not handle rendering itself.
 
@@ -143,6 +143,20 @@ superAdminRoutes.route('/post', {
 });
 ~~~
 
+You can determine which group the current route is in using:
+
+~~~js
+FlowRouter.current().route.group.name
+~~~
+
+This can be useful for determining if the current route is in a specific group (e.g. *admin*, *public*, *loggedIn*) without needing to use prefixes if you don't want to. If it's a nested group, you can get the parent group's name with:
+
+~~~js
+FlowRouter.current().route.group.parent.name
+~~~
+
+As with all current route properties, these are not reactive, but can be combined with `FlowRouter.watchPathChange()` to get group names reactively.
+
 ## Rendering and Layout Management
 
 FlowRouter does not handle rendering or layout management. For that, you can use:
@@ -252,10 +266,10 @@ You can configure Not Found routes like this:
 FlowRouter.notFound = {
     // Subscriptions registered here don't have Fast Render support.
     subscriptions: function() {
-      
+
     },
     action: function() {
-      
+
     }
 };
 ~~~
@@ -489,7 +503,7 @@ Then the route object will be something like this:
 
 So, it's not the internal route object we are using.
 
-## Subscription Management 
+## Subscription Management
 
 For Subscription Management, we highly suggest you to follow [Template/Component level subscriptions](https://kadira.io/academy/meteor-routing-guide/content/subscriptions-and-data-management). Visit this [guide](https://kadira.io/academy/meteor-routing-guide/content/subscriptions-and-data-management) for that.
 
@@ -547,7 +561,7 @@ Template.myTemplate.events(
 >![FlowRouter's Subscription Management](https://cldup.com/esLzM8cjEL.gif)
 
 #### Fast Render
-FlowRouter has built in support for [Fast Render](https://github.com/meteorhacks/fast-render). 
+FlowRouter has built in support for [Fast Render](https://github.com/meteorhacks/fast-render).
 
 - `meteor add meteorhacks:fast-render`
 - Put `router.js` in a shared location. We suggest `lib/router.js`.
@@ -584,7 +598,7 @@ meteor add tmeasday:html5-history-api
 
 ## Addons
 
-Router is a base package for an app. Other projects like [useraccounts](http://useraccounts.meteor.com/)  should have support for FlowRouter. Otherwise, it's hard to use  FlowRouter in a real project. Now a lot of packages have [started to support FlowRouter](https://kadira.io/blog/meteor/addon-packages-for-flowrouter). 
+Router is a base package for an app. Other projects like [useraccounts](http://useraccounts.meteor.com/)  should have support for FlowRouter. Otherwise, it's hard to use  FlowRouter in a real project. Now a lot of packages have [started to support FlowRouter](https://kadira.io/blog/meteor/addon-packages-for-flowrouter).
 
 So, you can use your your favorite package with FlowRouter as well. If not, there is an [easy process](https://kadira.io/blog/meteor/addon-packages-for-flowrouter#what-if-project-xxx-still-doesn-t-support-flowrouter-) to convert them to FlowRouter.
 
@@ -602,7 +616,7 @@ FlowRouter is a minimalistic solution focused on routing with UI performance in 
 
 Let's learn more about the differences:
 
-### Rendering 
+### Rendering
 
 FlowRouter doesn't handle rendering. By decoupling rendering from the router it's possible to use any rendering framework, such as [Blaze Layout](https://github.com/kadirahq/blaze-layout) to render with Blaze's Dynamic Templates. Rendering calls are made in the the route's action. We have a layout manager for [React](https://github.com/kadirahq/meteor-react-layout) as well.
 
@@ -614,7 +628,7 @@ With FlowRouter, we highly suggest using template/component layer subscriptions.
 
 In Iron Router you can use reactive content inside the router, but any hook or method can re-run in an unpredictable manner. FlowRouter limits reactive data sources to a single run; when it is first called.
 
-We think that's the way to go. Router is just a user action. We can work with reactive content in the rendering layer. 
+We think that's the way to go. Router is just a user action. We can work with reactive content in the rendering layer.
 
 ### router.current() is evil
 
@@ -639,7 +653,7 @@ Let's say we changed `:section` in the route. Then the above helper also gets re
 
 Because of this, a lot parts of our app get re-run and re-rendered. This creates unpredictable rendering behavior in our app.
 
-FlowRouter fixes this issue by providing the `Router.getParam()` API. See how to use it: 
+FlowRouter fixes this issue by providing the `Router.getParam()` API. See how to use it:
 
 ~~~js
 Templates['foo'].helpers({
@@ -671,7 +685,7 @@ Meteor is not a traditional framework where you can send HTML directly from the 
 Also, in the server we need look for different things compared with the client. For example:
 
 * In the server we have to deal with headers.
-* In the server we have to deal with methods like `GET`, `POST`, etc. 
+* In the server we have to deal with methods like `GET`, `POST`, etc.
 * In the server we have Cookies.
 
 So, it's better to use a dedicated server-side router like [`meteorhacks:picker`](https://github.com/meteorhacks/picker). It supports connect and express middlewares and has a very easy to use route syntax.
@@ -706,5 +720,3 @@ Here are the steps to migrate your app into 2.0.
 * There is no middleware support. Use triggers instead.
 * There is no API called `.reactiveCurrent()`, use `.watchPathChange()` instead.
 * Earlier, you can access query params with `FlowRouter.current().params.query`. But, now you can't do that. Use `FlowRouter.current().queryParams` instead.
-
-
