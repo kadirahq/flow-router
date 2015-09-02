@@ -97,6 +97,24 @@ function(test, done) {
 });
 
 Tinytest.addAsync(
+'Triggers - runTriggers - stop callback',
+function(test, done) {
+  var store = [];
+  var triggers = MakeTriggers(2, store);
+  triggers.splice(1, 0, function(context, redirect, stop) {
+    stop();
+  });
+
+  Triggers.runTriggers(triggers, null, null, function() {
+    store.push(2);
+  });
+
+  test.equal(store, [0]);
+  done();
+});
+
+
+Tinytest.addAsync(
 'Triggers - runTriggers - get context',
 function(test, done) {
   var context = {};
