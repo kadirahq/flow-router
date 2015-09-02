@@ -64,7 +64,7 @@ Triggers.createRouteBoundTriggers = function(triggers, names, negate) {
   return filteredTriggers;
 };
 
-//  run triggers and abort if redirected
+//  run triggers and abort if redirected or callback stopped
 //  @triggers - a set of triggers 
 //  @context - context we need to pass (it must have the route)
 //  @redirectFn - function which used to redirect 
@@ -76,7 +76,7 @@ Triggers.runTriggers = function(triggers, context, redirectFn, after) {
 
   for(var lc=0; lc<triggers.length; lc++) {
     var trigger = triggers[lc];
-    trigger(context, doRedirect);
+    trigger(context, doRedirect, doStop);
 
     if(abort) {
       return;
@@ -104,5 +104,9 @@ Triggers.runTriggers = function(triggers, context, redirectFn, after) {
     abort = true;
     alreadyRedirected = true;
     redirectFn(url, params, queryParams);
+  }
+
+  function doStop() {
+    abort = true;
   }
 };
