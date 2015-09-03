@@ -593,7 +593,7 @@ FlowRouter has IE9 support. But it does not ship the **HTML5 history polyfill** 
 If you need to support IE9, add the **HTML5 history polyfill** with the following package.
 
 ~~~shell
-meteor add tmeasday:html5-history-api
+meteor add tomwasd:history-polyfill
 ~~~
 
 ## Addons
