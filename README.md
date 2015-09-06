@@ -258,6 +258,34 @@ Every trigger callback comes with a second argument: a function you can use to r
 
 Check this [PR](https://github.com/meteorhacks/flow-router/pull/172) to learn more about our redirect API.
 
+#### Stopping the Callback With Triggers
+
+In some cases, you may need to stop the route callback from firing using triggers. You can do this in **before** triggers, using the third argument: the `stop` function. For example, you can check the prefix and if it fails, show the notFound layout and stop before the action fires.
+
+```js
+var localeGroup = FlowRouter.group({
+  prefix: '/:locale?',
+  triggersEnter: [localeCheck]
+});
+
+localeGroup.route('/login', {
+  action: function (params, queryParams) {
+    BlazeLayout.render('componentLayout', {content: 'login'});
+  }
+});
+
+function localeCheck(context, redirect, stop) {
+  var locale = context.params.locale;
+
+  if (locale !== undefined && locale !== 'fr') {
+    BlazeLayout.render('notFound');
+    stop();
+  }
+}
+```
+
+> **Note**: When using the stop function, you should always pass the second **redirect** argument, even if you won't use it.
+
 ## Not Found Routes
 
 You can configure Not Found routes like this:
