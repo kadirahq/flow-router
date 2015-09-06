@@ -1,5 +1,8 @@
 # Change Log
 
+### v2.5.0
+* Add a stop callback on the triggers. See: [#306](https://github.com/kadirahq/flow-router/pull/306).
+
 ### v2.4.0
 
 * Add a name to the route groups. See: [#290](https://github.com/kadirahq/flow-router/pull/290)
