@@ -599,11 +599,14 @@ meteor add tomwasd:history-polyfill
 
 ## Hashbang URLs
 
-To enable hashbang urls like `mydomain.com/#!/mypath` simple set the `hashbang` option to `true`.
-Do this outside of a `Meteor.startup()` function, or before you initialize FlowRouter:
+To enable hashbang urls like `mydomain.com/#!/mypath` simple set the `hashbang` option to `true` in the initialize funtion:
 
 ~~~js
-FlowRouter.hashbang = true;
+// file: app.js
+FlowRouter.wait();
+WhenEverYourAppIsReady(function() {
+  FlowRouter.initialize({hashbang: true});
+});
 ~~~
 
 
