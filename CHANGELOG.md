@@ -1,25 +1,41 @@
 # Change Log
 
-### v3.2.1
+### v3.3.0
+* Get changes from FlowRouter 2.6.0
+* Add query params to triggers and action
 
+### v3.2.1
 * Fix adding support for unicode chars in the head
 
 ### v3.2.0
-
 * Upgrade FastRender for Meteor 1.2 support
 
 ### v3.1.0
-
 * Support null publications and custom publications with `this.xxx` apis
 * Support server side login state
 * Get the changes from v2.1.1
 
 ### v3.0.1
-
 * Add initial SSR support
 * It's implemented as extendable manner. Currently ReactLayout supports it.
 
 ------------
+
+### v2.6.0
+* Add hashbang support. See [#311](https://github.com/kadirahq/flow-router/pull/311)
+
+### v2.5.0
+* Add a stop callback on the triggers. See: [#306](https://github.com/kadirahq/flow-router/pull/306).
+
+### v2.4.0
+
+* Add a name to the route groups. See: [#290](https://github.com/kadirahq/flow-router/pull/290)
+
+### v2.3.0
+* We've used `path` for both the current path and for the pathDef earlier. Now we differentiate it. See: [#272](https://github.com/kadirahq/flow-router/issues/272) and [#273](https://github.com/kadirahq/flow-router/pull/273) for more information.
+
+### v2.2.0
+* Add the first addOn api: FlowRouter.onRouteRegister(cb)
 
 ### v2.1.1
 * There was an issue in IE9 support. We fix it with this version.

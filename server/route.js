@@ -1,13 +1,16 @@
 var Url = Npm.require('url');
 var Cheerio = Npm.require('cheerio');
 
-Route = function(router, path, options) {
+Route = function(router, pathDef, options) {
   var self = this;
   options = options || {};
   this.options = options;
-
-  this.path = path;
   this.name = options.name;
+  this.pathDef = pathDef;
+
+  // Route.path is deprecated and will be removed in 3.0
+  this.path = pathDef;
+
   this.action = options.action || Function.prototype;
   this._router = router;
   this.subscriptions = options.subscriptions || Function.prototype;
@@ -17,7 +20,7 @@ Route = function(router, path, options) {
   Picker.middleware(Npm.require('connect').cookieParser());
   // process null subscriptions with FR support
   Picker.middleware(FastRender.handleOnAllRoutes);
-  Picker.route(path, function(params, req, res, next) {
+  Picker.route(pathDef, function(params, req, res, next) {
 
     if(!self.isHtmlPage(req.url)) {
       return next();

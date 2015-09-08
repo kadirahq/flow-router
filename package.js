@@ -31,7 +31,6 @@ Package.onTest(function(api) {
   api.use('meteorhacks:inject-data');
   api.use('tmeasday:html5-history-api');
 
-
   api.addFiles('test/client/_helpers.js', 'client');
   api.addFiles('test/server/_helpers.js', 'server');
 
@@ -43,8 +42,9 @@ Package.onTest(function(api) {
   api.addFiles('test/client/group.spec.js', 'client');
   api.addFiles('test/client/trigger.spec.js', 'client');
   api.addFiles('test/client/triggers.js', 'client');
-  
+
   api.addFiles('test/common/router.path.spec.js', ['client', 'server']);
+  api.addFiles('test/common/router.addons.spec.js', ['client', 'server']);
   api.addFiles('test/common/route.spec.js', ['client', 'server']);
 });
 

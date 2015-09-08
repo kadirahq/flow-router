@@ -8,22 +8,26 @@ Router = function () {
   this.inSubscription = new Meteor.EnvironmentVariable();
   this.currentRoute = new Meteor.EnvironmentVariable();
   this.pageCacheTimeout = 1000 * 30;
+
+  // holds onRoute callbacks
+  this._onRouteCallbacks = [];
 };
 
-Router.prototype.route = function(path, options) {
-  if (!/^\/.*/.test(path)) {
+Router.prototype.route = function(pathDef, options) {
+  if (!/^\/.*/.test(pathDef)) {
     var message = "route's path must start with '/'";
     throw new Error(message);
   }
   
   options = options || {};
-  var route = new Route(this, path, options);
+  var route = new Route(this, pathDef, options);
   this._routes.push(route);
 
   if (options.name) {
     this._routesMap[options.name] = route;
   }
 
+  this._triggerRouteRegister(route);
   return route;
 };
 
@@ -60,6 +64,26 @@ Router.prototype.path = function(pathDef, fields, queryParams) {
   }
 
   return path;
+};
+
+Router.prototype.onRouteRegister = function(cb) {
+  this._onRouteCallbacks.push(cb);
+};
+
+Router.prototype._triggerRouteRegister = function(currentRoute) {
+  // We should only need to send a safe set of fields on the route
+  // object.
+  // This is not to hide what's inside the route object, but to show 
+  // these are the public APIs
+  var routePublicApi = _.pick(currentRoute, 'name', 'pathDef', 'path');
+  var omittingOptionFields = [
+    'triggersEnter', 'triggersExit', 'action', 'subscriptions', 'name'
+  ];
+  routePublicApi.options = _.omit(currentRoute.options, omittingOptionFields);
+
+  _.each(this._onRouteCallbacks, function(cb) {
+    cb(routePublicApi);
+  });
 };
 
 

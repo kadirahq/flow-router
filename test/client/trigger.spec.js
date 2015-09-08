@@ -463,6 +463,31 @@ Tinytest.addAsync('Client - Triggers - redirect from exit', function(test, next)
   }, 100);
 });
 
+Tinytest.addAsync('Client - Triggers - stop callback from enter', function(test, next) {
+  var rand = Random.id();
+  var log = [];
+
+  FlowRouter.route('/' + rand, {
+    triggersEnter: [function(context, redirect, stop) {
+      log.push(10);
+      stop();
+    }, function() {
+      throw new Error("should not execute this trigger");
+    }],
+    action: function(_params) {
+      throw new Error("should not execute the action");
+    }
+  });
+
+  FlowRouter.go('/');
+  FlowRouter.go('/' + rand);
+
+  setTimeout(function() {
+    test.equal(log, [10]);
+    next();
+  }, 100);
+});
+
 Tinytest.addAsync(
 'Client - Triggers - invalidate inside an autorun', 
 function(test, next) {

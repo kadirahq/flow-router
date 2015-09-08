@@ -1,7 +1,7 @@
 
 # FlowRouter SSR
 
-This is same as FlowRouter 2.0 but with SSR support. So, for the FlowRouter related documentation, visit [here](https://github.com/kadirahq/flow-router).
+This is same as FlowRouter 2.6.0 but with SSR support. So, for the FlowRouter related documentation, visit [here](https://github.com/kadirahq/flow-router).
 
 ## Installation
 

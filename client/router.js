@@ -11,6 +11,9 @@ Router = function () {
 
   this._globalRoute = new Route(this);
 
+  // holds onRoute callbacks
+  this._onRouteCallbacks = [];
+
   // if _askedToWait is true. We don't automatically start the router 
   // in Meteor.startup callback. (see client/_init.js)
   // Instead user need to call `.initialize()
@@ -45,15 +48,15 @@ Router = function () {
   this._initTriggersAPI();
 };
 
-Router.prototype.route = function(path, options, group) {
-  if (!/^\/.*/.test(path)) {
+Router.prototype.route = function(pathDef, options, group) {
+  if (!/^\/.*/.test(pathDef)) {
     var message = "route's path must start with '/'";
     throw new Error(message);
   }
 
   options = options || {};
   var self = this;
-  var route = new Route(this, path, options, group);
+  var route = new Route(this, pathDef, options, group);
 
   // calls when the page route being activates
   route._actionHandle = function (context, next) {
@@ -108,6 +111,7 @@ Router.prototype.route = function(path, options, group) {
   }
 
   this._updateCallbacks();
+  this._triggerRouteRegister(route);
 
   return route;
 };
@@ -118,7 +122,7 @@ Router.prototype.group = function(options) {
 
 Router.prototype.path = function(pathDef, fields, queryParams) {
   if (this._routesMap[pathDef]) {
-    pathDef = this._routesMap[pathDef].path;
+    pathDef = this._routesMap[pathDef].pathDef;
   }
 
   fields = fields || {};
@@ -182,7 +186,7 @@ Router.prototype.redirect = function(path) {
 Router.prototype.setParams = function(newParams) {
   if(!this._current.route) {return false;}
 
-  var pathDef = this._current.route.path;
+  var pathDef = this._current.route.pathDef;
   var existingParams = this._current.params;
   var params = {};
   _.each(_.keys(existingParams), function(key) {
@@ -208,7 +212,7 @@ Router.prototype.setQueryParams = function(newParams) {
     }
   }
 
-  var pathDef = this._current.route.path;
+  var pathDef = this._current.route.pathDef;
   var params = this._current.params;
   this.go(pathDef, params, queryParams);
   return true;
@@ -318,7 +322,9 @@ Router.prototype._notfoundRoute = function(context) {
   this._invalidateTracker();
 };
 
-Router.prototype.initialize = function() {
+Router.prototype.initialize = function(options) {
+  options = options || {};
+
   if(this._initialized) {
     throw new Error("FlowRouter is already initialized");
   }
@@ -351,7 +357,7 @@ Router.prototype.initialize = function() {
   // in unpredicatable manner. See #168
   // this is the default behaviour and we need keep it like that
   // we are doing a hack. see .path()
-  this._page({decodeURLComponents: true});
+  this._page({decodeURLComponents: true, hashbang: !!options.hashbang});
   this._initialized = true;
 };
 
@@ -477,8 +483,8 @@ Router.prototype._updateCallbacks = function () {
   self._page.exits = [];
 
   _.each(self._routes, function(route) {
-    self._page(route.path, route._actionHandle);
-    self._page.exit(route.path, function(context, next) {
+    self._page(route.pathDef, route._actionHandle);
+    self._page.exit(route.pathDef, function(context, next) {
       // XXX: With React, exit handler gets called twice
       // We've not debugged into why yet, but it's an issue
       // so, we need to manually handle it like this
@@ -521,6 +527,26 @@ Router.prototype.wait = function() {
   }
 
   this._askedToWait = true;
+};
+
+Router.prototype.onRouteRegister = function(cb) {
+  this._onRouteCallbacks.push(cb);
+};
+
+Router.prototype._triggerRouteRegister = function(currentRoute) {
+  // We should only need to send a safe set of fields on the route
+  // object.
+  // This is not to hide what's inside the route object, but to show 
+  // these are the public APIs
+  var routePublicApi = _.pick(currentRoute, 'name', 'pathDef', 'path');
+  var omittingOptionFields = [
+    'triggersEnter', 'triggersExit', 'action', 'subscriptions', 'name'
+  ];
+  routePublicApi.options = _.omit(currentRoute.options, omittingOptionFields);
+
+  _.each(this._onRouteCallbacks, function(cb) {
+    cb(routePublicApi);
+  });
 };
 
 Router.prototype._page = page;
