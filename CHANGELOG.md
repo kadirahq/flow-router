@@ -2,7 +2,7 @@
 
 ### v3.3.0
 * Get changes from FlowRouter 2.6.0
-* Add query params to triggers and action
+* Add complete queryParams support in SSR. Fixes: [#237](https://github.com/kadirahq/flow-router/issues/237)
 
 ### v3.2.1
 * Fix adding support for unicode chars in the head
