@@ -20,6 +20,7 @@ It exposes a great API for changing the URL and reactively getting data from the
 * [API](#api)
 * [Subscription Management](#subscription-management)
 * [IE9 Support](#ie9-support)
+* [Hashbang URLs](#hashbang-urls)
 * [Addons](#addons)
 * [Difference with Iron Router](#difference-with-iron-router)
 * [Migrating into 2.0](#migrating-into-20)
@@ -623,6 +624,19 @@ If you need to support IE9, add the **HTML5 history polyfill** with the followin
 ~~~shell
 meteor add tomwasd:history-polyfill
 ~~~
+
+## Hashbang URLs
+
+To enable hashbang urls like `mydomain.com/#!/mypath` simple set the `hashbang` option to `true` in the initialize funtion:
+
+~~~js
+// file: app.js
+FlowRouter.wait();
+WhenEverYourAppIsReady(function() {
+  FlowRouter.initialize({hashbang: true});
+});
+~~~
+
 
 ## Addons
 

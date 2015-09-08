@@ -322,7 +322,9 @@ Router.prototype._notfoundRoute = function(context) {
   this._invalidateTracker();
 };
 
-Router.prototype.initialize = function() {
+Router.prototype.initialize = function(options) {
+  options = options || {};
+
   if(this._initialized) {
     throw new Error("FlowRouter is already initialized");
   }
@@ -355,7 +357,7 @@ Router.prototype.initialize = function() {
   // in unpredicatable manner. See #168
   // this is the default behaviour and we need keep it like that
   // we are doing a hack. see .path()
-  this._page({decodeURLComponents: true});
+  this._page({decodeURLComponents: true, hashbang: !!options.hashbang});
   this._initialized = true;
 };
 
