@@ -1,5 +1,8 @@
 # Change Log
 
+### v2.6.0
+* Add hashbang support. See [#311](https://github.com/kadirahq/flow-router/pull/311)
+
 ### v2.5.0
 * Add a stop callback on the triggers. See: [#306](https://github.com/kadirahq/flow-router/pull/306).
 
