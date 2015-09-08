@@ -42,7 +42,14 @@ Route.prototype._processFromSsr = function (params, req, res) {
   var self = this;
   var ssrContext = new SsrContext();
   self._router.ssrContext.withValue(ssrContext, function() {
-    var context = self._buildContext(req.url, params);
+    var queryParams = params.query;
+    // We need to remove `.query` since it's not part of our params API
+    // But we only need to remove it in our copy. 
+    // We should not trigger any side effects
+    params = _.clone(params);
+    delete params.query;
+    var context = self._buildContext(req.url, params, queryParams);
+
     self._router.currentRoute.withValue(context, function () {
       try {
         // get the data for null subscriptions and add them to the
@@ -53,11 +60,11 @@ Route.prototype._processFromSsr = function (params, req, res) {
         }
 
         if(self.options.subscriptions) {
-          self.options.subscriptions.call(self, params);
+          self.options.subscriptions.call(self, params, queryParams);
         }
 
         if(self.options.action) {
-          self.options.action.call(self, params);
+          self.options.action.call(self, params, queryParams);
         }
       } catch(ex) {
         console.error("Error when doing SSR. path:", req.url, " ", ex.message);
@@ -118,12 +125,12 @@ Route.prototype._processFromCache = function(pageInfo, res, next) {
   next();
 };
 
-Route.prototype._buildContext = function(url, params) {
+Route.prototype._buildContext = function(url, params, queryParams) {
   var context = {
     route: this,
     path: url,
     params: params,
-    queryParams: params.query
+    queryParams: queryParams
   };
 
   return context;
