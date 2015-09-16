@@ -1,5 +1,11 @@
 # Change Log
 
+### v2.6.1
+
+* Fix [#143](https://github.com/kadirahq/flow-router/issues/314). 
+  This says that when we are doing a trigger redirect,
+  We won't get reactive changes like: `getRouteName()`
+
 ### v2.6.0
 * Add hashbang support. See [#311](https://github.com/kadirahq/flow-router/pull/311)
 
