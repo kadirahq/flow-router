@@ -32,6 +32,11 @@ Router = function () {
   // this is a solution for #145
   this.safeToRun = 0;
 
+  // this is a chain contains a list of old routes
+  // most of the time, there is only one old route
+  // but when it's the time for a trigger redirect we've a chain
+  this._oldRouteChain = [];
+
   this.env = {
     replaceState: new Meteor.EnvironmentVariable(),
     reload: new Meteor.EnvironmentVariable(),
@@ -61,6 +66,8 @@ Router.prototype.route = function(pathDef, options, group) {
   // calls when the page route being activates
   route._actionHandle = function (context, next) {
     var oldRoute = self._current.route;
+    self._oldRouteChain.push(oldRoute);
+
     var queryParams = self._qs.parse(context.querystring);
     // _qs.parse() gives us a object without prototypes, 
     // created with Object.create(null)
@@ -401,6 +408,13 @@ Router.prototype._buildTracker = function() {
         isRouteChange = false;
       }
 
+      // Clear oldRouteChain just before calling the action
+      // We still need to get a copy of the oldestRoute first
+      // It's very important to get the oldest route and registerRouteClose() it
+      // See: https://github.com/kadirahq/flow-router/issues/314
+      var oldestRoute = self._oldRouteChain[0];
+      self._oldRouteChain = [];
+
       currentContext.route.registerRouteChange(currentContext, isRouteChange);
       route.callAction(currentContext);
 
@@ -414,7 +428,9 @@ Router.prototype._buildTracker = function() {
 
           // We also need to afterFlush, otherwise this will re-run
           // helpers on templates which are marked for destroying
-          currentContext.oldRoute.registerRouteClose();
+          if(oldestRoute) {
+            oldestRoute.registerRouteClose();
+          }
         }
       });
     });
