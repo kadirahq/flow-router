@@ -229,7 +229,13 @@ Router.prototype.setQueryParams = function(newParams) {
 // This is by design. use .getParam() instead
 // If you really need to watch the path change, use .watchPathChange()
 Router.prototype.current = function() {
-  return this._current;
+  // We can't trust outside, that's why we clone this
+  // Anyway, we can't clone the whole object since it has non-jsonable values
+  // That's why we clone what's really needed.
+  var current = _.clone(this._current);
+  current.queryParams = EJSON.clone(current.queryParams);
+  current.params = EJSON.clone(current.params);
+  return current;
 };
 
 // Implementing Reactive APIs
