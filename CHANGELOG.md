@@ -1,4 +1,6 @@
 # Change Log
+### v2.6.2
+* Now .current() sends a cloned version of the internal current object. Which prevent outside mutations to params and queryParams
 
 ### v2.6.1
 
