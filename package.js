@@ -20,8 +20,10 @@ Package.onUse(function(api) {
 Package.onTest(function(api) {
   configure(api);
   api.use('tinytest');
+  api.use('check');
   api.use('mongo');
   api.use('http');
+  api.use('random');
   api.use('practicalmeteor:sinon');
   api.use('meteorhacks:fast-render');
   api.use('meteorhacks:inject-data');
@@ -55,8 +57,9 @@ function configure(api) {
   api.use('tracker');
   api.use('reactive-dict');
   api.use('reactive-var');
+  api.use('ejson');
 
-  api.use('meteorhacks:fast-render@2.3.2', ['client', 'server'], {weak: true});
+  api.use('meteorhacks:fast-render@2.10.0', ['client', 'server'], {weak: true});
   api.use('cosmos:browserify@0.5.0', 'client');
 
   api.addFiles('client.browserify.js', 'client');
