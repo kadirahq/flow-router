@@ -463,6 +463,46 @@ Tinytest.addAsync('Client - Triggers - redirect from exit', function(test, next)
   }, 100);
 });
 
+Tinytest.addAsync('Client - Triggers - redirect to external URL fails', function(test, next) {
+  var rand = Random.id(), rand2 = Random.id();
+  var log = [];
+
+  // testing "http://" URLs
+  FlowRouter.route('/' + rand, {
+    triggersEnter: [function(context, redirect) {
+      test.throws(function() {
+          redirect("http://example.com/")
+      }, "Redirects to URLs outside of the app are not supported")
+    }],
+    action: function(_params) {
+      log.push(1);
+    },
+    name: rand
+  });
+
+  // testing "https://" URLs
+  FlowRouter.route('/' + rand2, {
+    triggersEnter: [function(context, redirect) {
+      test.throws(function() {
+          redirect("https://example.com/")
+      })
+    }],
+    action: function(_params) {
+      log.push(2);
+    },
+    name: rand2
+  });
+
+  FlowRouter.go('/');
+  FlowRouter.go('/' + rand);
+  FlowRouter.go('/' + rand2);
+
+  setTimeout(function() {
+    test.equal(log, []);
+    next();
+  }, 300);
+});
+
 Tinytest.addAsync('Client - Triggers - stop callback from enter', function(test, next) {
   var rand = Random.id();
   var log = [];
