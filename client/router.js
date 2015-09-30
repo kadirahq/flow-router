@@ -45,6 +45,10 @@ Router = function () {
 
   // redirect function used inside triggers
   this._redirectFn = function(pathDef, fields, queryParams) {
+    if (/^http(s)?:\/\//.test(pathDef)) {
+        var message = "Redirects to URLs outside of the app are not supported in this version of Flow Router. Use 'window.location = yourUrl' instead";
+        throw new Error(message);
+    }
     self.withReplaceState(function() {
       var path = FlowRouter.path(pathDef, fields, queryParams);
       self._page.redirect(path);
