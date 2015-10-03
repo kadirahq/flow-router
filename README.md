@@ -21,6 +21,7 @@ It exposes a great API for changing the URL and reactively getting data from the
 * [Subscription Management](#subscription-management)
 * [IE9 Support](#ie9-support)
 * [Hashbang URLs](#hashbang-urls)
+* [Prefixed paths](#prefixed-paths)
 * [Addons](#addons)
 * [Difference with Iron Router](#difference-with-iron-router)
 * [Migrating into 2.0](#migrating-into-20)
@@ -637,6 +638,9 @@ WhenEverYourAppIsReady(function() {
 });
 ~~~
 
+## Prefixed paths
+
+In cases you wish to run multiple web application on the same domain name, you’ll probably want to serve your particular meteor application under a sub-path (eg `example.com/myapp`). In this case simply include the path prefix in the meteor `ROOT_URL` environment variable and FlowRouter will handle it transparently without any additional configuration.
 
 ## Addons
 
