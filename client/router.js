@@ -141,7 +141,7 @@ Router.prototype.path = function(pathDef, fields, queryParams) {
 
   // Prefix the path with the router global prefix
   if (this._basePath) {
-    path += this._basePath + "/";
+    path += "/" + this._basePath + "/";
   }
 
   fields = fields || {};

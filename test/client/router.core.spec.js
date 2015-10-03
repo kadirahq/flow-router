@@ -574,7 +574,6 @@ Tinytest.addAsync(
 'Client - Router - base path - url updated',
 function(test, done) {
   var simulatedBasePath = '/flow';
-  var previousBasePath = FlowRouter._basePath;
   var rand = Random.id();
   FlowRouter.route('/' + rand, { action: function() {} });
 
@@ -582,7 +581,7 @@ function(test, done) {
   FlowRouter.go('/' + rand);
   setTimeout(function() {
     test.equal(location.pathname, simulatedBasePath + '/' + rand);
-    setBasePath(previousBasePath);
+    resetBasePath();
     done();
   }, 100);
 });
@@ -591,11 +590,10 @@ Tinytest.addAsync(
 'Client - Router - base path - route action called',
 function(test, done) {
   var simulatedBasePath = '/flow';
-  var previousBasePath = FlowRouter._basePath;
   var rand = Random.id();
   FlowRouter.route('/' + rand, {
     action: function() {
-      setBasePath(previousBasePath);
+      resetBasePath();
       done();
     }
   });
@@ -604,11 +602,27 @@ function(test, done) {
   FlowRouter.go('/' + rand);
 });
 
+Tinytest.add(
+'Client - Router - base path - path generation',
+function(test, done) {
+  _.each(['/flow', '/flow/', 'flow/', 'flow'], function(simulatedBasePath) {
+    var rand = Random.id();
+    setBasePath(simulatedBasePath);
+    test.equal(FlowRouter.path('/' + rand), '/flow/' + rand);
+  });
+  resetBasePath();
+});
+
 
 function setBasePath(path) {
   FlowRouter._initialized = false;
   FlowRouter._basePath = path;
   FlowRouter.initialize();
+}
+
+var defaultBasePath = FlowRouter._basePath;
+function resetBasePath() {
+  setBasePath(defaultBasePath);
 }
 
 function bind(obj, method) {
