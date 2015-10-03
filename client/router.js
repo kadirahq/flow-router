@@ -137,9 +137,16 @@ Router.prototype.path = function(pathDef, fields, queryParams) {
     pathDef = this._routesMap[pathDef].pathDef;
   }
 
+  var path = "";
+
+  // Prefix the path with the router global prefix
+  if (this._basePath) {
+    path += this._basePath + "/";
+  }
+
   fields = fields || {};
   var regExp = /(:[\w\(\)\\\+\*\.\?]+)+/g;
-  var path = pathDef.replace(regExp, function(key) {
+  path += pathDef.replace(regExp, function(key) {
     var firstRegexpChar = key.indexOf("(");
     // get the content behind : and (\\d+/)
     key = key.substring(1, (firstRegexpChar > 0)? firstRegexpChar: undefined);
@@ -153,7 +160,8 @@ Router.prototype.path = function(pathDef, fields, queryParams) {
     return encodeURIComponent(encodeURIComponent(fields[key] || ""));
   });
 
-  path = path.replace(/\/\/+/g, "/"); // Replace multiple slashes with single slash
+  // Replace multiple slashes with single slash
+  path = path.replace(/\/\/+/g, "/");
 
   // remove trailing slash
   // but keep the root slash if it's the only one
