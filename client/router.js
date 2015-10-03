@@ -369,12 +369,11 @@ Router.prototype.initialize = function(options) {
   // in unpredicatable manner. See #168
   // this is the default behaviour and we need keep it like that
   // we are doing a hack. see .path()
+  this._page.base(this._basePath);
   this._page({
-    basePath: this._basePath,
     decodeURLComponents: true,
     hashbang: !!options.hashbang
   });
-  this._page.base(this._basePath);
 
   this._initialized = true;
 };
