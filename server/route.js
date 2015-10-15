@@ -80,7 +80,7 @@ Route.prototype._processFromSsr = function (params, req, res) {
           data = data.replace('</head>', head + '\n</head>');
         }
 
-        var reactRoot = "<div id='react-root'>" + ssrContext.getHtml() + "</div>";
+        var reactRoot = ssrContext.getHtml();
         if (self._router.deferScriptLoading) {
           data = moveScripts(data);
         }
