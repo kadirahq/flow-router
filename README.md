@@ -59,4 +59,4 @@ if(Meteor.isServer) {
 
 It's depend on how you write your app. We are 80% feature complete and now we can call this is in alplha stage. At Kadira we use this in production for our main site. <https://kadira.io>.
 
-But, we might have breaking changes. We'll try to maintain semvar, but that's not a promise.
+But, we might have breaking changes. We'll try to maintain semver, but that's not a promise.
