@@ -1,5 +1,9 @@
 # Change Log
 
+### v3.4.0
+
+* Now, React root node generation done outside of the router. It's handle by the ReactLayout. **This is a breaking change and need to update ReactLayout**
+
 ### v3.3.0
 * Get changes from FlowRouter 2.6.0
 * Add complete queryParams support in SSR. Fixes: [#237](https://github.com/kadirahq/flow-router/issues/237)
