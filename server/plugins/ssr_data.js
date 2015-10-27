@@ -64,3 +64,9 @@ Tracker.autorun = function (fn) {
     return response;
   };
 });
+
+// This is not available in the server. But to make it work with SSR
+// We need to have it.
+Meteor.loggingIn = function() {
+  return false;
+};
