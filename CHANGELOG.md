@@ -1,5 +1,10 @@
 # Change Log
 
+### v3.5.0
+
+* Get changes from master upto v2.7.0
+* Add support for path prefix for SSR
+
 ### v3.4.0
 
 * Now, React root node generation done outside of the router. It's handle by the ReactLayout. **This is a breaking change and need to update ReactLayout**
