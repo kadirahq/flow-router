@@ -8,8 +8,9 @@ Route = function(router, pathDef, options) {
   this.name = options.name;
   this.pathDef = pathDef;
 
+
   // Route.path is deprecated and will be removed in 3.0
-  this.path = pathDef;
+  this.path = this.pathDef;
 
   this.action = options.action || Function.prototype;
   this._router = router;
@@ -20,7 +21,9 @@ Route = function(router, pathDef, options) {
   Picker.middleware(Npm.require('connect').cookieParser());
   // process null subscriptions with FR support
   Picker.middleware(FastRender.handleOnAllRoutes);
-  Picker.route(pathDef, function(params, req, res, next) {
+  
+  var route = FlowRouter.basePath + this.pathDef;
+  Picker.route(route, function(params, req, res, next) {
 
     if(!self.isHtmlPage(req.url)) {
       return next();

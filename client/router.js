@@ -14,7 +14,7 @@ Router = function () {
   // holds onRoute callbacks
   this._onRouteCallbacks = [];
 
-  // if _askedToWait is true. We don't automatically start the router 
+  // if _askedToWait is true. We don't automatically start the router
   // in Meteor.startup callback. (see client/_init.js)
   // Instead user need to call `.initialize()
   this._askedToWait = false;
@@ -27,10 +27,20 @@ Router = function () {
   this.notFound = this.notfound = null;
   // indicate it's okay (or not okay) to run the tracker
   // when doing subscriptions
-  // using a number and increment it help us to support FlowRouter.go() 
+  // using a number and increment it help us to support FlowRouter.go()
   // and legitimate reruns inside tracker on the same event loop.
   // this is a solution for #145
   this.safeToRun = 0;
+
+  // Meteor exposes to the client the path prefix that was defined using the
+  // ROOT_URL environement variable on the server using the global runtime
+  // configuration. See #315.
+  this._basePath = __meteor_runtime_config__.ROOT_URL_PATH_PREFIX || '';
+
+  // this is a chain contains a list of old routes
+  // most of the time, there is only one old route
+  // but when it's the time for a trigger redirect we've a chain
+  this._oldRouteChain = [];
 
   this.env = {
     replaceState: new Meteor.EnvironmentVariable(),
@@ -40,6 +50,10 @@ Router = function () {
 
   // redirect function used inside triggers
   this._redirectFn = function(pathDef, fields, queryParams) {
+    if (/^http(s)?:\/\//.test(pathDef)) {
+        var message = "Redirects to URLs outside of the app are not supported in this version of Flow Router. Use 'window.location = yourUrl' instead";
+        throw new Error(message);
+    }
     self.withReplaceState(function() {
       var path = FlowRouter.path(pathDef, fields, queryParams);
       self._page.redirect(path);
@@ -61,10 +75,12 @@ Router.prototype.route = function(pathDef, options, group) {
   // calls when the page route being activates
   route._actionHandle = function (context, next) {
     var oldRoute = self._current.route;
+    self._oldRouteChain.push(oldRoute);
+
     var queryParams = self._qs.parse(context.querystring);
-    // _qs.parse() gives us a object without prototypes, 
+    // _qs.parse() gives us a object without prototypes,
     // created with Object.create(null)
-    // Meteor's check doesn't play nice with it. 
+    // Meteor's check doesn't play nice with it.
     // So, we need to fix it by cloning it.
     // see more: https://github.com/meteorhacks/flow-router/issues/164
     queryParams = JSON.parse(JSON.stringify(queryParams));
@@ -87,9 +103,9 @@ Router.prototype.route = function(pathDef, options, group) {
 
     var triggers = self._triggersEnter.concat(route._triggersEnter);
     Triggers.runTriggers(
-      triggers, 
-      self._current, 
-      self._redirectFn, 
+      triggers,
+      self._current,
+      self._redirectFn,
       afterAllTriggersRan
     );
   };
@@ -125,9 +141,16 @@ Router.prototype.path = function(pathDef, fields, queryParams) {
     pathDef = this._routesMap[pathDef].pathDef;
   }
 
+  var path = "";
+
+  // Prefix the path with the router global prefix
+  if (this._basePath) {
+    path += "/" + this._basePath + "/";
+  }
+
   fields = fields || {};
   var regExp = /(:[\w\(\)\\\+\*\.\?]+)+/g;
-  var path = pathDef.replace(regExp, function(key) {
+  path += pathDef.replace(regExp, function(key) {
     var firstRegexpChar = key.indexOf("(");
     // get the content behind : and (\\d+/)
     key = key.substring(1, (firstRegexpChar > 0)? firstRegexpChar: undefined);
@@ -136,12 +159,13 @@ Router.prototype.path = function(pathDef, fields, queryParams) {
 
     // this is to allow page js to keep the custom characters as it is
     // we need to encode 2 times otherwise "/" char does not work properly
-    // So, in that case, when I includes "/" it will think it's a part of the 
+    // So, in that case, when I includes "/" it will think it's a part of the
     // route. encoding 2times fixes it
     return encodeURIComponent(encodeURIComponent(fields[key] || ""));
   });
 
-  path = path.replace(/\/\/+/g, "/"); // Replace multiple slashes with single slash
+  // Replace multiple slashes with single slash
+  path = path.replace(/\/\/+/g, "/");
 
   // remove trailing slash
   // but keep the root slash if it's the only one
@@ -162,7 +186,7 @@ Router.prototype.path = function(pathDef, fields, queryParams) {
 
 Router.prototype.go = function(pathDef, fields, queryParams) {
   var path = this.path(pathDef, fields, queryParams);
-  
+
   var useReplaceState = this.env.replaceState.get();
   if(useReplaceState) {
     this._page.replace(path);
@@ -222,12 +246,18 @@ Router.prototype.setQueryParams = function(newParams) {
 // This is by design. use .getParam() instead
 // If you really need to watch the path change, use .watchPathChange()
 Router.prototype.current = function() {
-  return this._current;
+  // We can't trust outside, that's why we clone this
+  // Anyway, we can't clone the whole object since it has non-jsonable values
+  // That's why we clone what's really needed.
+  var current = _.clone(this._current);
+  current.queryParams = EJSON.clone(current.queryParams);
+  current.params = EJSON.clone(current.params);
+  return current;
 };
 
 // Implementing Reactive APIs
 var reactiveApis = [
-  'getParam', 'getQueryParam', 
+  'getParam', 'getQueryParam',
   'getRouteName', 'watchPathChange'
 ];
 reactiveApis.forEach(function(api) {
@@ -336,11 +366,11 @@ Router.prototype.initialize = function(options) {
   // by overriding page.js`s "show" method.
   // Why?
   // It is impossible to bypass exit triggers,
-  // becuase they execute before the handler and
+  // because they execute before the handler and
   // can not know what the next path is, inside exit trigger.
   //
   // we need override both show, replace to make this work
-  // since we use redirect when we are talking about withReplaceState 
+  // since we use redirect when we are talking about withReplaceState
   _.each(['show', 'replace'], function(fnName) {
     var original = self._page[fnName];
     self._page[fnName] = function(path, state, dispatch, push) {
@@ -357,7 +387,12 @@ Router.prototype.initialize = function(options) {
   // in unpredicatable manner. See #168
   // this is the default behaviour and we need keep it like that
   // we are doing a hack. see .path()
-  this._page({decodeURLComponents: true, hashbang: !!options.hashbang});
+  this._page.base(this._basePath);
+  this._page({
+    decodeURLComponents: true,
+    hashbang: !!options.hashbang
+  });
+
   this._initialized = true;
 };
 
@@ -401,6 +436,13 @@ Router.prototype._buildTracker = function() {
         isRouteChange = false;
       }
 
+      // Clear oldRouteChain just before calling the action
+      // We still need to get a copy of the oldestRoute first
+      // It's very important to get the oldest route and registerRouteClose() it
+      // See: https://github.com/kadirahq/flow-router/issues/314
+      var oldestRoute = self._oldRouteChain[0];
+      self._oldRouteChain = [];
+
       currentContext.route.registerRouteChange(currentContext, isRouteChange);
       route.callAction(currentContext);
 
@@ -409,12 +451,14 @@ Router.prototype._buildTracker = function() {
         if(isRouteChange) {
           // We need to trigger that route (definition itself) has changed.
           // So, we need to re-run all the register callbacks to current route
-          // This is pretty important, otherwise tracker 
+          // This is pretty important, otherwise tracker
           // can't identify new route's items
 
           // We also need to afterFlush, otherwise this will re-run
           // helpers on templates which are marked for destroying
-          currentContext.oldRoute.registerRouteClose();
+          if(oldestRoute) {
+            oldestRoute.registerRouteClose();
+          }
         }
       });
     });
@@ -452,9 +496,9 @@ Router.prototype._invalidateTracker = function() {
       // XXX: fix this with a proper solution by removing subscription mgt.
       // from the router. Then we don't need to run invalidate using a tracker
 
-      // this happens when we are trying to invoke a route change 
+      // this happens when we are trying to invoke a route change
       // with inside a route chnage. (eg:- Template.onCreated)
-      // Since we use page.js and tracker, we don't have much control 
+      // Since we use page.js and tracker, we don't have much control
       // over this process.
       // only solution is to defer route execution.
 
@@ -536,7 +580,7 @@ Router.prototype.onRouteRegister = function(cb) {
 Router.prototype._triggerRouteRegister = function(currentRoute) {
   // We should only need to send a safe set of fields on the route
   // object.
-  // This is not to hide what's inside the route object, but to show 
+  // This is not to hide what's inside the route object, but to show
   // these are the public APIs
   var routePublicApi = _.pick(currentRoute, 'name', 'pathDef', 'path');
   var omittingOptionFields = [

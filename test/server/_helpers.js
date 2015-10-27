@@ -27,7 +27,11 @@ InjectData = Package['meteorhacks:inject-data'].InjectData;
 var urlResolve = Npm.require('url').resolve;
 GetFRData = function GetFRData(path) {
   var url = urlResolve(process.env.ROOT_URL, path);
-  var res = HTTP.get(url);
+  // FastRender only servers if there is a accept header with html in it
+  var options  = {
+    headers: {'accept': 'html'}
+  };
+  var res = HTTP.get(url, options);
 
   var encodedData = res.content.match(/data">(.*)<\/script/)[1];
   return InjectData._decode(encodedData)['fast-render-data'];

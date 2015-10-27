@@ -124,6 +124,49 @@ function(test, done) {
 });
 
 Tinytest.addAsync(
+'Client - Router - Reactivity - reactive chnages and trigger redirects',
+function(test, done) {
+  var name1 = Random.id();
+  var route1 = "/" + name1;
+  FlowRouter.route(route1, {
+    name: name1
+  });
+
+  var name2 = Random.id();
+  var route2 = "/" + name2;
+  FlowRouter.route(route2, {
+    name: name2,
+    triggersEnter: [function(context, redirect) {
+      redirect(name3);
+    }]
+  });
+
+
+  var name3 = Random.id();
+  var route3 = "/" + name3;
+  FlowRouter.route(route3, {
+    name: name3
+  });
+
+  var routeNamesFired = [];
+  FlowRouter.go(name1);
+
+  var c = null;
+  setTimeout(function() {
+    c = Tracker.autorun(function(c) {
+      routeNamesFired.push(FlowRouter.getRouteName());
+    });
+    FlowRouter.go(name2);
+  }, 50);
+
+  setTimeout(function() {
+    c.stop();
+    test.equal(routeNamesFired, [name1, name3]);
+    Meteor.defer(done);
+  }, 250);
+});
+
+Tinytest.addAsync(
 'Client - Router - Reactivity - watchPathChange for every route change',
 function(test, done) {
   var route1 = "/" + Random.id();

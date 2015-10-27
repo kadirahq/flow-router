@@ -36,13 +36,15 @@ Router.prototype.group = function(options) {
 };
 
 Router.prototype.path = function(pathDef, fields, queryParams) {
-  if (this._routesMap[pathDef]) {
+  if(this._routesMap[pathDef]) {
     pathDef = this._routesMap[pathDef].path;
   }
 
+  var path = FlowRouter.basePath;
+
   fields = fields || {};
   var regExp = /(:[\w\(\)\\\+\*\.\?]+)+/g;
-  var path = pathDef.replace(regExp, function(key) {
+  path += pathDef.replace(regExp, function(key) {
     var firstRegexpChar = key.indexOf("(");
     // get the content behind : and (\\d+/)
     key = key.substring(1, (firstRegexpChar > 0)? firstRegexpChar: undefined);
@@ -92,7 +94,13 @@ Router.prototype.go = function() {
 };
 
 Router.prototype.current = function() {
-  return this.currentRoute.get();
+  // We can't trust outside, that's why we clone this
+  // Anyway, we can't clone the whole object since it has non-jsonable values
+  // That's why we clone what's really needed.
+  var current = _.clone(this.currentRoute.get());
+  current.queryParams = EJSON.clone(current.queryParams);
+  current.params = EJSON.clone(current.params);
+  return current;
 };
 
 Router.prototype.getParam = function(key) {

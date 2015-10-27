@@ -346,7 +346,7 @@ Tinytest.addAsync('Client - Router - notFound', function (test, done) {
   }, 50);
 });
 
-Tinytest.addAsync('Client - Router - withReplaceState - enabled', 
+Tinytest.addAsync('Client - Router - withReplaceState - enabled',
 function (test, done) {
   var pathDef = "/" + Random.id() + "/:id";
   var originalRedirect = FlowRouter._page.replace;
@@ -362,7 +362,7 @@ function (test, done) {
       test.equal(params.id, "awesome");
       test.equal(callCount, 1);
       FlowRouter._page.replace = originalRedirect;
-      // We don't use Meteor.defer here since it carries 
+      // We don't use Meteor.defer here since it carries
       // Meteor.Environment vars too
       // Which breaks our test below
       setTimeout(done, 0);
@@ -374,7 +374,7 @@ function (test, done) {
   });
 });
 
-Tinytest.addAsync('Client - Router - withReplaceState - disabled', 
+Tinytest.addAsync('Client - Router - withReplaceState - disabled',
 function (test, done) {
   var pathDef = "/" + Random.id() + "/:id";
   var originalRedirect = FlowRouter._page.replace;
@@ -537,7 +537,7 @@ function (test, next) {
 });
 
 Tinytest.addAsync(
-'Client - Router - wait - before initialize', 
+'Client - Router - wait - before initialize',
 function(test, done) {
   FlowRouter._initialized = false;
   FlowRouter.wait();
@@ -549,7 +549,7 @@ function(test, done) {
 });
 
 Tinytest.addAsync(
-'Client - Router - wait - after initialized', 
+'Client - Router - wait - after initialized',
 function(test, done) {
   try {
     FlowRouter.wait();
@@ -560,7 +560,7 @@ function(test, done) {
 });
 
 Tinytest.addAsync(
-'Client - Router - initialize - after initialized', 
+'Client - Router - initialize - after initialized',
 function(test, done) {
   try {
     FlowRouter.initialize();
@@ -569,6 +569,61 @@ function(test, done) {
     done();
   }
 });
+
+Tinytest.addAsync(
+'Client - Router - base path - url updated',
+function(test, done) {
+  var simulatedBasePath = '/flow';
+  var rand = Random.id();
+  FlowRouter.route('/' + rand, { action: function() {} });
+
+  setBasePath(simulatedBasePath);
+  FlowRouter.go('/' + rand);
+  setTimeout(function() {
+    test.equal(location.pathname, simulatedBasePath + '/' + rand);
+    resetBasePath();
+    done();
+  }, 100);
+});
+
+Tinytest.addAsync(
+'Client - Router - base path - route action called',
+function(test, done) {
+  var simulatedBasePath = '/flow';
+  var rand = Random.id();
+  FlowRouter.route('/' + rand, {
+    action: function() {
+      resetBasePath();
+      done();
+    }
+  });
+
+  setBasePath(simulatedBasePath);
+  FlowRouter.go('/' + rand);
+});
+
+Tinytest.add(
+'Client - Router - base path - path generation',
+function(test, done) {
+  _.each(['/flow', '/flow/', 'flow/', 'flow'], function(simulatedBasePath) {
+    var rand = Random.id();
+    setBasePath(simulatedBasePath);
+    test.equal(FlowRouter.path('/' + rand), '/flow/' + rand);
+  });
+  resetBasePath();
+});
+
+
+function setBasePath(path) {
+  FlowRouter._initialized = false;
+  FlowRouter._basePath = path;
+  FlowRouter.initialize();
+}
+
+var defaultBasePath = FlowRouter._basePath;
+function resetBasePath() {
+  setBasePath(defaultBasePath);
+}
 
 function bind(obj, method) {
   return function() {

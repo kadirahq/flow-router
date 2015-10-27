@@ -25,6 +25,18 @@
 
 ------------
 
+### v2.7.0
+* Add Path Prefix support. See: [#329](https://github.com/kadirahq/flow-router/pull/329)
+
+### v2.6.2
+* Now .current() sends a cloned version of the internal current object. Which prevent outside mutations to params and queryParams
+
+### v2.6.1
+
+* Fix [#143](https://github.com/kadirahq/flow-router/issues/314). 
+  This says that when we are doing a trigger redirect,
+  We won't get reactive changes like: `getRouteName()`
+
 ### v2.6.0
 * Add hashbang support. See [#311](https://github.com/kadirahq/flow-router/pull/311)
 
