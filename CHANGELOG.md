@@ -1,4 +1,7 @@
 # Change Log
+### v2.7.0
+* Add Path Prefix support. See: [#329](https://github.com/kadirahq/flow-router/pull/329)
+
 ### v2.6.2
 * Now .current() sends a cloned version of the internal current object. Which prevent outside mutations to params and queryParams
 
