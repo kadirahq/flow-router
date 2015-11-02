@@ -1,4 +1,7 @@
 # Change Log
+### v2.8.0
+* Allow to access options in groups as well. See: [#378](https://github.com/kadirahq/flow-router/pull/378)
+
 ### v2.7.0
 * Add Path Prefix support. See: [#329](https://github.com/kadirahq/flow-router/pull/329)
 
