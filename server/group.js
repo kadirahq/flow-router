@@ -1,7 +1,7 @@
 Group = function(router, options) {
   options = options || {};
   this.prefix = options.prefix || '';
-
+  this.options = options;
   this._router = router;
 };
 
