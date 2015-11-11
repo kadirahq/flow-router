@@ -378,6 +378,11 @@ You can call `FlowRouter.go` like this as well:
 FlowRouter.go("/blog");
 ~~~
 
+
+#### FlowRouter.url(pathDef, params, queryParams)
+
+Just like `FlowRouter.path`, but gives the abosolute url. (Uses `Meteor.absoluteUrl` behind the schenes.)
+
 #### FlowRouter.setParams(newParams)
 
 This will change the current params with the newParams and re-route to the new path.

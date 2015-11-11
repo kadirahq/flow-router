@@ -1,4 +1,8 @@
 # Change Log
+
+### v2.9.0
+* Add FlowRouter.url() See: [#374](https://github.com/kadirahq/flow-router/pull/374)
+
 ### v2.8.0
 * Allow to access options in groups as well. See: [#378](https://github.com/kadirahq/flow-router/pull/378)
 
