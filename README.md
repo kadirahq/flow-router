@@ -130,11 +130,13 @@ You can even have nested group routes as shown below:
 
 ~~~js
 var adminRoutes = FlowRouter.group({
-    prefix: "/admin"
+    prefix: "/admin",
+    name: "admin"
 });
 
 var superAdminRoutes = adminRoutes.group({
-    prefix: "/super"
+    prefix: "/super",
+    name: "superadmin"
 });
 
 // handling /admin/super/post
