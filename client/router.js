@@ -23,6 +23,7 @@ Router = function () {
   this._triggersExit = [];
   this._routes = [];
   this._routesMap = {};
+  this._ignoredPaths = [];
   this._updateCallbacks();
   this.notFound = this.notfound = null;
   // indicate it's okay (or not okay) to run the tracker
@@ -182,6 +183,52 @@ Router.prototype.path = function(pathDef, fields, queryParams) {
   }
 
   return path;
+};
+
+Router.prototype.ignore = function(path) {
+  this._ignoredPaths.push(path);
+};
+
+Router.prototype._isIgnored = function(path) {
+  return _.some(this._ignoredPaths, function(ignoredPath) {
+    if (_.isRegExp(ignoredPath)) {
+      if (ignoredPath.test(path)) return true;
+    }
+    else {
+      // does path starts with ignoredPath
+      if (path.lastIndexOf(ignoredPath, 0) === 0) return true;
+    }
+    return false;
+  });
+};
+
+Router.prototype._getPath = function(event) {
+  function which(e) {
+    e = e || window.event;
+    return null === e.which ? e.button : e.which;
+  }
+
+  if (1 !== which(event)) return;
+
+  if (event.metaKey || event.ctrlKey || event.shiftKey) return;
+  if (event.defaultPrevented) return;
+
+  // ensure link
+  var el = event.target;
+  while (el && 'A' !== el.nodeName) el = el.parentNode;
+  if (!el || 'A' !== el.nodeName) return;
+
+  // check target
+  if (el.target) return;
+
+  // x-origin
+  if (!page.sameOrigin(el.href)) return;
+
+  // fix for IE9 for not having leading slash (issue #259)
+  var pathname = el.pathname;
+  pathname = pathname[0] !== "/" ? "/" + pathname : pathname;
+
+  return pathname;
 };
 
 Router.prototype.go = function(pathDef, fields, queryParams) {
@@ -382,6 +429,16 @@ Router.prototype.initialize = function(options) {
       original.call(this, path, state, dispatch, push);
     };
   });
+
+  var originalOnClick = self._page.onclick;
+  self._page.onclick = function(event) {
+    var path = self._getPath(event);
+    if (path && self._isIgnored(path)) {
+      return;
+    }
+
+    originalOnClick.call(this, event);
+  };
 
   // this is very ugly part of pagejs and it does decoding few times
   // in unpredicatable manner. See #168

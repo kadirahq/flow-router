@@ -306,6 +306,23 @@ FlowRouter.notFound = {
 };
 ~~~
 
+## Ignoring Links
+
+If you want that some links are not handled by FlowRouter but that a normal HTTP request is made to the server
+(for example, to link to a static file/asset), you can register path to be ignored:
+
+~~~js
+FlowRouter.ignore('/storage');
+~~~~
+
+This will ignore all same-origin links which start with `/storage`. You can also pass an regexp instead.
+
+Additionally, links are ignored by FlowRouter if:
+* Links are not of the same origin.
+* Links have the `download` attribute.
+* Links have the `target` attribute.
+* Links have the `rel="external"` attribute.
+
 ## API
 
 FlowRouter has a rich API to help you to navigate the router and reactively get information from the router.

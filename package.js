@@ -8,7 +8,8 @@ Package.describe({
 Npm.depends({
   // In order to support IE9, we had to fork pagejs and apply
   // this PR: https://github.com/visionmedia/page.js/pull/288
-  'page':'https://github.com/kadirahq/page.js/archive/f29d4d4491178b285b9058c32d74975a4f945dea.tar.gz',
+  // And this PR: https://github.com/visionmedia/page.js/pull/331
+  'page':'https://github.com/peerlibrary/page.js/archive/b90fb4b32f55aba71bb374c946130d3ed82a9d1f.tar.gz',
   'qs':'3.1.0'
 });
 
