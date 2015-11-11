@@ -46,6 +46,7 @@ Package.onTest(function(api) {
   api.addFiles('test/server/plugins/fast_render.js', 'server');
 
   api.addFiles('test/common/router.path.spec.js', ['client', 'server']);
+  api.addFiles('test/common/router.url.spec.js', ['client', 'server']);
   api.addFiles('test/common/router.addons.spec.js', ['client', 'server']);
   api.addFiles('test/common/route.spec.js', ['client', 'server']);
   api.addFiles('test/common/group.spec.js', ['client', 'server']);
@@ -76,4 +77,6 @@ function configure(api) {
   api.addFiles('server/_init.js', 'server');
 
   api.addFiles('server/plugins/fast_render.js', 'server');
+
+  api.addFiles('lib/router.js', ['client', 'server']);
 }
