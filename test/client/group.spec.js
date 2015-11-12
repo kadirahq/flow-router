@@ -87,3 +87,27 @@ Tinytest.addAsync('Client - Group - set and retrieve group name', function (test
     next();
   }, 100);
 });
+
+Tinytest.add('Client - Group - expose group options on a route', function (test) {
+  var pathDef = "/" + Random.id();
+  var name = Random.id();
+  var groupName = Random.id();
+  var data = {aa: 10};
+  var layout = 'blah';
+
+  var group = FlowRouter.group({
+    name: groupName,
+    prefix: '/admin',
+    layout: layout,
+    someData: data
+  });
+
+  group.route(pathDef, {
+    name: name
+  });
+
+  var route = FlowRouter._routesMap[name];
+
+  test.equal(route.group.options.someData, data);
+  test.equal(route.group.options.layout, layout);
+});

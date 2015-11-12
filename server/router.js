@@ -88,6 +88,10 @@ Router.prototype._triggerRouteRegister = function(currentRoute) {
   });
 };
 
+Router.prototype.url = function() {
+  var path = this.path.apply(this, arguments);
+  return Meteor.absoluteUrl(path.replace(/^\//, ''));
+};
 
 Router.prototype.go = function() {
   // client only

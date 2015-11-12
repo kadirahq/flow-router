@@ -1,5 +1,8 @@
 # Change Log
 
+### v3.6.0
+* Get features from v2.9.0
+
 ### v3.5.0
 
 * Get changes from master upto v2.7.0
@@ -29,6 +32,12 @@
 * It's implemented as extendable manner. Currently ReactLayout supports it.
 
 ------------
+
+### v2.9.0
+* Add FlowRouter.url() See: [#374](https://github.com/kadirahq/flow-router/pull/374)
+
+### v2.8.0
+* Allow to access options in groups as well. See: [#378](https://github.com/kadirahq/flow-router/pull/378)
 
 ### v2.7.0
 * Add Path Prefix support. See: [#329](https://github.com/kadirahq/flow-router/pull/329)

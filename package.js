@@ -1,7 +1,7 @@
 Package.describe({
   name: 'kadira:flow-router-ssr',
   summary: 'Same as kadira:flow-router, but with SSR support',
-  version: '3.5.0',
+  version: '3.6.0',
   git: 'https://github.com/kadirahq/flow-router.git'
 });
 
@@ -46,8 +46,10 @@ Package.onTest(function(api) {
   api.addFiles('test/client/triggers.js', 'client');
 
   api.addFiles('test/common/router.path.spec.js', ['client', 'server']);
+  api.addFiles('test/common/router.url.spec.js', ['client', 'server']);
   api.addFiles('test/common/router.addons.spec.js', ['client', 'server']);
   api.addFiles('test/common/route.spec.js', ['client', 'server']);
+  api.addFiles('test/common/group.spec.js', ['client', 'server']);
 });
 
 function configure(api) {
@@ -78,4 +80,5 @@ function configure(api) {
   api.addFiles('server/_init.js', 'server');
 
   api.addFiles('server/plugins/ssr_data.js', 'server');
+  api.addFiles('lib/router.js', ['client', 'server']);
 }
