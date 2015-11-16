@@ -2,7 +2,6 @@ Router = function () {
   var self = this;
   this.globals = [];
 
-  this._tracker = this._buildTracker();
   this._current = {};
 
   // tracks the current path change
@@ -91,7 +90,7 @@ Router.prototype.route = function(pathDef, options, group) {
     // if not that means, we've been redirected to another path
     // then we don't need to invalidate
     var afterAllTriggersRan = function() {
-      self._invalidateTracker();
+      self._applyRoute();
     };
 
     var triggers = self._triggersEnter.concat(route._triggersEnter);
@@ -293,7 +292,7 @@ Router.prototype._notfoundRoute = function(context) {
   }
 
   this._current.route = new Route(this, "*", this.notFound);
-  this._invalidateTracker();
+  this._applyRoute();
 };
 
 Router.prototype.initialize = function(options) {
@@ -329,7 +328,7 @@ Router.prototype.initialize = function(options) {
 
   // this is very ugly part of pagejs and it does decoding few times
   // in unpredicatable manner. See #168
-  // this is the default behaviour and we need keep it like that
+  // this is the defa_ult behaviour and we need keep it like that
   // we are doing a hack. see .path()
   this._page.base(this._basePath);
   this._page({
@@ -340,109 +339,50 @@ Router.prototype.initialize = function(options) {
   this._initialized = true;
 };
 
-Router.prototype._buildTracker = function() {
+Router.prototype._applyRoute = function() {
   var self = this;
 
-  // main autorun function
-  var tracker = Tracker.autorun(function () {
-    if(!self._current || !self._current.route) {
-      return;
+  // see the definition of `this._processingContexts`
+  var currentContext = self._current;
+  var route = currentContext.route;
+  var path = currentContext.path;
+
+  // otherwise, computations inside action will trigger to re-run
+  // this computation. which we do not need.
+  Tracker.nonreactive(function() {
+    var isRouteChange = currentContext.oldRoute !== currentContext.route;
+    var isFirstRoute = !currentContext.oldRoute;
+    // first route is not a route change
+    if(isFirstRoute) {
+      isRouteChange = false;
     }
 
-    // see the definition of `this._processingContexts`
-    var currentContext = self._current;
-    var route = currentContext.route;
-    var path = currentContext.path;
+    // Clear oldRouteChain just before calling the action
+    // We still need to get a copy of the oldestRoute first
+    // It's very important to get the oldest route and registerRouteClose() it
+    // See: https://github.com/kadirahq/flow-router/issues/314
+    var oldestRoute = self._oldRouteChain[0];
+    self._oldRouteChain = [];
 
-    // otherwise, computations inside action will trigger to re-run
-    // this computation. which we do not need.
-    Tracker.nonreactive(function() {
-      var isRouteChange = currentContext.oldRoute !== currentContext.route;
-      var isFirstRoute = !currentContext.oldRoute;
-      // first route is not a route change
-      if(isFirstRoute) {
-        isRouteChange = false;
-      }
+    currentContext.route.registerRouteChange(currentContext, isRouteChange);
+    route.callAction(currentContext);
 
-      // Clear oldRouteChain just before calling the action
-      // We still need to get a copy of the oldestRoute first
-      // It's very important to get the oldest route and registerRouteClose() it
-      // See: https://github.com/kadirahq/flow-router/issues/314
-      var oldestRoute = self._oldRouteChain[0];
-      self._oldRouteChain = [];
+    Tracker.afterFlush(function() {
+      self._onEveryPath.changed();
+      if(isRouteChange) {
+        // We need to trigger that route (definition itself) has changed.
+        // So, we need to re-run all the register callbacks to current route
+        // This is pretty important, otherwise tracker
+        // can't identify new route's items
 
-      currentContext.route.registerRouteChange(currentContext, isRouteChange);
-      route.callAction(currentContext);
-
-      Tracker.afterFlush(function() {
-        self._onEveryPath.changed();
-        if(isRouteChange) {
-          // We need to trigger that route (definition itself) has changed.
-          // So, we need to re-run all the register callbacks to current route
-          // This is pretty important, otherwise tracker
-          // can't identify new route's items
-
-          // We also need to afterFlush, otherwise this will re-run
-          // helpers on templates which are marked for destroying
-          if(oldestRoute) {
-            oldestRoute.registerRouteClose();
-          }
+        // We also need to afterFlush, otherwise this will re-run
+        // helpers on templates which are marked for destroying
+        if(oldestRoute) {
+          oldestRoute.registerRouteClose();
         }
-      });
+      }
     });
   });
-
-  return tracker;
-};
-
-Router.prototype._invalidateTracker = function() {
-  var self = this;
-  this._tracker.invalidate();
-  // After the invalidation we need to flush to make changes imediately
-  // otherwise, we have face some issues context mix-maches and so on.
-  // But there are some cases we can't flush. So we need to ready for that.
-
-  // we clearly know, we can't flush inside an autorun
-  // this may leads some issues on flow-routing
-  // we may need to do some warning
-  if(!Tracker.currentComputation) {
-    // Still there are some cases where we can't flush
-    //  eg:- when there is a flush currently
-    // But we've no public API or hacks to get that state
-    // So, this is the only solution
-    try {
-      Tracker.flush();
-    } catch(ex) {
-      // only handling "while flushing" errors
-      if(!/Tracker\.flush while flushing/.test(ex.message)) {
-        return;
-      }
-
-      // XXX: fix this with a proper solution by removing subscription mgt.
-      // from the router. Then we don't need to run invalidate using a tracker
-
-      // this happens when we are trying to invoke a route change
-      // with inside a route chnage. (eg:- Template.onCreated)
-      // Since we use page.js and tracker, we don't have much control
-      // over this process.
-      // only solution is to defer route execution.
-
-      // It's possible to have more than one path want to defer
-      // But, we only need to pick the last one.
-      // self._nextPath = self._current.path;
-      Meteor.defer(function() {
-        var path = self._nextPath;
-        if(!path) {
-          return;
-        }
-
-        delete self._nextPath;
-        self.env.reload.withValue(true, function() {
-          self.go(path);
-        });
-      });
-    }
-  }
 };
 
 Router.prototype._updateCallbacks = function () {
