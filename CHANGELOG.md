@@ -1,5 +1,10 @@
 # Change Log
 
+### v.NEXT
+
+* Remove subscription registration from the router
+* Remove internal tracker and apply route changes immediately. With this change, we don't use `Track.flush()`. That'll fix a lot of runtime issues.
+
 ### v3.6.0
 * Get features from v2.9.0
 
