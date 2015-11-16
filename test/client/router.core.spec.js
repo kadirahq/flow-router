@@ -111,23 +111,6 @@ Tinytest.addAsync('Client - Router - get current route path', function (test, ne
   }, 50);
 });
 
-Tinytest.addAsync('Client - Router - subscribe to global subs', function (test, next) {
-  var rand = Random.id();
-  FlowRouter.route('/' + rand);
-
-  FlowRouter.subscriptions = function (path) {
-    test.equal(path, '/' + rand);
-    this.register('baz', Meteor.subscribe('baz'));
-  };
-
-  FlowRouter.go('/' + rand);
-  setTimeout(function() {
-    test.isTrue(!!GetSub('baz'));
-    FlowRouter.subscriptions = Function.prototype;
-    next();
-  }, 100);
-});
-
 Tinytest.addAsync('Client - Router - setParams - generic', function (test, done) {
   var randomKey = Random.id();
   var pathDef = "/" + randomKey + "/:cat/:id";
@@ -331,9 +314,6 @@ Tinytest.add('Client - Router - setQueryParams - no route selected', function (t
 Tinytest.addAsync('Client - Router - notFound', function (test, done) {
   var data = [];
   FlowRouter.notFound = {
-    subscriptions: function() {
-      data.push("subscriptions");
-    },
     action: function() {
       data.push("action");
     }
@@ -341,7 +321,7 @@ Tinytest.addAsync('Client - Router - notFound', function (test, done) {
 
   FlowRouter.go("/" + Random.id());
   setTimeout(function() {
-    test.equal(data, ["subscriptions", "action"]);
+    test.equal(data, ["action"]);
     done();
   }, 50);
 });

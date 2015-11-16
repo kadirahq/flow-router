@@ -1,7 +1,6 @@
 Router = function () {
   var self = this;
   this.globals = [];
-  this.subscriptions = Function.prototype;
 
   this._tracker = this._buildTracker();
   this._current = {};
@@ -25,12 +24,6 @@ Router = function () {
   this._routesMap = {};
   this._updateCallbacks();
   this.notFound = this.notfound = null;
-  // indicate it's okay (or not okay) to run the tracker
-  // when doing subscriptions
-  // using a number and increment it help us to support FlowRouter.go()
-  // and legitimate reruns inside tracker on the same event loop.
-  // this is a solution for #145
-  this.safeToRun = 0;
 
   // Meteor exposes to the client the path prefix that was defined using the
   // ROOT_URL environement variable on the server using the global runtime
@@ -276,55 +269,6 @@ reactiveApis.forEach(function(api) {
   };
 });
 
-Router.prototype.subsReady = function() {
-  var callback = null;
-  var args = _.toArray(arguments);
-
-  if (typeof _.last(args) === "function") {
-    callback = args.pop();
-  }
-
-  var currentRoute = this.current().route;
-  var globalRoute = this._globalRoute;
-
-  // we need to depend for every route change and
-  // rerun subscriptions to check the ready state
-  this._onEveryPath.depend();
-
-  if(!currentRoute) {
-    return false;
-  }
-
-  var subscriptions;
-  if(args.length === 0) {
-    subscriptions = _.values(globalRoute.getAllSubscriptions());
-    subscriptions = subscriptions.concat(_.values(currentRoute.getAllSubscriptions()));
-  } else {
-    subscriptions = _.map(args, function(subName) {
-      return globalRoute.getSubscription(subName) || currentRoute.getSubscription(subName);
-    });
-  }
-
-  var isReady = function() {
-    var ready =  _.every(subscriptions, function(sub) {
-      return sub && sub.ready();
-    });
-
-    return ready;
-  };
-
-  if (callback) {
-    Tracker.autorun(function(c) {
-      if (isReady()) {
-        callback();
-        c.stop();
-      }
-    });
-  } else {
-    return isReady();
-  }
-};
-
 Router.prototype.withReplaceState = function(fn) {
   return this.env.replaceState.withValue(true, fn);
 };
@@ -410,22 +354,6 @@ Router.prototype._buildTracker = function() {
     var route = currentContext.route;
     var path = currentContext.path;
 
-    if(self.safeToRun === 0) {
-      var message =
-        "You can't use reactive data sources like Session" +
-        " inside the `.subscriptions` method!";
-      throw new Error(message);
-    }
-
-    // We need to run subscriptions inside a Tracker
-    // to stop subs when switching between routes
-    // But we don't need to run this tracker with
-    // other reactive changes inside the .subscription method
-    // We tackle this with the `safeToRun` variable
-    self._globalRoute.clearSubscriptions();
-    self.subscriptions.call(self._globalRoute, path);
-    route.callSubscriptions(currentContext);
-
     // otherwise, computations inside action will trigger to re-run
     // this computation. which we do not need.
     Tracker.nonreactive(function() {
@@ -462,8 +390,6 @@ Router.prototype._buildTracker = function() {
         }
       });
     });
-
-    self.safeToRun--;
   });
 
   return tracker;
@@ -471,7 +397,6 @@ Router.prototype._buildTracker = function() {
 
 Router.prototype._invalidateTracker = function() {
   var self = this;
-  this.safeToRun++;
   this._tracker.invalidate();
   // After the invalidation we need to flush to make changes imediately
   // otherwise, we have face some issues context mix-maches and so on.
@@ -584,7 +509,7 @@ Router.prototype._triggerRouteRegister = function(currentRoute) {
   // these are the public APIs
   var routePublicApi = _.pick(currentRoute, 'name', 'pathDef', 'path');
   var omittingOptionFields = [
-    'triggersEnter', 'triggersExit', 'action', 'subscriptions', 'name'
+    'triggersEnter', 'triggersExit', 'action', 'name'
   ];
   routePublicApi.options = _.omit(currentRoute.options, omittingOptionFields);
 
