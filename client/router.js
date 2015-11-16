@@ -1,9 +1,7 @@
 Router = function () {
   var self = this;
   this.globals = [];
-  this.subscriptions = Function.prototype;
 
-  this._tracker = this._buildTracker();
   this._current = {};
 
   // tracks the current path change
@@ -25,12 +23,6 @@ Router = function () {
   this._routesMap = {};
   this._updateCallbacks();
   this.notFound = this.notfound = null;
-  // indicate it's okay (or not okay) to run the tracker
-  // when doing subscriptions
-  // using a number and increment it help us to support FlowRouter.go()
-  // and legitimate reruns inside tracker on the same event loop.
-  // this is a solution for #145
-  this.safeToRun = 0;
 
   // Meteor exposes to the client the path prefix that was defined using the
   // ROOT_URL environement variable on the server using the global runtime
@@ -98,7 +90,7 @@ Router.prototype.route = function(pathDef, options, group) {
     // if not that means, we've been redirected to another path
     // then we don't need to invalidate
     var afterAllTriggersRan = function() {
-      self._invalidateTracker();
+      self._applyRoute();
     };
 
     var triggers = self._triggersEnter.concat(route._triggersEnter);
@@ -276,55 +268,6 @@ reactiveApis.forEach(function(api) {
   };
 });
 
-Router.prototype.subsReady = function() {
-  var callback = null;
-  var args = _.toArray(arguments);
-
-  if (typeof _.last(args) === "function") {
-    callback = args.pop();
-  }
-
-  var currentRoute = this.current().route;
-  var globalRoute = this._globalRoute;
-
-  // we need to depend for every route change and
-  // rerun subscriptions to check the ready state
-  this._onEveryPath.depend();
-
-  if(!currentRoute) {
-    return false;
-  }
-
-  var subscriptions;
-  if(args.length === 0) {
-    subscriptions = _.values(globalRoute.getAllSubscriptions());
-    subscriptions = subscriptions.concat(_.values(currentRoute.getAllSubscriptions()));
-  } else {
-    subscriptions = _.map(args, function(subName) {
-      return globalRoute.getSubscription(subName) || currentRoute.getSubscription(subName);
-    });
-  }
-
-  var isReady = function() {
-    var ready =  _.every(subscriptions, function(sub) {
-      return sub && sub.ready();
-    });
-
-    return ready;
-  };
-
-  if (callback) {
-    Tracker.autorun(function(c) {
-      if (isReady()) {
-        callback();
-        c.stop();
-      }
-    });
-  } else {
-    return isReady();
-  }
-};
-
 Router.prototype.withReplaceState = function(fn) {
   return this.env.replaceState.withValue(true, fn);
 };
@@ -349,7 +292,7 @@ Router.prototype._notfoundRoute = function(context) {
   }
 
   this._current.route = new Route(this, "*", this.notFound);
-  this._invalidateTracker();
+  this._applyRoute();
 };
 
 Router.prototype.initialize = function(options) {
@@ -385,7 +328,7 @@ Router.prototype.initialize = function(options) {
 
   // this is very ugly part of pagejs and it does decoding few times
   // in unpredicatable manner. See #168
-  // this is the default behaviour and we need keep it like that
+  // this is the defa_ult behaviour and we need keep it like that
   // we are doing a hack. see .path()
   this._page.base(this._basePath);
   this._page({
@@ -396,128 +339,50 @@ Router.prototype.initialize = function(options) {
   this._initialized = true;
 };
 
-Router.prototype._buildTracker = function() {
+Router.prototype._applyRoute = function() {
   var self = this;
 
-  // main autorun function
-  var tracker = Tracker.autorun(function () {
-    if(!self._current || !self._current.route) {
-      return;
+  // see the definition of `this._processingContexts`
+  var currentContext = self._current;
+  var route = currentContext.route;
+  var path = currentContext.path;
+
+  // otherwise, computations inside action will trigger to re-run
+  // this computation. which we do not need.
+  Tracker.nonreactive(function() {
+    var isRouteChange = currentContext.oldRoute !== currentContext.route;
+    var isFirstRoute = !currentContext.oldRoute;
+    // first route is not a route change
+    if(isFirstRoute) {
+      isRouteChange = false;
     }
 
-    // see the definition of `this._processingContexts`
-    var currentContext = self._current;
-    var route = currentContext.route;
-    var path = currentContext.path;
+    // Clear oldRouteChain just before calling the action
+    // We still need to get a copy of the oldestRoute first
+    // It's very important to get the oldest route and registerRouteClose() it
+    // See: https://github.com/kadirahq/flow-router/issues/314
+    var oldestRoute = self._oldRouteChain[0];
+    self._oldRouteChain = [];
 
-    if(self.safeToRun === 0) {
-      var message =
-        "You can't use reactive data sources like Session" +
-        " inside the `.subscriptions` method!";
-      throw new Error(message);
-    }
+    currentContext.route.registerRouteChange(currentContext, isRouteChange);
+    route.callAction(currentContext);
 
-    // We need to run subscriptions inside a Tracker
-    // to stop subs when switching between routes
-    // But we don't need to run this tracker with
-    // other reactive changes inside the .subscription method
-    // We tackle this with the `safeToRun` variable
-    self._globalRoute.clearSubscriptions();
-    self.subscriptions.call(self._globalRoute, path);
-    route.callSubscriptions(currentContext);
+    Tracker.afterFlush(function() {
+      self._onEveryPath.changed();
+      if(isRouteChange) {
+        // We need to trigger that route (definition itself) has changed.
+        // So, we need to re-run all the register callbacks to current route
+        // This is pretty important, otherwise tracker
+        // can't identify new route's items
 
-    // otherwise, computations inside action will trigger to re-run
-    // this computation. which we do not need.
-    Tracker.nonreactive(function() {
-      var isRouteChange = currentContext.oldRoute !== currentContext.route;
-      var isFirstRoute = !currentContext.oldRoute;
-      // first route is not a route change
-      if(isFirstRoute) {
-        isRouteChange = false;
-      }
-
-      // Clear oldRouteChain just before calling the action
-      // We still need to get a copy of the oldestRoute first
-      // It's very important to get the oldest route and registerRouteClose() it
-      // See: https://github.com/kadirahq/flow-router/issues/314
-      var oldestRoute = self._oldRouteChain[0];
-      self._oldRouteChain = [];
-
-      currentContext.route.registerRouteChange(currentContext, isRouteChange);
-      route.callAction(currentContext);
-
-      Tracker.afterFlush(function() {
-        self._onEveryPath.changed();
-        if(isRouteChange) {
-          // We need to trigger that route (definition itself) has changed.
-          // So, we need to re-run all the register callbacks to current route
-          // This is pretty important, otherwise tracker
-          // can't identify new route's items
-
-          // We also need to afterFlush, otherwise this will re-run
-          // helpers on templates which are marked for destroying
-          if(oldestRoute) {
-            oldestRoute.registerRouteClose();
-          }
+        // We also need to afterFlush, otherwise this will re-run
+        // helpers on templates which are marked for destroying
+        if(oldestRoute) {
+          oldestRoute.registerRouteClose();
         }
-      });
+      }
     });
-
-    self.safeToRun--;
   });
-
-  return tracker;
-};
-
-Router.prototype._invalidateTracker = function() {
-  var self = this;
-  this.safeToRun++;
-  this._tracker.invalidate();
-  // After the invalidation we need to flush to make changes imediately
-  // otherwise, we have face some issues context mix-maches and so on.
-  // But there are some cases we can't flush. So we need to ready for that.
-
-  // we clearly know, we can't flush inside an autorun
-  // this may leads some issues on flow-routing
-  // we may need to do some warning
-  if(!Tracker.currentComputation) {
-    // Still there are some cases where we can't flush
-    //  eg:- when there is a flush currently
-    // But we've no public API or hacks to get that state
-    // So, this is the only solution
-    try {
-      Tracker.flush();
-    } catch(ex) {
-      // only handling "while flushing" errors
-      if(!/Tracker\.flush while flushing/.test(ex.message)) {
-        return;
-      }
-
-      // XXX: fix this with a proper solution by removing subscription mgt.
-      // from the router. Then we don't need to run invalidate using a tracker
-
-      // this happens when we are trying to invoke a route change
-      // with inside a route chnage. (eg:- Template.onCreated)
-      // Since we use page.js and tracker, we don't have much control
-      // over this process.
-      // only solution is to defer route execution.
-
-      // It's possible to have more than one path want to defer
-      // But, we only need to pick the last one.
-      // self._nextPath = self._current.path;
-      Meteor.defer(function() {
-        var path = self._nextPath;
-        if(!path) {
-          return;
-        }
-
-        delete self._nextPath;
-        self.env.reload.withValue(true, function() {
-          self.go(path);
-        });
-      });
-    }
-  }
 };
 
 Router.prototype._updateCallbacks = function () {
@@ -584,7 +449,7 @@ Router.prototype._triggerRouteRegister = function(currentRoute) {
   // these are the public APIs
   var routePublicApi = _.pick(currentRoute, 'name', 'pathDef', 'path');
   var omittingOptionFields = [
-    'triggersEnter', 'triggersExit', 'action', 'subscriptions', 'name'
+    'triggersEnter', 'triggersExit', 'action', 'name'
   ];
   routePublicApi.options = _.omit(currentRoute.options, omittingOptionFields);
 

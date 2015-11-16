@@ -52,24 +52,6 @@ Tinytest.addAsync('Client - Group - define and go to route without prefix', func
   }, 100);
 });
 
-Tinytest.addAsync('Client - Group - subscribe', function (test, next) {
-  var rand = Random.id();
-
-  var group = FlowRouter.group({
-    subscriptions: function (params) {
-      this.register('baz', Meteor.subscribe('baz'));
-    }
-  });
-
-  group.route('/' + rand);
-
-  FlowRouter.go('/' + rand);
-  setTimeout(function() {
-    test.isTrue(!!GetSub('baz'));
-    next();
-  }, 100);
-});
-
 
 Tinytest.addAsync('Client - Group - set and retrieve group name', function (test, next) {
   var rand = Random.id();

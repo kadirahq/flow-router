@@ -22,7 +22,6 @@ Tinytest.addAsync('Common - Addons - onRouteRegister basic usage', function (tes
   FlowRouter.route(pathDef, {
     name: name,
     action: function() {},
-    subscriptions: function() {},
     triggersEnter: function() {},
     triggersExit: function() {},
     customField: customField

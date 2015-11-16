@@ -12,10 +12,8 @@ Route = function(router, pathDef, options, group) {
   }
 
   this._action = options.action || Function.prototype;
-  this._subscriptions = options.subscriptions || Function.prototype;
   this._triggersEnter = options.triggersEnter || [];
   this._triggersExit = options.triggersExit || [];
-  this._subsMap = {};
   this._router = router;
 
   this._params = new ReactiveDict();
@@ -28,37 +26,11 @@ Route = function(router, pathDef, options, group) {
   this.group = group;
 };
 
-Route.prototype.clearSubscriptions = function() {
-  this._subsMap = {};
-};
-
-Route.prototype.register = function(name, sub, options) {
-  this._subsMap[name] = sub;
-};
-
-
-Route.prototype.getSubscription = function(name) {
-  return this._subsMap[name];
-};
-
-
-Route.prototype.getAllSubscriptions = function() {
-  return this._subsMap;
-};
-
 Route.prototype.callAction = function(current) {
   var self = this;
   self._action(current.params, current.queryParams);
 };
 
-Route.prototype.callSubscriptions = function(current) {
-  this.clearSubscriptions();
-  if (this.group) {
-    this.group.callSubscriptions(current);
-  }
-
-  this._subscriptions(current.params, current.queryParams);
-};
 
 Route.prototype.getRouteName = function() {
   this._routeCloseDep.depend();
