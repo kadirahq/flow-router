@@ -4,7 +4,7 @@ FlowRouter.Router = Router;
 FlowRouter.Route = Route;
 
 // Initialize FlowRouter
-Meteor.startup(function () {
+Meteor.startup(() => {
   if(!FlowRouter._askedToWait) {
     FlowRouter.initialize();
   }
