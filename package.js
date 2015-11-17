@@ -54,6 +54,7 @@ Package.onTest(function(api) {
 function configure(api) {
   api.versionsFrom('1.0');
 
+  api.use('ecmascript');
   api.use('underscore');
   api.use('tracker');
   api.use('reactive-dict');

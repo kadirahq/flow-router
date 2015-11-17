@@ -1,5 +1,3 @@
-"use strict";
-
 window.Route = class {
   constructor(router, pathDef, options, group) {
     options = options || {};
