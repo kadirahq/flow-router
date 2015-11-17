@@ -1,4 +1,4 @@
-window.Route = class {
+Route = class {
   constructor(router, pathDef, options, group) {
     options = options || {};
 
@@ -89,15 +89,13 @@ window.Route = class {
     const oldKeys = _.keys(dict.keyDeps);
 
     // set new values
-    //  params is an array. So, _.each(params) does not works
-    //  to iterate params
-    _.each(currentKeys, (key) => {
+    currentKeys.forEach((key) => {
       dict.set(key, newValues[key]);
     });
 
     // remove keys which does not exisits here
     const removedKeys = _.difference(oldKeys, currentKeys);
-    _.each(removedKeys, (key) => {
+    removedKeys.forEach((key) => {
       dict.set(key, undefined);
     });
   }
