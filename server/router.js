@@ -130,18 +130,6 @@ Router = class {
     }
   }
   
-  ready() {
-    // client only
-  }
-  
-  initialize() {
-    // client only
-  }
-  
-  wait() {
-    // client only
-  }
-  
   watchPathChange() {
   
   }

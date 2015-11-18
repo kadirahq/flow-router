@@ -15,7 +15,7 @@ Meteor.subscribe = function (pubName) {
   }
   
   return {
-    ready: () => { return true; }
+    ready: () => true
   };
 };
 
@@ -60,8 +60,7 @@ Tracker.autorun = (fn) => {
 // Then, we need to remove the SsrContext within Method calls
 ['call', 'apply'].forEach((methodName) => {
   const original = Meteor[methodName];
-  Meteor[methodName] = () => {
-    const args = arguments;
+  Meteor[methodName] = (...args) => {
     const response = FlowRouter.ssrContext.withValue(null, () => {
       return original.apply(this, args);
     });

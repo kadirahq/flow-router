@@ -16,8 +16,8 @@ function setupFastRender () {
     FastRender.route(route.pathDef, (routeParams, path) => {
       // anyone using Meteor.subscribe for something else?
       const original = Meteor.subscribe;
-      Meteor.subscribe = () => {
-        return _.toArray(arguments);
+      Meteor.subscribe = (...args) => {
+        return _.toArray(args);
       };
 
       route._subsMap = {};
