@@ -1,36 +1,34 @@
-if(!Package['meteorhacks:fast-render']) {
+if (!Package['meteorhacks:fast-render']) {
   return;
 }
 
 FastRender = Package['meteorhacks:fast-render'].FastRender;
 
 // hack to run after eveything else on startup
-Meteor.startup(function () {
-  Meteor.startup(function () {
+Meteor.startup(() => {
+  Meteor.startup(() => {
     setupFastRender();
   });
 });
 
 function setupFastRender () {
-  _.each(FlowRouter._routes, function (route) {
-    FastRender.route(route.pathDef, function (routeParams, path) {
-      var self = this;
-
+  FlowRouter._routes.forEach((route) => {
+    FastRender.route(route.pathDef, (routeParams, path) => {
       // anyone using Meteor.subscribe for something else?
-      var original = Meteor.subscribe;
-      Meteor.subscribe = function () {
+      const original = Meteor.subscribe;
+      Meteor.subscribe = () => {
         return _.toArray(arguments);
       };
 
       route._subsMap = {};
       FlowRouter.subscriptions.call(route, path);
-      if(route.subscriptions) {
-        var queryParams = routeParams.query;
-        var params = _.omit(routeParams, 'query');
+      if (route.subscriptions) {
+        const queryParams = routeParams.query;
+        const params = _.omit(routeParams, 'query');
         route.subscriptions(params, queryParams);
       }
-      _.each(route._subsMap, function (args) {
-        self.subscribe.apply(self, args);
+      route._subsMap.forEach((args) => {
+        this.subscribe.apply(this, args);
       });
 
       // restore Meteor.subscribe, ... on server side
