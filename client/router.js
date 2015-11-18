@@ -124,7 +124,7 @@ Router = class {
     return route;
   }
   
-  group = (options) => {
+  group(options) {
     return new Group(this, options);
   }
   
@@ -215,7 +215,7 @@ Router = class {
   
     this.go(pathDef, params, queryParams);
     return true;
-  };
+  }
   
   setQueryParams(newParams) {
     if (!this._current.route) {
@@ -253,11 +253,11 @@ Router = class {
   
   withReplaceState(fn) {
     return this.env.replaceState.withValue(true, fn);
-  };
+  }
   
   withTrailingSlash(fn) {
     return this.env.trailingSlash.withValue(true, fn);
-  };
+  }
   
   _notfoundRoute(context) {
     this._current = {
