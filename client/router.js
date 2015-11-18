@@ -442,7 +442,7 @@ const reactiveApis = [
   'getRouteName', 'watchPathChange'
 ];
 reactiveApis.forEach((api) => {
-  Router.prototype[api] = (arg1) => {
+  Router.prototype[api] = function (arg1) {
     // when this is calling, there may not be any route initiated
     // so we need to handle it
     const currentRoute = this._current.route;
