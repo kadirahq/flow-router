@@ -54,7 +54,7 @@ Router = class {
     this._initTriggersAPI();
   }
   
-  route(pathDef, options, group) => {
+  route(pathDef, options, group) {
     if (!/^\/.*/.test(pathDef)) {
       const message = "route's path must start with '/'";
       throw new Error(message);
