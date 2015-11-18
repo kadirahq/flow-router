@@ -1,6 +1,6 @@
 const originalSubscribe = Meteor.subscribe;
 
-Meteor.subscribe = (pubName) => {
+Meteor.subscribe = function (pubName) {
   const params = Array.prototype.slice.call(arguments, 1);
 
   const ssrContext = FlowRouter.ssrContext.get();
@@ -22,7 +22,7 @@ Meteor.subscribe = (pubName) => {
 const Mongo = Package['mongo'].Mongo;
 const originalFind = Mongo.Collection.prototype.find;
 
-Mongo.Collection.prototype.find = (selector, options) => {
+Mongo.Collection.prototype.find = function (selector, options) {
   selector = selector || {};
   const collName = this._name;
   const ssrContext = FlowRouter.ssrContext.get();
@@ -35,7 +35,7 @@ Mongo.Collection.prototype.find = (selector, options) => {
   return originalFind.call(this, selector, options);
 };
 
-Mongo.Collection.prototype.findOne = (selector, options) => {
+Mongo.Collection.prototype.findOne = function (selector, options) {
   options = options || {};
   options.limit = 1;
   return this.find(selector, options).fetch()[0];
