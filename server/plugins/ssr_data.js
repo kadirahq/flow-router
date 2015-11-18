@@ -1,47 +1,53 @@
-var originalSubscribe = Meteor.subscribe;
-Meteor.subscribe = function(pubName) {
-  var params = Array.prototype.slice.call(arguments, 1);
+const originalSubscribe = Meteor.subscribe;
 
-  var ssrContext = FlowRouter.ssrContext.get();
-  if(ssrContext) {
-    FlowRouter.inSubscription.withValue(true, function() {
+Meteor.subscribe = (pubName) => {
+  const params = Array.prototype.slice.call(arguments, 1);
+
+  const ssrContext = FlowRouter.ssrContext.get();
+  if (ssrContext) {
+    FlowRouter.inSubscription.withValue(true, () => {
       ssrContext.addSubscription(pubName, params);
     });
   }
 
-  if(originalSubscribe) {
+  if (originalSubscribe) {
     originalSubscribe.apply(this, arguments);
   }
-  return {ready: function () {return true}};
+  
+  return {
+    ready: () => { return true; }
+  };
 };
 
-var Mongo = Package['mongo'].Mongo;
-var originalFind = Mongo.Collection.prototype.find;
-Mongo.Collection.prototype.find = function(selector, options) {
+const Mongo = Package['mongo'].Mongo;
+const originalFind = Mongo.Collection.prototype.find;
+
+Mongo.Collection.prototype.find = (selector, options) => {
   selector = selector || {};
-  var collName = this._name;
-  var ssrContext = FlowRouter.ssrContext.get();
-  if(ssrContext && !FlowRouter.inSubscription.get()) {
-    var collection = ssrContext.getCollection(collName);
-    var cursor = collection.find(selector, options);
+  const collName = this._name;
+  const ssrContext = FlowRouter.ssrContext.get();
+  if (ssrContext && !FlowRouter.inSubscription.get()) {
+    const collection = ssrContext.getCollection(collName);
+    const cursor = collection.find(selector, options);
     return cursor;
   }
 
   return originalFind.call(this, selector, options);
 };
 
-Mongo.Collection.prototype.findOne = function(selector, options) {
+Mongo.Collection.prototype.findOne = (selector, options) => {
   options = options || {};
   options.limit = 1;
   return this.find(selector, options).fetch()[0];
 };
 
-var originalAutorun = Tracker.autorun;
-Tracker.autorun = function (fn) {
+const originalAutorun = Tracker.autorun;
+
+Tracker.autorun = (fn) => {
   // if autorun is in the ssrContext, we need fake and run the callback 
   // in the same eventloop
-  if(FlowRouter.ssrContext.get()) {
-    var c = {firstRun: true, stop: function () {}};
+  if (FlowRouter.ssrContext.get()) {
+    const c = { firstRun: true, stop: () => {} };
     fn(c);
     return c;
   } else {
@@ -52,13 +58,12 @@ Tracker.autorun = function (fn) {
 // By default, Meteor[call,apply] also inherit SsrContext
 // So, they can't access the full MongoDB dataset because of that
 // Then, we need to remove the SsrContext within Method calls
-['call', 'apply'].forEach(function(methodName) {
-  var original = Meteor[methodName];
-  Meteor[methodName] = function() {
-    var self = this;
-    var args = arguments;
-    var response = FlowRouter.ssrContext.withValue(null, function() {
-      return original.apply(self, args);
+['call', 'apply'].forEach((methodName) => {
+  const original = Meteor[methodName];
+  Meteor[methodName] = () => {
+    const args = arguments;
+    const response = FlowRouter.ssrContext.withValue(null, () => {
+      return original.apply(this, args);
     });
 
     return response;
@@ -67,6 +72,6 @@ Tracker.autorun = function (fn) {
 
 // This is not available in the server. But to make it work with SSR
 // We need to have it.
-Meteor.loggingIn = function() {
+Meteor.loggingIn = () => {
   return false;
 };
