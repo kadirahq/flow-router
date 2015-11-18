@@ -1,60 +1,60 @@
-var deepMerge = Npm.require('deepmerge');
+const deepMerge = Npm.require('deepmerge');
 
-SsrContext = function() {
-  this._html = "";
-  this._head = "";
-  this._collections = {};
-};
-
-SsrContext.prototype.getCollection = function(collName) {
-  var collection = this._collections[collName];
-  if(!collection) {
-    var minimongo = Package['minimongo'];
-    collection = this._collections[collName] = new minimongo.LocalCollection();
+SsrContext = class {
+  constructor() {
+    this._html = "";
+    this._head = "";
+    this._collections = {};
   }
 
-  return collection;
-};
+  getCollection(collName) {
+    let collection = this._collections[collName];
+    if(!collection) {
+      const minimongo = Package['minimongo'];
+      collection = this._collections[collName] = new minimongo.LocalCollection();
+    }
+  
+    return collection;
+  }
 
-SsrContext.prototype.setHtml = function(html) {
-  this._html = html;
-};
-
-SsrContext.prototype.getHtml = function() {
-  return this._html;
-};
-
-SsrContext.prototype.addToHead = function(headHtml) {
-  this._head += '\n' + headHtml;
-};
-
-SsrContext.prototype.getHead = function() {
-  return this._head;
-};
-
-SsrContext.prototype.addSubscription = function(name, params) {
-  var pub = Meteor.default_server.publish_handlers[name];
-  var fastRenderContext = FastRender.frContext.get();
-  var args = [name].concat(params);
-  var data = fastRenderContext.subscribe.apply(fastRenderContext, args);
-  this.addData(data);  
-};
-
-SsrContext.prototype.addData = function(data) {
-  var self = this;
-  _.each(data, function(collDataCollection, collectionName) {
-    var collection = self.getCollection(collectionName);
-    collDataCollection.forEach(function(collData) {
-      collData.forEach(function(item) {
-        var existingDoc = collection.findOne(item._id);
-        if(existingDoc) {
-          var newDoc = deepMerge(existingDoc, item);
-          delete newDoc._id;
-          collection.update(item._id, newDoc);
-        } else {
-          collection.insert(item);
-        }
+  setHtml(html) {
+    this._html = html;
+  }
+  
+  getHtml() {
+    return this._html;
+  }
+  
+  addToHead(headHtml) {
+    this._head += '\n' + headHtml;
+  }
+  
+  getHead() {
+    return this._head;
+  }
+  
+  addSubscription(name, params) {
+    const fastRenderContext = FastRender.frContext.get();
+    const args = [name].concat(params);
+    const data = fastRenderContext.subscribe.apply(fastRenderContext, args);
+    this.addData(data);  
+  }
+  
+  addData(data) {
+    data.forEach((collDataCollection, collectionName) => {
+      const collection = this.getCollection(collectionName);
+      collDataCollection.forEach((collData) => {
+        collData.forEach((item) => {
+          const existingDoc = collection.findOne(item._id);
+          if(existingDoc) {
+            const newDoc = deepMerge(existingDoc, item);
+            delete newDoc._id;
+            collection.update(item._id, newDoc);
+          } else {
+            collection.insert(item);
+          }
+        });
       });
     });
-  });
-};
+  }
+}
