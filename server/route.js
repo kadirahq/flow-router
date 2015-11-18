@@ -42,6 +42,7 @@ Route = class {
   }
   
   _processFromSsr(params, req, res) {
+    const self = this;
     const ssrContext = new SsrContext();
     
     this._router.ssrContext.withValue(ssrContext, () => {
@@ -76,7 +77,7 @@ Route = class {
       });
   
       const originalWrite = res.write;
-      res.write = (data) => {
+      res.write = function (data) {
         if(typeof data === 'string') {
           const head = ssrContext.getHead();
           if(head && head.trim() !== "") {
@@ -84,7 +85,7 @@ Route = class {
           }
   
           const reactRoot = ssrContext.getHtml();
-          if (this._router.deferScriptLoading) {
+          if (self._router.deferScriptLoading) {
             data = moveScripts(data);
           }
           data = data.replace('<body>', '<body>' + reactRoot);
@@ -95,8 +96,8 @@ Route = class {
           };
   
           // cache the page if mentioned a timeout
-          if(this._router.pageCacheTimeout) {
-            this._cachePage(req.url, pageInfo, this._router.pageCacheTimeout);
+          if(self._router.pageCacheTimeout) {
+            self._cachePage(req.url, pageInfo, self._router.pageCacheTimeout);
           }
         }
         
@@ -104,7 +105,7 @@ Route = class {
       };
     });
   
-    const moveScripts = (data) => {
+    function moveScripts(data) {
       const $ = Cheerio.load(data, {
         decodeEntities: false
       });

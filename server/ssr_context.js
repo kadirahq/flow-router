@@ -41,7 +41,7 @@ SsrContext = class {
   }
   
   addData(data) {
-    data.forEach((collDataCollection, collectionName) => {
+    _.each(data, (collDataCollection, collectionName) => {
       const collection = this.getCollection(collectionName);
       collDataCollection.forEach((collData) => {
         collData.forEach((item) => {
