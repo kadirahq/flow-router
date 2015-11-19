@@ -14,8 +14,6 @@ Route = class {
   
     this.action = options.action || Function.prototype;
     this._router = router;
-    this.subscriptions = options.subscriptions || Function.prototype;
-    this._subsMap = {};
     this._cache = {};
   
     Picker.middleware(Npm.require('connect').cookieParser());
@@ -45,16 +43,16 @@ Route = class {
     const self = this;
     const ssrContext = new SsrContext();
     
-    this._router.ssrContext.withValue(ssrContext, () => {
+    self._router.ssrContext.withValue(ssrContext, function () {
       const queryParams = params.query;
       // We need to remove `.query` since it's not part of our params API
       // But we only need to remove it in our copy. 
       // We should not trigger any side effects
       params = _.clone(params);
       delete params.query;
-      const context = this._buildContext(req.url, params, queryParams);
+      const context = self._buildContext(req.url, params, queryParams);
   
-      this._router.currentRoute.withValue(context, () => {
+      self._router.currentRoute.withValue(context, () => {
         try {
           // get the data for null subscriptions and add them to the
           // ssrContext
@@ -63,12 +61,8 @@ Route = class {
             ssrContext.addData(frData.collectionData);
           }
   
-          if(this.options.subscriptions) {
-            this.options.subscriptions.call(this, params, queryParams);
-          }
-  
-          if(this.options.action) {
-            this.options.action.call(this, params, queryParams);
+          if(self.options.action) {
+            self.options.action.call(self, params, queryParams);
           }
         } catch(ex) {
           console.error("Error when doing SSR. path:", req.url, " ", ex.message);
@@ -121,7 +115,7 @@ Route = class {
   
   _processFromCache(pageInfo, res, next) {
     const originalWrite = res.write;
-    res.write = (data) => {
+    res.write = function (data) {
       originalWrite.call(this, pageInfo.html);
     }
   
@@ -180,17 +174,5 @@ Route = class {
     };
   
     this._cache[url] = info;
-  }
-  
-  register(name, sub, options) {
-    this._subsMap[name] = sub;
-  };
-  
-  subscription(name) {
-    return this._subsMap[name];
-  }
-  
-  middleware(middleware) {
-  
   }
 }
