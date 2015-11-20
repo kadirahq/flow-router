@@ -22,7 +22,7 @@ It exposes a great API for changing the URL and reactively getting data from the
 * [IE9 Support](#ie9-support)
 * [Hashbang URLs](#hashbang-urls)
 * [Prefixed paths](#prefixed-paths)
-* [Addons](#addons)
+* [Add-ons](#add-ons)
 * [Difference with Iron Router](#difference-with-iron-router)
 * [Migrating into 2.0](#migrating-into-20)
 
@@ -257,7 +257,7 @@ FlowRouter.route('/', {
 Every trigger callback comes with a second argument: a function you can use to redirect to a different route. Redirect also has few properties to make sure it's not blocking the router.
 
 * redirect must be called with an URL
-* redirect must be called within the same eventloop cycle (no async or called inside a Tracker)
+* redirect must be called within the same event loop cycle (no async or called inside a Tracker)
 * redirect cannot be called multiple times
 
 Check this [PR](https://github.com/meteorhacks/flow-router/pull/172) to learn more about our redirect API.
@@ -338,7 +338,7 @@ console.log(color); // prints "red"
 
 Generate a path from a path definition. Both `params` and `queryParams` are optional.
 
-Special characters in `params` and `queryParams` will be urlencoded.
+Special characters in `params` and `queryParams` will be URL encoded.
 
 ~~~js
 var pathDef = "/blog/:cat/:id";
@@ -383,7 +383,7 @@ FlowRouter.go("/blog");
 
 #### FlowRouter.url(pathDef, params, queryParams)
 
-Just like `FlowRouter.path`, but gives the abosolute url. (Uses `Meteor.absoluteUrl` behind the schenes.)
+Just like `FlowRouter.path`, but gives the absolute url. (Uses `Meteor.absoluteUrl` behind the scenes.)
 
 #### FlowRouter.setParams(newParams)
 
@@ -464,7 +464,7 @@ FlowRouter.setParams({id: "the-id-2"});
 FlowRouter.setParams({id: "the-id-3"});
 ~~~
 
-Now you can hit the back button of your browser two times. This is normal behaviour since users may click the back button and expect to see the previous state of the app.
+Now you can hit the back button of your browser two times. This is normal behavior since users may click the back button and expect to see the previous state of the app.
 
 But sometimes, this is not something you want. You don't need to pollute the browser history. Then, you can use the following syntax.
 
@@ -506,7 +506,7 @@ For more information visit [issue #180](https://github.com/meteorhacks/flow-rout
 
 #### FlowRouter.onRouteRegister(cb)
 
-This API is specially designed for addon developers. They can listen for any registered route and add custom functionality to FlowRouter. This works on both server and client alike.
+This API is specially designed for add-on developers. They can listen for any registered route and add custom functionality to FlowRouter. This works on both server and client alike.
 
 ~~~js
 FlowRouter.onRouteRegister(function(route) {
@@ -524,7 +524,7 @@ FlowRouter.route('/blog/:post', {
   subscriptions: function() {},
   action: function() {},
   triggersExit: [function() {}],
-  customeField: 'customName'
+  customField: 'customName'
 });
 ~~~
 
@@ -534,7 +534,7 @@ Then the route object will be something like this:
 {
   pathDef: '/blog/:post',
   name: 'postList',
-  options: {customeField: 'customName'}
+  options: {customField: 'customName'}
 }
 ~~~
 
@@ -635,7 +635,7 @@ meteor add tomwasd:history-polyfill
 
 ## Hashbang URLs
 
-To enable hashbang urls like `mydomain.com/#!/mypath` simple set the `hashbang` option to `true` in the initialize funtion:
+To enable hashbang urls like `mydomain.com/#!/mypath` simple set the `hashbang` option to `true` in the initialize function:
 
 ~~~js
 // file: app.js
@@ -649,17 +649,17 @@ WhenEverYourAppIsReady(function() {
 
 In cases you wish to run multiple web application on the same domain name, you’ll probably want to serve your particular meteor application under a sub-path (eg `example.com/myapp`). In this case simply include the path prefix in the meteor `ROOT_URL` environment variable and FlowRouter will handle it transparently without any additional configuration.
 
-## Addons
+## Add-ons
 
 Router is a base package for an app. Other projects like [useraccounts](http://useraccounts.meteor.com/)  should have support for FlowRouter. Otherwise, it's hard to use  FlowRouter in a real project. Now a lot of packages have [started to support FlowRouter](https://kadira.io/blog/meteor/addon-packages-for-flowrouter).
 
 So, you can use your your favorite package with FlowRouter as well. If not, there is an [easy process](https://kadira.io/blog/meteor/addon-packages-for-flowrouter#what-if-project-xxx-still-doesn-t-support-flowrouter-) to convert them to FlowRouter.
 
-**Addon API**
+**Add-on API**
 
-We have also released a [new API](https://github.com/kadirahq/flow-router#flowrouteronrouteregistercb) to support addon developers. With that addon packages can get a notification, when the user created a route in their app.
+We have also released a [new API](https://github.com/kadirahq/flow-router#flowrouteronrouteregistercb) to support add-on developers. With that add-on packages can get a notification, when the user created a route in their app.
 
-If you've more ideas for the addon API, [let us know](https://github.com/kadirahq/flow-router/issues).
+If you've more ideas for the add-on API, [let us know](https://github.com/kadirahq/flow-router/issues).
 
 ## Difference with Iron Router
 
