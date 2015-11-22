@@ -1,5 +1,43 @@
 # Change Log
 
+### v.NEXT
+
+* Remove subscription registration from the router
+* Remove internal tracker and apply route changes immediately. With this change, we don't use `Track.flush()`. That'll fix a lot of runtime issues.
+
+### v3.6.0
+* Get features from v2.9.0
+
+### v3.5.0
+
+* Get changes from master upto v2.7.0
+* Add support for path prefix for SSR
+
+### v3.4.0
+
+* Now, React root node generation done outside of the router. It's handle by the ReactLayout. **This is a breaking change and need to update ReactLayout**
+
+### v3.3.0
+* Get changes from FlowRouter 2.6.0
+* Add complete queryParams support in SSR. Fixes: [#237](https://github.com/kadirahq/flow-router/issues/237)
+
+### v3.2.1
+* Fix adding support for unicode chars in the head
+
+### v3.2.0
+* Upgrade FastRender for Meteor 1.2 support
+
+### v3.1.0
+* Support null publications and custom publications with `this.xxx` apis
+* Support server side login state
+* Get the changes from v2.1.1
+
+### v3.0.1
+* Add initial SSR support
+* It's implemented as extendable manner. Currently ReactLayout supports it.
+
+------------
+
 ### v2.9.0
 * Add FlowRouter.url() See: [#374](https://github.com/kadirahq/flow-router/pull/374)
 
