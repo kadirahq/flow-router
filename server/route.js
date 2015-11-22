@@ -50,7 +50,7 @@ Route = class {
       // We should not trigger any side effects
       params = _.clone(params);
       delete params.query;
-      const context = self._buildContext(req.url, params, queryParams);
+      const context = self._buildContext(req, params, queryParams);
   
       self._router.currentRoute.withValue(context, () => {
         try {
@@ -117,18 +117,19 @@ Route = class {
     const originalWrite = res.write;
     res.write = function (data) {
       originalWrite.call(this, pageInfo.html);
-    }
+    };
   
     res.pushData('fast-render-data', pageInfo.frData);
     next();
   }
   
-  _buildContext(url, params, queryParams) {
+  _buildContext(req, params, queryParams) {
     const context = {
       route: this,
-      path: url,
+      path: req.url,
       params: params,
-      queryParams: queryParams
+      queryParams: queryParams,
+      serverRequest: req
     };
   
     return context;
