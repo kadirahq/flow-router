@@ -52,7 +52,7 @@ Route = class {
       delete params.query;
       const context = self._buildContext(req.url, params, queryParams);
   
-      self._router.currentRoute.withValue(context, () => {
+      self._router._current.withValue(context, () => {
         try {
           // get the data for null subscriptions and add them to the
           // ssrContext

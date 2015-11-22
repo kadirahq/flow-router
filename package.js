@@ -66,6 +66,8 @@ function configure(api) {
   api.use('meteorhacks:picker@1.0.3', 'server');
   api.use('meteorhacks:inject-data@1.3.0');
 
+  api.addFiles('lib/router.js', ['client', 'server']);
+
   api.addFiles('client.browserify.js', 'client');
   api.addFiles('client/triggers.js', 'client');
   api.addFiles('client/router.js', 'client');
@@ -80,5 +82,4 @@ function configure(api) {
   api.addFiles('server/_init.js', 'server');
 
   api.addFiles('server/plugins/ssr_data.js', 'server');
-  api.addFiles('lib/router.js', ['client', 'server']);
 }
