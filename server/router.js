@@ -23,16 +23,6 @@ Router = class extends SharedRouter {
     }
   }
   
-  route(pathDef, options) {
-    return super.route(pathDef, options);
-  }
-    
-  path(pathDef, fields, queryParams) {
-    return super.path(pathDef, fields, queryParams);
-  }
-
-
-  
   getParam(key) {
     const current = this.current();
     if(current) {

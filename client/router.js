@@ -110,10 +110,6 @@ Router = class extends SharedRouter {
     return route;
   }
   
-  path(pathDef, fields, queryParams) {
-    return super.path(pathDef, fields, queryParams);
-  }
-  
   go(pathDef, fields, queryParams) {
     const path = this.path(pathDef, fields, queryParams);
   
@@ -124,8 +120,6 @@ Router = class extends SharedRouter {
       this._page(path);
     }
   }
-  
-
   
   reload() {
     this.env.reload.withValue(true, () => {
