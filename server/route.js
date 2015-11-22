@@ -1,19 +1,12 @@
 const Url = Npm.require('url');
 const Cheerio = Npm.require('cheerio');
 
-Route = class {
+Route = class extends SharedRoute {
   constructor(router, pathDef, options) {
+    super(router, pathDef, options);
+
     options = options || {};
-    this.options = options;
-    this.name = options.name;
-    this.pathDef = pathDef;
-  
-  
-    // Route.path is deprecated and will be removed in 3.0
-    this.path = this.pathDef;
-  
-    this.action = options.action || Function.prototype;
-    this._router = router;
+
     this._cache = {};
   
     Picker.middleware(Npm.require('connect').cookieParser());
@@ -61,8 +54,8 @@ Route = class {
             ssrContext.addData(frData.collectionData);
           }
   
-          if(self.options.action) {
-            self.options.action.call(self, params, queryParams);
+          if(self.options._action) {
+            self.options._action.call(self, params, queryParams);
           }
         } catch(ex) {
           console.error("Error when doing SSR. path:", req.url, " ", ex.message);

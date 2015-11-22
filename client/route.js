@@ -1,21 +1,11 @@
-Route = class {
+Route = class extends SharedRoute {
   constructor(router, pathDef, options, group) {
+    super(router, pathDef, options);
+
     options = options || {};
 
-    this.options = options;
-    this.pathDef = pathDef
-
-    // Route.path is deprecated and will be removed in 3.0
-    this.path = pathDef;
-
-    if (options.name) {
-      this.name = options.name;
-    }
-
-    this._action = options.action || Function.prototype;
     this._triggersEnter = options.triggersEnter || [];
     this._triggersExit = options.triggersExit || [];
-    this._router = router;
 
     this._params = new ReactiveDict();
     this._queryParams = new ReactiveDict();

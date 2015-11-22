@@ -14,7 +14,13 @@ Tinytest.addAsync('Common - Addons - onRouteRegister basic usage', function (tes
 
       name: name,
       options: {customField: customField}
-    });  
+    });
+
+    // test.equal(route.pathDef, pathDef);
+    // test.equal(route.path, pathDef);
+    // test.equal(route.name, name);
+    // test.equal(route.options, {customField: customField});
+
     FlowRouter._onRouteCallbacks = [];
     done();
   });

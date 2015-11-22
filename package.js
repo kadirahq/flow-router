@@ -67,6 +67,7 @@ function configure(api) {
   api.use('meteorhacks:inject-data@1.3.0');
 
   api.addFiles('lib/router.js', ['client', 'server']);
+  api.addFiles('lib/route.js', ['client', 'server']);
 
   api.addFiles('client.browserify.js', 'client');
   api.addFiles('client/triggers.js', 'client');
