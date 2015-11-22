@@ -75,12 +75,14 @@ function configure(api) {
   api.addFiles('client/router.js', 'client');
   api.addFiles('client/group.js', 'client');
   api.addFiles('client/route.js', 'client');
-  api.addFiles('client/_init.js', 'client');
 
   api.addFiles('server/router.js', 'server');
   api.addFiles('server/group.js', 'server');
   api.addFiles('server/route.js', 'server');
   api.addFiles('server/ssr_context.js', 'server');
+
+  api.addFiles('lib/_init.js', ['client', 'server']);
+  api.addFiles('client/_init.js', 'client');
   api.addFiles('server/_init.js', 'server');
 
   api.addFiles('server/plugins/ssr_data.js', 'server');

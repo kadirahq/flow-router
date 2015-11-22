@@ -1,8 +1,3 @@
-// Export Router Instance
-FlowRouter = new Router();
-FlowRouter.Router = Router;
-FlowRouter.Route = Route;
-
 // This is a magic configuration in Meteor which allows some apps to be 
 // run with a prefix.
 // This is very important when especially app running in something like
