@@ -6,7 +6,7 @@ Triggers = {};
 // @triggers - a set of triggers
 // @filter - filter with array fileds with `only` and `except` 
 //           support only either `only` or `except`, but not both
-Triggers.applyFilters = function(triggers, filter) {
+Triggers.applyFilters = (triggers, filter) => {
   if(!(triggers instanceof Array)) {
     triggers = [triggers];
   }
@@ -42,19 +42,20 @@ Triggers.applyFilters = function(triggers, filter) {
 //  @triggers - a set of triggers 
 //  @names - list of route names to be bound (trigger runs only for these names)
 //  @negate - negate the result (triggers won't run for above names)
-Triggers.createRouteBoundTriggers = function(triggers, names, negate) {
-  var namesMap = {};
-  _.each(names, function(name) {
+Triggers.createRouteBoundTriggers = (triggers, names, negate) => {
+  const namesMap = {};
+
+  names.forEach((name) => {
     namesMap[name] = true;
   });
 
-  var filteredTriggers = _.map(triggers, function(originalTrigger) {
-    var modifiedTrigger = function(context, next) {
-      var routeName = context.route.name;
-      var matched = (namesMap[routeName])? 1: -1;
-      matched = (negate)? matched * -1 : matched;
+  const filteredTriggers = triggers.map((originalTrigger) => {
+    const modifiedTrigger = (context, next) => {
+      const routeName = context.route.name;
+      let matched = (namesMap[routeName]) ? 1: -1;
+      matched = (negate) ? matched * -1 : matched;
 
-      if(matched === 1) {
+      if (matched === 1) {
         originalTrigger(context, next);
       }
     };
@@ -69,16 +70,16 @@ Triggers.createRouteBoundTriggers = function(triggers, names, negate) {
 //  @context - context we need to pass (it must have the route)
 //  @redirectFn - function which used to redirect 
 //  @after - called after if only all the triggers runs
-Triggers.runTriggers = function(triggers, context, redirectFn, after) {
-  var abort = false;
-  var inCurrentLoop = true;
-  var alreadyRedirected = false;
+Triggers.runTriggers = (triggers, context, redirectFn, after) => {
+  let abort = false;
+  let inCurrentLoop = true;
+  let alreadyRedirected = false;
 
-  for(var lc=0; lc<triggers.length; lc++) {
-    var trigger = triggers[lc];
+  for (let lc=0; lc<triggers.length; lc++) {
+    const trigger = triggers[lc];
     trigger(context, doRedirect, doStop);
 
-    if(abort) {
+    if (abort) {
       return;
     }
   }
@@ -89,15 +90,15 @@ Triggers.runTriggers = function(triggers, context, redirectFn, after) {
   after();
 
   function doRedirect(url, params, queryParams) {
-    if(alreadyRedirected) {
+    if (alreadyRedirected) {
       throw new Error("already redirected");
     }
 
-    if(!inCurrentLoop) {
+    if (!inCurrentLoop) {
       throw new Error("redirect needs to be done in sync");
     }
 
-    if(!url) {
+    if (!url) {
       throw new Error("trigger redirect requires an URL");
     }
 
