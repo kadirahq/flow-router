@@ -5,8 +5,6 @@ Route = class extends SharedRoute {
   constructor(router, pathDef, options) {
     super(router, pathDef, options);
 
-    options = options || {};
-
     this._cache = {};
   
     Picker.middleware(Npm.require('connect').cookieParser());

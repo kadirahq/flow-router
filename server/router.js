@@ -4,6 +4,8 @@ Router = class extends SharedRouter {
   constructor() {
     super();
 
+    this._qs = Qs;
+
     this.subscriptions = Function.prototype;
     this.ssrContext = new Meteor.EnvironmentVariable();
     this.inSubscription = new Meteor.EnvironmentVariable();
