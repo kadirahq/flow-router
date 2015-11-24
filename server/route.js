@@ -23,7 +23,7 @@ Route = class {
 
     const route = FlowRouter.basePath + this.pathDef;
     Picker.route(route, (params, req, res, next) => {
-      if (!this.isHtmlPage(req.url)) {
+      if (!this._isHtmlPage(req.url)) {
         return next();
       }
 
@@ -139,7 +139,7 @@ Route = class {
     return context;
   }
 
-  isHtmlPage(url) {
+  _isHtmlPage(url) {
     const pathname = Url.parse(url).pathname;
     const ext = pathname.split('.').slice(1).join('.');
 
