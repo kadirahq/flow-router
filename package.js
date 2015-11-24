@@ -64,7 +64,7 @@ function configure(api) {
   api.use('meteorhacks:fast-render@2.10.0', ['client', 'server']);
   api.use('cosmos:browserify@0.9.2', 'client');
   api.use('meteorhacks:picker@1.0.3', 'server');
-  api.use('meteorhacks:inject-data@1.3.0');
+  api.use('meteorhacks:inject-data@1.4.1');
 
   api.addFiles('client.browserify.js', 'client');
   api.addFiles('client/triggers.js', 'client');
