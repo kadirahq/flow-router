@@ -335,6 +335,10 @@ Router = class extends SharedRouter {
   
     this._askedToWait = true;
   }
+
+  _getCurrentRouteContext() {
+    return this._current;
+  }
 }
 
 // Implementing Reactive APIs
