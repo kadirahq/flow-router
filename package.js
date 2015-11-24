@@ -7,7 +7,7 @@ Package.describe({
 
 Npm.depends({
   'deepmerge': '0.2.10',
-  "connect": "2.13.0",
+  'cookie-parser': '1.4.0',
   'cheerio': '0.19.0',
   // In order to support IE9, we had to fork pagejs and apply
   // this PR: https://github.com/visionmedia/page.js/pull/288

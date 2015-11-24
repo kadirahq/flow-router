@@ -17,7 +17,8 @@ Route = class {
   }
 
   init() {
-    Picker.middleware(Npm.require('connect').cookieParser());
+    const cookieParser = Npm.require('cookie-parser');
+    Picker.middleware(cookieParser());
     // process null subscriptions with FR support
     Picker.middleware(FastRender.handleOnAllRoutes);
 
