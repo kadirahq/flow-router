@@ -1,10 +1,10 @@
 {
   "dependencies": {
     "page": {
-      "version": "https://github.com/kadirahq/page.js/archive/f29d4d4491178b285b9058c32d74975a4f945dea.tar.gz",
+      "version": "https://github.com/kadirahq/page.js/archive/34ddf45ea8e4c37269ce3df456b44fc0efc595c6.tar.gz",
       "dependencies": {
         "path-to-regexp": {
-          "version": "1.0.3",
+          "version": "1.2.1",
           "dependencies": {
             "isarray": {
               "version": "0.0.1"
@@ -14,7 +14,7 @@
       }
     },
     "qs": {
-      "version": "3.1.0"
+      "version": "5.2.0"
     }
   }
 }
