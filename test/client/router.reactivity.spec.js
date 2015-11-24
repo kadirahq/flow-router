@@ -124,7 +124,7 @@ function(test, done) {
 });
 
 Tinytest.addAsync(
-'Client - Router - Reactivity - reactive chnages and trigger redirects',
+'Client - Router - Reactivity - reactive changes and trigger redirects',
 function(test, done) {
   var name1 = Random.id();
   var route1 = "/" + name1;
