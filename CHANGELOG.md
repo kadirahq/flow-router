@@ -1,4 +1,4 @@
-# Change Log
+# Changelog
 
 ### v.NEXT
 
@@ -100,7 +100,7 @@
 
 ### v1.18.0
 
-* Implement idempotant routing on withReplaceState. See [#197](https://github.com/meteorhacks/flow-router/issues/197)
+* Implement idempotent routing on withReplaceState. See: [#197](https://github.com/meteorhacks/flow-router/issues/197)
 * Add an [API](https://github.com/meteorhacks/flow-router#flowrouterwithtrailingslashfn) to set trailing slashes.
 
 ### v1.17.2
@@ -145,7 +145,7 @@
 * Bring browserify back with the updated version of `cosmos:browserify` which fixes some size issues. See [more info](https://github.com/meteorhacks/flow-router/issues/128#issuecomment-109799953).
 
 ### v1.13.0
-* Remove browserified pagejs and qs dependancy loading. With that we could reduce ~10kb of data size. (without compression) We can look for a bower integration future. For now, here are the dependancies we have.
+* Remove browserified pagejs and qs dependency loading. With that we could reduce ~10kb of data size (without compression). We can look for a bower integration in the future. For now, here are the dependencies we have.
     - page@1.6.3: https://github.com/visionmedia/page.js
     - qs@3.1.0: https://github.com/hapijs/qs
 
@@ -167,7 +167,7 @@ Fix [#120](https://github.com/meteorhacks/flow-router/issues/120) and added call
 
 ### v1.8.0
 
-This relase comes with improvements to the reactive API.
+This release comes with improvements to the reactive API.
 
 * Fixed [#77](https://github.com/meteorhacks/flow-router/issues/77), [#85](https://github.com/meteorhacks/flow-router/issues/85), [#95](https://github.com/meteorhacks/flow-router/issues/95), [#96](https://github.com/meteorhacks/flow-router/issues/96), [#103](https://github.com/meteorhacks/flow-router/issues/103)
 * Add a new API called `FlowRouter.watchPathChange()`

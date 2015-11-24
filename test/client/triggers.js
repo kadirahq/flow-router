@@ -256,7 +256,7 @@ function(test, done) {
 });
 
 Tinytest.addAsync(
-'Triggers - applyFilters - unsupporeted filter',
+'Triggers - applyFilters - unsupported filter',
 function(test, done) {
   var original = [];
   try {
