@@ -168,7 +168,7 @@ Route = class {
   _cachePage(url, data, timeout) {
     const existingInfo = this._cache[url];
     if(existingInfo) {
-      clearTimeout(existingInfo.timeoutHandle);
+      throw new Error(`Cannot cache a existing cahced page: ${url}`);
     }
 
     const info = {
