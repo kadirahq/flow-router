@@ -74,14 +74,14 @@ Route = class {
       if(typeof data === 'string') {
         const head = ssrContext.getHead();
         if(head && head.trim() !== "") {
-          data = data.replace('</head>', head + '\n</head>');
+          data = data.replace(`</head>${head}\n</head>`);
         }
 
-        const reactRoot = ssrContext.getHtml();
+        const body = ssrContext.getHtml();
         if (self._router.deferScriptLoading) {
           data = self._moveScriptsToBottom(data);
         }
-        data = data.replace('<body>', '<body>' + reactRoot);
+        data = data.replace('<body>', `<body>\n${body}`);
 
         const pageInfo = {
           frData: res.getData("fast-render-data"),
