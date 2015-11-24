@@ -24,9 +24,9 @@ const originalFind = Mongo.Collection.prototype.find;
 
 Mongo.Collection.prototype.find = function (selector, options) {
   selector = selector || {};
-  const collName = this._name;
   const ssrContext = FlowRouter.ssrContext.get();
   if (ssrContext && !FlowRouter.inSubscription.get()) {
+    const collName = this._name;
     const collection = ssrContext.getCollection(collName);
     const cursor = collection.find(selector, options);
     return cursor;

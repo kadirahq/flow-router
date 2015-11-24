@@ -65,7 +65,7 @@ Tinytest.addAsync('Client - Group - set and retrieve group name', function (test
 
   FlowRouter.go('/' + rand);
   setTimeout(function() {
-    test.isTrue(FlowRouter.current().route.group.name === name);
+    test.equal(FlowRouter.current().route.group.name, name);
     next();
   }, 100);
 });

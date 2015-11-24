@@ -1,5 +1,7 @@
-Router = class {
+Router = class extends SharedRouter {
   constructor() {
+    super();
+
     this.globals = [];
   
     this._current = {};
@@ -9,9 +11,6 @@ Router = class {
   
     this._globalRoute = new Route(this);
   
-    // holds onRoute callbacks
-    this._onRouteCallbacks = [];
-  
     // if _askedToWait is true. We don't automatically start the router
     // in Meteor.startup callback. (see client/_init.js)
     // Instead user need to call `.initialize()
@@ -19,8 +18,6 @@ Router = class {
     this._initialized = false;
     this._triggersEnter = [];
     this._triggersExit = [];
-    this._routes = [];
-    this._routesMap = {};
     this._updateCallbacks();
     this.notFound = this.notfound = null;
   
@@ -46,24 +43,19 @@ Router = class {
         const message = "Redirects to URLs outside of the app are not supported in this version of Flow Router. Use 'window.location = yourUrl' instead";
         throw new Error(message);
       }
+
       this.withReplaceState(() => {
         const path = FlowRouter.path(pathDef, fields, queryParams);
         this._page.redirect(path);
       });
     };
+
     this._initTriggersAPI();
   }
   
   route(pathDef, options, group) {
-    if (!/^\/.*/.test(pathDef)) {
-      const message = "route's path must start with '/'";
-      throw new Error(message);
-    }
-  
-    options = options || {};
+    const route = super.route(pathDef, options, group);
 
-    const route = new Route(this, pathDef, options, group);
-  
     // calls when the page route being activates
     route._actionHandle = (context, next) => {
       const oldRoute = this._current.route;
@@ -113,67 +105,9 @@ Router = class {
       );
     };
   
-    this._routes.push(route);
-    if (options.name) {
-      this._routesMap[options.name] = route;
-    }
-  
     this._updateCallbacks();
-    this._triggerRouteRegister(route);
   
     return route;
-  }
-  
-  group(options) {
-    return new Group(this, options);
-  }
-  
-  path(pathDef, fields, queryParams) {
-    if (this._routesMap[pathDef]) {
-      pathDef = this._routesMap[pathDef].pathDef;
-    }
-  
-    let path = "";
-  
-    // Prefix the path with the router global prefix
-    if (this._basePath) {
-      path += "/" + this._basePath + "/";
-    }
-  
-    fields = fields || {};
-    const regExp = /(:[\w\(\)\\\+\*\.\?]+)+/g;
-    path += pathDef.replace(regExp, (key) => {
-      let firstRegexpChar = key.indexOf("(");
-      // get the content behind : and (\\d+/)
-      key = key.substring(1, (firstRegexpChar > 0) ? firstRegexpChar : undefined);
-      // remove +?*
-      key = key.replace(/[\+\*\?]+/g, "");
-  
-      // this is to allow page js to keep the custom characters as it is
-      // we need to encode 2 times otherwise "/" char does not work properly
-      // So, in that case, when I includes "/" it will think it's a part of the
-      // route. encoding 2times fixes it
-      return encodeURIComponent(encodeURIComponent(fields[key] || ""));
-    });
-  
-    // Replace multiple slashes with single slash
-    path = path.replace(/\/\/+/g, "/");
-  
-    // remove trailing slash
-    // but keep the root slash if it's the only one
-    path = path.match(/^\/{1}$/) ? path : path.replace(/\/$/, "");
-  
-    // explictly asked to add a trailing slash
-    if (this.env.trailingSlash.get() && _.last(path) !== "/") {
-      path += "/";
-    }
-  
-    const strQueryParams = this._qs.stringify(queryParams || {});
-    if(strQueryParams) {
-      path += "?" + strQueryParams;
-    }
-  
-    return path;
   }
   
   go(pathDef, fields, queryParams) {
@@ -236,19 +170,6 @@ Router = class {
     const params = this._current.params;
     this.go(pathDef, params, queryParams);
     return true;
-  }
-  
-  // .current is not reactive
-  // This is by design. use .getParam() instead
-  // If you really need to watch the path change, use .watchPathChange()
-  current() {
-    // We can't trust outside, that's why we clone this
-    // Anyway, we can't clone the whole object since it has non-jsonable values
-    // That's why we clone what's really needed.
-    const current = _.clone(this._current);
-    current.queryParams = EJSON.clone(current.queryParams);
-    current.params = EJSON.clone(current.params);
-    return current;
   }
   
   withReplaceState(fn) {
@@ -414,33 +335,16 @@ Router = class {
   
     this._askedToWait = true;
   }
-  
-  onRouteRegister(cb) {
-    this._onRouteCallbacks.push(cb);
-  }
-  
-  _triggerRouteRegister(currentRoute) {
-    // We should only need to send a safe set of fields on the route
-    // object.
-    // This is not to hide what's inside the route object, but to show
-    // these are the public APIs
-    const routePublicApi = _.pick(currentRoute, 'name', 'pathDef', 'path');
-    const omittingOptionFields = [
-      'triggersEnter', 'triggersExit', 'action', 'name'
-    ];
-    routePublicApi.options = _.omit(currentRoute.options, omittingOptionFields);
-  
-    this._onRouteCallbacks.forEach((cb) => {
-      cb(routePublicApi);
-    });
-  }
 }
 
 // Implementing Reactive APIs
 const reactiveApis = [
-  'getParam', 'getQueryParam',
-  'getRouteName', 'watchPathChange'
+  'getParam',
+  'getQueryParam',
+  'getRouteName',
+  'watchPathChange'
 ];
+
 reactiveApis.forEach((api) => {
   Router.prototype[api] = function (arg1) {
     // when this is calling, there may not be any route initiated
