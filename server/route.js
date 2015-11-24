@@ -33,9 +33,7 @@ Route = class {
       }
 
       const processFromSsr = this._processFromSsr.bind(this, params, req, res);
-      FastRender.handleRoute(processFromSsr, params, req, res, (data) => {
-        next();
-      });
+      FastRender.handleRoute(processFromSsr, params, req, res, next);
     });
   }
 
