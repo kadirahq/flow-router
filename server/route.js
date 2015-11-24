@@ -42,10 +42,10 @@ Route = class {
   _processFromSsr(params, req, res) {
     const self = this;
     const ssrContext = new SsrContext();
-    const context = self._buildContext(req, params);
+    const routeContext = self._buildContext(req, params);
 
     self._router.ssrContext.withValue(ssrContext, () => {
-      self._router.currentRoute.withValue(context, () => {
+      self._router.currentRouteContext.withValue(routeContext, () => {
         try {
           // get the data for null subscriptions and add them to the
           // ssrContext
@@ -55,10 +55,12 @@ Route = class {
           }
 
           if(self.options.action) {
-            self.options.action.call(self, context.params, context.queryParams);
+            self.options.action.call(
+              self, routeContext.params, routeContext.queryParams
+            );
           }
         } catch(ex) {
-          console.error("Error when doing SSR. path:", req.url, " ", ex.message);
+          console.error(`Error when doing SSR. path:${req.url}: ${ex.message}`);
           console.error(ex.stack);
         }
       });
