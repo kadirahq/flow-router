@@ -45,7 +45,7 @@ Route = class {
     const routeContext = self._buildContext(req, params);
 
     self._router.ssrContext.withValue(ssrContext, () => {
-      self._router.currentRouteContext.withValue(routeContext, () => {
+      self._router.routeContext.withValue(routeContext, () => {
         try {
           // get the data for null subscriptions and add them to the
           // ssrContext

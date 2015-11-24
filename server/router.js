@@ -7,7 +7,7 @@ Router = class {
     this.subscriptions = Function.prototype;
     this.ssrContext = new Meteor.EnvironmentVariable();
     this.inSubscription = new Meteor.EnvironmentVariable();
-    this.currentRouteContext = new Meteor.EnvironmentVariable();
+    this.routeContext = new Meteor.EnvironmentVariable();
     this.pageCacheTimeout = 1000 * 30;
 
     // holds onRoute callbacks
@@ -104,7 +104,7 @@ Router = class {
     // We can't trust outside, that's why we clone this
     // Anyway, we can't clone the whole object since it has non-jsonable values
     // That's why we clone what's really needed.
-    const current = _.clone(this.currentRouteContext.get());
+    const current = _.clone(this.routeContext.get());
     current.queryParams = EJSON.clone(current.queryParams);
     current.params = EJSON.clone(current.params);
     return current;
