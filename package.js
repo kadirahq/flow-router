@@ -8,8 +8,8 @@ Package.describe({
 Npm.depends({
   // In order to support IE9, we had to fork pagejs and apply
   // this PR: https://github.com/visionmedia/page.js/pull/288
-  'page':'https://github.com/kadirahq/page.js/archive/34ddf45ea8e4c37269ce3df456b44fc0efc595c6.tar.gz',
-  'qs':'5.2.0'
+  'page':'https://github.com/kadirahq/page.js/archive/f29d4d4491178b285b9058c32d74975a4f945dea.tar.gz',
+  'qs':'3.1.0'
 });
 
 Package.onUse(function(api) {
@@ -62,7 +62,7 @@ function configure(api) {
   api.use('ejson');
 
   api.use('meteorhacks:fast-render@2.10.0', ['client', 'server'], {weak: true});
-  api.use('cosmos:browserify@0.9.2', 'client');
+  api.use('cosmos:browserify@0.5.0', 'client');
 
   api.addFiles('client.browserify.js', 'client');
   api.addFiles('client/triggers.js', 'client');
