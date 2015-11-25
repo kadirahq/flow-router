@@ -332,6 +332,13 @@ Router = class extends SharedRouter {
   _getCurrentRouteContext() {
     return this._current;
   }
+
+  // reactive apis, defined below
+  
+  // getParam() {}
+  // getQueryParam() {}
+  // getRouteName() {}
+  // watchPathChange() {}
 }
 
 // Implementing Reactive APIs
