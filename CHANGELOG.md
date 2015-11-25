@@ -1,5 +1,8 @@
 # Changelog
 
+### v2.10.0
+* Update few dependencies to the latest versions: pagejs, qs, cosmos:browserify
+
 ### v2.9.0
 * Add FlowRouter.url() See: [#374](https://github.com/kadirahq/flow-router/pull/374)
 
