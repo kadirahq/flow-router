@@ -27,8 +27,6 @@ Group = class extends SharedGroup {
     const triggersExit = options.triggersExit || [];
     options.triggersExit = triggersExit.concat(this._triggersExit);
 
-    group = group || this;
-
     return super.route(pathDef, options, group);
   }
 
