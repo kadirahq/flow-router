@@ -1,6 +1,6 @@
 Route = class extends SharedRoute {
   constructor(router, pathDef, options, group) {
-    super(router, pathDef, options);
+    super(router, pathDef, options, group);
 
     options = options || {};
 
@@ -13,8 +13,6 @@ Route = class extends SharedRoute {
 
     // tracks the changes in the URL
     this._pathChangeDep = new Tracker.Dependency();
-
-    this.group = group;
   }
 
   callAction(current) {

@@ -2,8 +2,8 @@ const Url = Npm.require('url');
 const Cheerio = Npm.require('cheerio');
 
 Route = class extends SharedRoute {
-  constructor(router, pathDef, options) {
-    super(router, pathDef, options);
+  constructor(router, pathDef, options, group) {
+    super(router, pathDef, options, group);
 
     this._cache = {};
   }
