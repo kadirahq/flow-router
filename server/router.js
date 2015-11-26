@@ -47,10 +47,6 @@ Router = class extends SharedRouter {
     }
   }
 
-  watchPathChange() {
-
-  }
-
   setDeferScriptLoading(defer) {
     this.deferScriptLoading = defer;
   }

@@ -31,11 +31,8 @@ Router = class extends SharedRouter {
     // but when it's the time for a trigger redirect we've a chain
     this._oldRouteChain = [];
   
-    this.env = {
-      replaceState: new Meteor.EnvironmentVariable(),
-      reload: new Meteor.EnvironmentVariable(),
-      trailingSlash: new Meteor.EnvironmentVariable()
-    };
+    this.env.replaceState = new Meteor.EnvironmentVariable();
+    this.env.reload = new Meteor.EnvironmentVariable();
   
     // redirect function used inside triggers
     this._redirectFn = (pathDef, fields, queryParams) => {
@@ -175,11 +172,7 @@ Router = class extends SharedRouter {
   withReplaceState(fn) {
     return this.env.replaceState.withValue(true, fn);
   }
-  
-  withTrailingSlash(fn) {
-    return this.env.trailingSlash.withValue(true, fn);
-  }
-  
+
   _notfoundRoute(context) {
     this._current = {
       path: context.path,
@@ -339,6 +332,13 @@ Router = class extends SharedRouter {
   _getCurrentRouteContext() {
     return this._current;
   }
+
+  // reactive apis, defined below
+  
+  // getParam() {}
+  // getQueryParam() {}
+  // getRouteName() {}
+  // watchPathChange() {}
 }
 
 // Implementing Reactive APIs
