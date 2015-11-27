@@ -18,3 +18,36 @@ function(test, done) {
   test.equal(collection1, collection2);
   done();
 });
+
+
+Tinytest.addAsync(
+'SSR Context - body - should add and get body',
+function(test, done) {
+  var ssrContext = new SsrContext();
+
+  var html1 = "<p>Sample <em>Html</em> Strings</p>";
+  ssrContext.setHtml(html1);
+  var html2 = ssrContext.getHtml();
+
+  test.equal(html1, html2);
+  done();
+});
+
+Tinytest.addAsync(
+'SSR Context - body - should override existing body',
+function(test, done) {
+  var ssrContext = new SsrContext();
+
+  var body = '<p>Sample <em>Html</em> Strings</p>';
+  ssrContext.setHtml(body);
+  var existingBody = ssrContext.getHtml();
+
+  test.equal(body, existingBody);
+
+  var bodyToOverride = '<div>Demo HTML Content</div>';
+  ssrContext.setHtml(bodyToOverride);
+  var existingBody = ssrContext.getHtml();
+
+  test.equal(bodyToOverride, existingBody);
+  done();
+});
