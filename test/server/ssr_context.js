@@ -51,3 +51,39 @@ function(test, done) {
   test.equal(bodyToOverride, existingBody);
   done();
 });
+
+Tinytest.addAsync(
+'SSR Context - head - should get the existing head',
+function(test, done) {
+  var ssrContext = new SsrContext();
+
+  var headHtml = '<h1>Head</h1>';
+  ssrContext.addToHead(headHtml);
+  var existingHead = ssrContext.getHead();
+  var expectedHead = '\n' + headHtml;
+
+  test.equal(expectedHead, existingHead);
+  done();
+});
+
+Tinytest.addAsync(
+'SSR Context - head - should append to the existing head',
+function(test, done) {
+  var ssrContext = new SsrContext();
+
+  var headHtml = '<h1>Head</h1>';
+  ssrContext.addToHead(headHtml);
+  var existingHead = ssrContext.getHead();
+  var expectedHead = '\n' + headHtml;
+  
+  test.equal(expectedHead, existingHead);
+
+  var headHtmlToAppend = '<h2>Head 2</h2>';
+  ssrContext.addToHead(headHtmlToAppend);
+  var existingHead = ssrContext.getHead();
+  var expectedHead = expectedHead + '\n' + headHtmlToAppend;
+
+  test.equal(expectedHead, existingHead);
+
+  done();
+});
