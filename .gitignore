@@ -1,3 +1,5 @@
 .build*
 *.browserify.js.cached
 *.browserify.js.map
+node_modules/
+npm-debug.log
