@@ -2,6 +2,9 @@ Router = class extends SharedRouter {
   constructor() {
     super();
 
+    this._qs = qs;
+    this._page = page;
+    
     this.globals = [];
   
     this._current = {};
@@ -364,6 +367,3 @@ reactiveApis.forEach((api) => {
     return currentRoute[api].call(currentRoute, arg1);
   };
 });
-
-Router.prototype._page = page;
-Router.prototype._qs = qs;
