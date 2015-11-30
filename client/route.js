@@ -15,6 +15,12 @@ Route = class extends SharedRoute {
     this._pathChangeDep = new Tracker.Dependency();
   }
 
+  // This is a required method for the route. It's crucial to 
+  // have a dummy method even we don't need it.
+  _init() {
+
+  }
+
   callAction(current) {
     this._action(current.params, current.queryParams);
   }

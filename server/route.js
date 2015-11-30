@@ -8,7 +8,7 @@ Route = class extends SharedRoute {
     this._cache = {};
   }
 
-  init() {
+  _init() {
     const cookieParser = Npm.require('cookie-parser');
     Picker.middleware(cookieParser());
     // process null subscriptions with FR support
