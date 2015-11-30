@@ -1,9 +1,11 @@
 # Changelog
 
-### v.NEXT
+### v3.7.0
 
 * Remove subscription registration from the router
 * Remove internal tracker and apply route changes immediately. With this change, we don't use `Track.flush()`. That'll fix a lot of runtime issues.
+* Code is now written ES2015.
+* A lot of refactoring in the code base for SSR and isomorphich functionalities.
 
 ### v3.6.0
 * Get features from v2.9.0
