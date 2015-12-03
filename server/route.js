@@ -67,7 +67,7 @@ Route = class extends SharedRoute {
       if(typeof data === 'string') {
         const head = ssrContext.getHead();
         if(head && head.trim() !== "") {
-          data = data.replace(`</head>${head}\n</head>`);
+          data = data.replace('</head>', `${head}\n</head>`);
         }
 
         const body = ssrContext.getHtml();
