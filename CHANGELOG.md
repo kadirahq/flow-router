@@ -1,5 +1,8 @@
 # Changelog
 
+### v3.7.1
+* Fix a bug related to head injection. See: [#434](https://github.com/kadirahq/flow-router/pull/434)
+
 ### v3.7.0
 
 * Remove subscription registration from the router
