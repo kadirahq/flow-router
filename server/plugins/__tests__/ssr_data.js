@@ -110,4 +110,44 @@ describe('SSR Data', () => {
       });
     });
   });
+
+  context('Meteor.call', () => {
+    context('with a SSR Context', () => {
+      it('should call the method with the SSR Context', () => {
+        const methodName = Random.id();
+        const ssrContext = new SsrContext();
+
+        Meteor.methods({
+          [methodName]: (a, b) => {
+            expect(FlowRouter.ssrContext.get()).to.be.null;
+            return a + b;
+          }
+        });
+
+        FlowRouter.ssrContext.withValue(ssrContext, () => {
+          const result = Meteor.call(methodName, 10, 20);
+          expect(result).to.be.equal(30);
+        });
+      });
+
+      it('should bind the original function with Meteor.bindEnvironemnt', done => {
+        const methodName = Random.id();
+        const ssrContext = new SsrContext();
+        const sampleEnv = new Meteor.EnvironmentVariable();
+
+        Meteor.methods({
+          [methodName]: () => {
+            expect(sampleEnv.get()).to.be.true;
+            done();
+          }
+        });
+
+        sampleEnv.withValue(true, () => {
+          FlowRouter.ssrContext.withValue(ssrContext, () => {
+            Meteor.call(methodName);
+          });
+        });
+      });
+    });
+  });
 });
