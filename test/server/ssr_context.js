@@ -71,4 +71,42 @@ describe('SSR Context', () => {
       expect(expectedHead).to.be.equal(existingHead);
     });
   });
+
+  context('addData', () => {
+    context('for each data chunk', () => {
+      it('should insert to the collection if there no existing item', () => {
+        const ssrContext = new SsrContext();
+        const collName = Random.id();
+        const collection = ssrContext.getCollection(collName);
+        expect(collection.find().count()).to.be.equal(0);
+
+        const data = {};
+        data[collName] = [
+          [{_id: '1', aa: 10}, {_id: '2', aa: 20}]
+        ];
+        ssrContext.addData(data);
+        expect(collection.find().fetch()).to.be.deep.equal(data[collName][0]);
+      });
+
+      it('should deepMerge and update if there is an item', () => {
+        const ssrContext = new SsrContext();
+        const collName = Random.id();
+        const collection = ssrContext.getCollection(collName);
+        collection.insert({_id: '1', aa: 10, bb: {cc: 10}});
+        expect(collection.find().count()).to.be.equal(1);
+
+        const data = {};
+        data[collName] = [
+          [{_id: '1', aa: 20, bb: {dd: 30}}]
+        ];
+        ssrContext.addData(data);
+        const expectedDoc = {
+          _id: '1',
+          aa: 20,
+          bb: {cc: 10, dd: 30}
+        };
+        expect(collection.find().fetch()).to.be.deep.equal([expectedDoc]);
+      });
+    });
+  });
 });
