@@ -16,19 +16,41 @@ Route = class extends SharedRoute {
     Picker.middleware(FastRender.handleOnAllRoutes);
 
     const route = FlowRouter.basePath + this.pathDef;
-    Picker.route(route, (params, req, res, next) => {
-      if (!this._isHtmlPage(req.url)) {
-        return next();
-      }
+    Picker.route(route, this._handleRoute.bind(this));
+  }
 
-      const cachedPage = this._getCachedPage(req.url);
-      if (cachedPage) {
-        return this._processFromCache(cachedPage, res, next);
-      }
+  _handleRoute(params, req, res, next) {
+    if (!this._isHtmlPage(req.url)) {
+      return next();
+    }
 
-      const processFromSsr = this._processFromSsr.bind(this, params, req, res);
-      FastRender.handleRoute(processFromSsr, params, req, res, next);
-    });
+    const cachedPage = this._getCachedPage(req.url);
+    if (cachedPage) {
+      return this._processFromCache(cachedPage, res, next);
+    }
+
+    // Here we need to processFromSsr, 
+    // but also we need to process with FastRender as well.
+    // That's why we bind processFromSsr and pass args as below.
+    // It does not get any arguments from FastRender. 
+    // FastRender just trigger the following handler and do it's job
+    const processFromSsr = this._processFromSsr.bind(this, params, req, res);
+    FastRender.handleRoute(processFromSsr, params, req, res, next);
+  }
+
+  _processFromCache(pageInfo, res, next) {
+    // Here we can't simply call res.write.
+    // That's because, the HTML we've cached does not have the 
+    // injected fast-render data.
+    // That's why we hijack the res.write and let FastRender to push 
+    // the frData we've cached.
+    const originalWrite = res.write;
+    res.write = function() {
+      originalWrite.call(this, pageInfo.html);
+    };
+
+    res.pushData('fast-render-data', pageInfo.frData);
+    next();
   }
 
   _processFromSsr(params, req, res) {
@@ -101,16 +123,6 @@ Route = class extends SharedRoute {
     $('head').html($('head').html().replace(/(^[ \t]*\n)/gm, ''));
 
     return $.html();
-  }
-
-  _processFromCache(pageInfo, res, next) {
-    const originalWrite = res.write;
-    res.write = function() {
-      originalWrite.call(this, pageInfo.html);
-    };
-
-    res.pushData('fast-render-data', pageInfo.frData);
-    next();
   }
 
   _buildContext(req, _params) {

@@ -328,4 +328,100 @@ describe('Route', () => {
       });
     });
   });
+
+  context('_processFromCache', () => {
+    it('should inject the cached html', done => {
+      const route = new Route();
+      const pageInfo = {html: 'the-html'};
+
+      const res = {
+        write: data => {
+          expect(data).to.be.equal(pageInfo.html);
+          done();
+        },
+        pushData: () => {}
+      };
+
+      route._processFromCache(pageInfo, res, () => {
+        res.write('');
+      });
+    });
+
+    it('should inject the frData', done => {
+      const route = new Route();
+      const pageInfo = {frData: {aa: 10}};
+
+      const res = {
+        pushData: (key, data) => {
+          expect(key).to.be.equal('fast-render-data');
+          expect(data).to.be.deep.equal(pageInfo.frData);
+          done();
+        }
+      };
+
+      route._processFromCache(pageInfo, res, () => {});
+    });
+  });
+
+  context('_handleRoute', () => {
+    context('not a html page', () => {
+      it('should simply call next', done => {
+        const route = new Route();
+        const req = {url: '/aa.jpg'};
+        route._handleRoute(null, req, null, done);
+      });
+    });
+
+    context('if the page is cahced', () => {
+      it('should process the cached page', done => {
+        const route = new Route();
+        const req = {url: '/aa.html'};
+        const res = {write: () => {}};
+        const next = () => {throw new Error('should not call next')};
+        const pageInfo = {aa: 10};
+
+        route._processFromCache = (c, r, n) => {
+          expect(c).to.be.deep.equal(pageInfo);
+          expect(r).to.be.equal(res);
+          expect(n).to.be.equal(next);
+          done();
+        };
+
+        // let's cache the page
+        route._cachePage(req.url, pageInfo, 100);
+        route._handleRoute(null, req, res, next);
+      });
+    });
+
+    context('otherwise', () => {
+      it('should handle SSR with FastRender', done => {
+        const route = new Route();
+        const req = {url: '/aa.html'};
+        const res = {write: () => {}};
+        const next = () => {throw new Error('should not call next')};
+        const pageInfo = {aa: 10};
+        const params = {};
+
+        const originalHandleRoute = FastRender.handleRoute;
+
+        route._processFromSsr = (_params, _req, _res) => {
+          expect(_params).to.be.equal(params);
+          expect(_req).to.be.equal(req);
+          expect(_res).to.be.equal(res);
+          done();
+        };
+        
+        FastRender.handleRoute = (processFromSsr, _params, _req, _res, _next) => {
+          expect(_params).to.be.equal(params);
+          expect(_req).to.be.equal(req);
+          expect(_res).to.be.equal(res);
+          expect(_next).to.be.equal(next);
+
+          processFromSsr();
+        };
+
+        route._handleRoute(params, req, res, next);
+      });
+    });
+  });
 });
