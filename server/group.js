@@ -1,2 +1,2 @@
 Group = class extends SharedGroup {
-}
+};

@@ -4,16 +4,16 @@ Router = class extends SharedRouter {
 
     this._qs = qs;
     this._page = page;
-    
+
     this.globals = [];
-  
+
     this._current = {};
-  
+
     // tracks the current path change
     this._onEveryPath = new Tracker.Dependency();
-  
+
     this._globalRoute = new Route(this);
-  
+
     // if _askedToWait is true. We don't automatically start the router
     // in Meteor.startup callback. (see client/_init.js)
     // Instead user need to call `.initialize()
@@ -23,20 +23,20 @@ Router = class extends SharedRouter {
     this._triggersExit = [];
     this._updateCallbacks();
     this.notFound = this.notfound = null;
-  
+
     // Meteor exposes to the client the path prefix that was defined using the
     // ROOT_URL environement variable on the server using the global runtime
     // configuration. See #315.
     this._basePath = __meteor_runtime_config__.ROOT_URL_PATH_PREFIX || '';
-  
+
     // this is a chain contains a list of old routes
     // most of the time, there is only one old route
     // but when it's the time for a trigger redirect we've a chain
     this._oldRouteChain = [];
-  
+
     this.env.replaceState = new Meteor.EnvironmentVariable();
     this.env.reload = new Meteor.EnvironmentVariable();
-  
+
     // redirect function used inside triggers
     this._redirectFn = (pathDef, fields, queryParams) => {
       if (/^http(s)?:\/\//.test(pathDef)) {
@@ -52,7 +52,7 @@ Router = class extends SharedRouter {
 
     this._initTriggersAPI();
   }
-  
+
   route(pathDef, options, group) {
     const route = super.route(pathDef, options, group);
 
@@ -60,7 +60,7 @@ Router = class extends SharedRouter {
     route._actionHandle = (context, next) => {
       const oldRoute = this._current.route;
       this._oldRouteChain.push(oldRoute);
-  
+
       let queryParams = this._qs.parse(context.querystring);
       // _qs.parse() gives us a object without prototypes,
       // created with Object.create(null)
@@ -68,7 +68,7 @@ Router = class extends SharedRouter {
       // So, we need to fix it by cloning it.
       // see more: https://github.com/meteorhacks/flow-router/issues/164
       queryParams = JSON.parse(JSON.stringify(queryParams));
-  
+
       this._current = {
         path: context.path,
         context: context,
@@ -77,14 +77,14 @@ Router = class extends SharedRouter {
         route: route,
         oldRoute: oldRoute
       };
-  
+
       // we need to invalidate if all the triggers have been completed
       // if not that means, we've been redirected to another path
       // then we don't need to invalidate
       const afterAllTriggersRan = () => {
         this._applyRoute();
       };
-  
+
       const triggers = this._triggersEnter.concat(route._triggersEnter);
       Triggers.runTriggers(
         triggers,
@@ -93,7 +93,7 @@ Router = class extends SharedRouter {
         afterAllTriggersRan
       );
     };
-  
+
     // calls when you exit from the page js route
     route._exitHandle = (context, next) => {
       const triggers = this._triggersExit.concat(route._triggersExit);
@@ -104,74 +104,74 @@ Router = class extends SharedRouter {
         next
       );
     };
-  
+
     this._updateCallbacks();
-  
+
     return route;
   }
-  
+
   go(pathDef, fields, queryParams) {
     const path = this.path(pathDef, fields, queryParams);
-  
+
     const useReplaceState = this.env.replaceState.get();
-    if(useReplaceState) {
+    if (useReplaceState) {
       this._page.replace(path);
     } else {
       this._page(path);
     }
   }
-  
+
   reload() {
     this.env.reload.withValue(true, () => {
       this._page.replace(this._current.path);
     });
   }
-  
+
   redirect(path) {
     this._page.redirect(path);
   }
-  
+
   setParams(newParams) {
     if (!this._current.route) {
       return false;
     }
-  
+
     const pathDef = this._current.route.pathDef;
     const existingParams = this._current.params;
     let params = {};
     Object.keys(existingParams).forEach((key) => {
       params[key] = existingParams[key];
     });
-  
+
     // _.extend(dst, src1, src2) can be replaced with Object.assign(dst, src1, src2) in ES2015
     params = Object.assign(params, newParams);
     const queryParams = this._current.queryParams;
-  
+
     this.go(pathDef, params, queryParams);
     return true;
   }
-  
+
   setQueryParams(newParams) {
     if (!this._current.route) {
       return false;
     }
-  
+
     const queryParams = _.clone(this._current.queryParams);
     // Object.assign can be used instead of _.extend
     Object.assign(queryParams, newParams);
-  
+
     for (let k in queryParams) {
       if (queryParams[k] === null || queryParams[k] === undefined) {
         delete queryParams[k];
       }
     }
-  
+
     const pathDef = this._current.route.pathDef;
     const params = this._current.params;
     this.go(pathDef, params, queryParams);
     return true;
   }
-  
+
   withReplaceState(fn) {
     return this.env.replaceState.withValue(true, fn);
   }
@@ -183,27 +183,27 @@ Router = class extends SharedRouter {
       params: [],
       queryParams: {},
     };
-  
+
     // XXX this.notfound kept for backwards compatibility
     this.notFound = this.notFound || this.notfound;
     if (!this.notFound) {
-      console.error("There is no route for the path:", context.path);
+      console.error('There is no route for the path:', context.path);
       return;
     }
-  
-    this._current.route = new Route(this, "*", this.notFound);
+
+    this._current.route = new Route(this, '*', this.notFound);
     this._applyRoute();
   }
-  
+
   initialize(options) {
     options = options || {};
-  
+
     if (this._initialized) {
-      throw new Error("FlowRouter is already initialized");
+      throw new Error('FlowRouter is already initialized');
     }
-  
+
     this._updateCallbacks();
-  
+
     // Implementing idempotent routing
     // by overriding page.js`s "show" method.
     // Why?
@@ -220,11 +220,11 @@ Router = class extends SharedRouter {
         if (!reload && this._current.path === path) {
           return;
         }
-  
+
         original.call(this, path, state, dispatch, push);
       };
     });
-  
+
     // this is very ugly part of pagejs and it does decoding few times
     // in unpredicatable manner. See #168
     // this is the defa_ult behaviour and we need keep it like that
@@ -234,36 +234,36 @@ Router = class extends SharedRouter {
       decodeURLComponents: true,
       hashbang: !!options.hashbang
     });
-  
+
     this._initialized = true;
   }
-  
+
   _applyRoute() {
     // see the definition of `this._processingContexts`
     const currentContext = this._current;
     const route = currentContext.route;
     const path = currentContext.path;
-  
+
     // otherwise, computations inside action will trigger to re-run
     // this computation. which we do not need.
     Tracker.nonreactive(() => {
       let isRouteChange = currentContext.oldRoute !== currentContext.route;
       const isFirstRoute = !currentContext.oldRoute;
       // first route is not a route change
-      if(isFirstRoute) {
+      if (isFirstRoute) {
         isRouteChange = false;
       }
-  
+
       // Clear oldRouteChain just before calling the action
       // We still need to get a copy of the oldestRoute first
       // It's very important to get the oldest route and registerRouteClose() it
       // See: https://github.com/kadirahq/flow-router/issues/314
       const oldestRoute = this._oldRouteChain[0];
       this._oldRouteChain = [];
-  
+
       currentContext.route.registerRouteChange(currentContext, isRouteChange);
       route.callAction(currentContext);
-  
+
       Tracker.afterFlush(() => {
         this._onEveryPath.changed();
         if (isRouteChange) {
@@ -271,7 +271,7 @@ Router = class extends SharedRouter {
           // So, we need to re-run all the register callbacks to current route
           // This is pretty important, otherwise tracker
           // can't identify new route's items
-  
+
           // We also need to afterFlush, otherwise this will re-run
           // helpers on templates which are marked for destroying
           if (oldestRoute) {
@@ -281,11 +281,11 @@ Router = class extends SharedRouter {
       });
     });
   }
-  
+
   _updateCallbacks() {
     this._page.callbacks = [];
     this._page.exits = [];
-  
+
     this._routes.forEach((route) => {
       this._page(route.pathDef, route._actionHandle);
       this._page.exit(route.pathDef, (context, next) => {
@@ -295,17 +295,17 @@ Router = class extends SharedRouter {
         if (this._oldExitPath === context.path) {
           return next();
         }
-  
+
         this._oldExitPath = context.path;
         route._exitHandle(context, next);
       });
     });
-  
-    this._page("*", (context) => {
+
+    this._page('*', (context) => {
       this._notfoundRoute(context);
     });
   }
-  
+
   _initTriggersAPI() {
     this.triggers = {
       enter: (triggers, filter) => {
@@ -314,7 +314,7 @@ Router = class extends SharedRouter {
           this._triggersEnter = this._triggersEnter.concat(triggers);
         }
       },
-  
+
       exit: (triggers, filter) => {
         triggers = Triggers.applyFilters(triggers, filter);
         if (triggers.length) {
@@ -323,12 +323,12 @@ Router = class extends SharedRouter {
       }
     };
   }
-  
+
   wait() {
     if (this._initialized) {
       throw new Error("can't wait after FlowRouter has been initialized");
     }
-  
+
     this._askedToWait = true;
   }
 
@@ -337,12 +337,12 @@ Router = class extends SharedRouter {
   }
 
   // reactive apis, defined below
-  
+
   // getParam() {}
   // getQueryParam() {}
   // getRouteName() {}
   // watchPathChange() {}
-}
+};
 
 // Implementing Reactive APIs
 const reactiveApis = [
@@ -353,11 +353,11 @@ const reactiveApis = [
 ];
 
 reactiveApis.forEach((api) => {
-  Router.prototype[api] = function (arg1) {
+  Router.prototype[api] = function(arg1) {
     // when this is calling, there may not be any route initiated
     // so we need to handle it
     const currentRoute = this._current.route;
-    if(!currentRoute) {
+    if (!currentRoute) {
       this._onEveryPath.depend();
       return;
     }

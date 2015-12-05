@@ -15,7 +15,7 @@ Route = class extends SharedRoute {
     this._pathChangeDep = new Tracker.Dependency();
   }
 
-  // This is a required method for the route. It's crucial to 
+  // This is a required method for the route. It's crucial to
   // have a dummy method even we don't need it.
   _init() {
 
@@ -64,9 +64,9 @@ Route = class extends SharedRoute {
     // if we did this, old route's path watchers will detect this
     // Real issue is, above watcher will get removed with the new route
     // So, we don't need to trigger it now
-    // We are doing it on the route close event. So, if they exists they'll 
+    // We are doing it on the route close event. So, if they exists they'll
     // get notify that
-    if(!routeChanging) {
+    if (!routeChanging) {
       this._pathChangeDep.changed();
     }
   }
@@ -86,4 +86,4 @@ Route = class extends SharedRoute {
       dict.set(key, undefined);
     });
   }
-}
+};

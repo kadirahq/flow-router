@@ -23,26 +23,26 @@ Router = class extends SharedRouter {
       exit: function() {
         // client only
       }
-    }
+    };
   }
 
   getParam(key) {
     const current = this.current();
-    if(current) {
+    if (current) {
       return current.params[key];
     }
   }
 
   getQueryParam(key) {
     const current = this.current();
-    if(current) {
+    if (current) {
       return current.queryParams[key];
     }
   }
 
   getRouteName() {
     const current = this.current();
-    if(current) {
+    if (current) {
       return current.route.name;
     }
   }
@@ -58,4 +58,4 @@ Router = class extends SharedRouter {
   _getCurrentRouteContext() {
     return this.routeContext.get();
   }
-}
+};
