@@ -10,7 +10,7 @@ Router = class extends SharedRouter {
     this.ssrContext = new Meteor.EnvironmentVariable();
     this.inSubscription = new Meteor.EnvironmentVariable();
     this.routeContext = new Meteor.EnvironmentVariable();
-
+    
     this.pageCacheTimeout = 1000 * 30;
 
     // holds onRoute callbacks
@@ -24,6 +24,17 @@ Router = class extends SharedRouter {
         // client only
       }
     };
+  }
+
+  redirect(pathDef, params, queryParams) {
+    const url = this.path(pathDef, params, queryParams);
+
+    const ssrContext = this.ssrContext.get();
+    if(!ssrContext) {
+      throw new Error('Cannot redirect without a SSR Context');
+    }
+
+    ssrContext.redirect(url);
   }
 
   getParam(key) {

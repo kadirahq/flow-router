@@ -77,6 +77,16 @@ Route = class extends SharedRoute {
         }
       });
 
+      const redirectInfo = ssrContext.getRedirectInfo();
+      if (redirectInfo) {
+        res.writeHead(redirectInfo.statusCode, {'Location': redirectInfo.url});
+        res.end();
+        // We need to ask FastRender to stop processing after redirected.
+        // otherwise, it'll try to add headers again.
+        FastRender.frContext.get().stop = true;
+        return;
+      }
+
       self._injectHtml(req, res, ssrContext);
     });
   }

@@ -5,6 +5,7 @@ SsrContext = class {
     this._html = '';
     this._head = '';
     this._collections = {};
+    this._redirectInfo = null;
   }
 
   getCollection(collName) {
@@ -31,6 +32,18 @@ SsrContext = class {
 
   getHead() {
     return this._head;
+  }
+
+  redirect(url, statusCode = 302) {
+    if(this._redirectInfo) {
+      throw new Error(`Already redirected to: ${this._redirectInfo.url}`);
+    }
+
+    this._redirectInfo = {url, statusCode};
+  }
+
+  getRedirectInfo() {
+    return _.clone(this._redirectInfo);
   }
 
   addSubscription(name, params) {
