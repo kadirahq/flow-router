@@ -1,6 +1,6 @@
 const originalSubscribe = Meteor.subscribe;
 
-Meteor.subscribe = function (pubName) {
+Meteor.subscribe = function(pubName) {
   const params = Array.prototype.slice.call(arguments, 1);
 
   const ssrContext = FlowRouter.ssrContext.get();
@@ -13,16 +13,16 @@ Meteor.subscribe = function (pubName) {
   if (originalSubscribe) {
     originalSubscribe.apply(this, arguments);
   }
-  
+
   return {
     ready: () => true
   };
 };
 
-const Mongo = Package['mongo'].Mongo;
+const Mongo = Package.mongo.Mongo;
 const originalFind = Mongo.Collection.prototype.find;
 
-Mongo.Collection.prototype.find = function (selector, options) {
+Mongo.Collection.prototype.find = function(selector, options) {
   selector = selector || {};
   const ssrContext = FlowRouter.ssrContext.get();
   if (ssrContext && !FlowRouter.inSubscription.get()) {
@@ -35,7 +35,7 @@ Mongo.Collection.prototype.find = function (selector, options) {
   return originalFind.call(this, selector, options);
 };
 
-Mongo.Collection.prototype.findOne = function (selector, options) {
+Mongo.Collection.prototype.findOne = function(selector, options) {
   options = options || {};
   options.limit = 1;
   return this.find(selector, options).fetch()[0];
@@ -44,15 +44,15 @@ Mongo.Collection.prototype.findOne = function (selector, options) {
 const originalAutorun = Tracker.autorun;
 
 Tracker.autorun = (fn) => {
-  // if autorun is in the ssrContext, we need fake and run the callback 
+  // if autorun is in the ssrContext, we need fake and run the callback
   // in the same eventloop
   if (FlowRouter.ssrContext.get()) {
     const c = { firstRun: true, stop: () => {} };
     fn(c);
     return c;
-  } else {
-    return originalAutorun.call(Tracker, fn);
   }
+
+  return originalAutorun.call(Tracker, fn);
 };
 
 // By default, Meteor[call,apply] also inherit SsrContext

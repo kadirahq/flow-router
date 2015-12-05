@@ -1,0 +1,34 @@
+{
+  "extends": [".eslintrc-meteor"],
+  "rules": {
+    "meteor/no-blaze-lifecycle-assignment": 2,
+    "meteor/no-zero-timeout": 2,
+    "meteor/audit-argument-checks": 2,
+    "meteor/core": 2,
+    "meteor/pubsub": 2,
+    "meteor/methods": 2,
+    "meteor/check": 2,
+    "meteor/connections": 2,
+    "meteor/collections": 2,
+    "meteor/session": 2
+  },
+
+  "plugins": ["meteor"],
+
+  "globals": {
+    "FlowRouter": true,
+    "Router": true,
+    "Route": true,
+    "Group": true,
+    "SharedRouter": true,
+    "SharedRoute": true,
+    "SharedGroup": true,
+    "Triggers": true,
+    "SsrContext": true,
+    "FastRender": true,
+    "Picker": true,
+    "__meteor_runtime_config__": true,
+    "qs": true,
+    "page": true
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "name": "flow-router",
+  "description": "Carefully Designed Client Side Router for Meteor.",
+  "scripts": {
+    "test": "npm run lint && npm run testonly",
+    "testonly": "spacejam test-packages ./ --port 9001",
+    "lint": "node_modules/eslint/bin/eslint.js ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kadirahq/flow-router.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kadirahq/flow-router/issues"
+  },
+  "homepage": "https://kadira.io/academy/meteor-routing-guide/",
+  "devDependencies": {
+    "babel-eslint": "^4.1.6",
+    "eslint": "^1.9.0",
+    "eslint-plugin-meteor": "^1.7.0",
+    "spacejam": "^1.3.0"
+  }
+}

@@ -1,5 +1,6 @@
 const Url = Npm.require('url');
 const Cheerio = Npm.require('cheerio');
+const logger = console;
 
 Route = class extends SharedRoute {
   constructor(router, pathDef, options, group) {
@@ -40,19 +41,19 @@ Route = class extends SharedRoute {
         try {
           // get the data for null subscriptions and add them to the
           // ssrContext
-          const frData = res.getData("fast-render-data");
-          if(frData) {
+          const frData = res.getData('fast-render-data');
+          if (frData) {
             ssrContext.addData(frData.collectionData);
           }
 
-          if(self.options.action) {
+          if (self.options.action) {
             self.options.action.call(
               self, routeContext.params, routeContext.queryParams
             );
           }
-        } catch(ex) {
-          console.error(`Error when doing SSR. path:${req.url}: ${ex.message}`);
-          console.error(ex.stack);
+        } catch (ex) {
+          logger.error(`Error when doing SSR. path:${req.url}: ${ex.message}`);
+          logger.error(ex.stack);
         }
       });
 
@@ -63,10 +64,10 @@ Route = class extends SharedRoute {
   _injectHtml(req, res, ssrContext) {
     const self = this;
     const originalWrite = res.write;
-    res.write = function (data) {
-      if(typeof data === 'string') {
+    res.write = function(data) {
+      if (typeof data === 'string') {
         const head = ssrContext.getHead();
-        if(head && head.trim() !== "") {
+        if (head && head.trim() !== '') {
           data = data.replace('</head>', `${head}\n</head>`);
         }
 
@@ -77,12 +78,12 @@ Route = class extends SharedRoute {
         data = data.replace('<body>', `<body>\n${body}`);
 
         const pageInfo = {
-          frData: res.getData("fast-render-data"),
+          frData: res.getData('fast-render-data'),
           html: data
         };
 
         // cache the page if mentioned a timeout
-        if(self._router.pageCacheTimeout) {
+        if (self._router.pageCacheTimeout) {
           self._cachePage(req.url, pageInfo, self._router.pageCacheTimeout);
         }
       }
@@ -106,9 +107,9 @@ Route = class extends SharedRoute {
 
   _processFromCache(pageInfo, res, next) {
     const originalWrite = res.write;
-    res.write = function (data) {
+    res.write = function() {
       originalWrite.call(this, pageInfo.html);
-    }
+    };
 
     res.pushData('fast-render-data', pageInfo.frData);
     next();
@@ -137,12 +138,12 @@ Route = class extends SharedRoute {
     const ext = pathname.split('.').slice(1).join('.');
 
     // if there is no extention, yes that's a html page
-    if(!ext) {
+    if (!ext) {
       return true;
     }
 
     // if this is htm or html, yes that's a html page
-    if(/^htm/.test(ext)) {
+    if (/^htm/.test(ext)) {
       return true;
     }
 
@@ -153,14 +154,14 @@ Route = class extends SharedRoute {
 
   _getCachedPage(url) {
     const info = this._cache[url];
-    if(info) {
+    if (info) {
       return info.data;
     }
   }
 
   _cachePage(url, data, timeout) {
     const existingInfo = this._cache[url];
-    if(existingInfo) {
+    if (existingInfo) {
       throw new Error(`Cannot cache a existing cahced page: ${url}`);
     }
 
@@ -173,4 +174,4 @@ Route = class extends SharedRoute {
 
     this._cache[url] = info;
   }
-}
+};

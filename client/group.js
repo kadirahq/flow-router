@@ -37,4 +37,4 @@ Group = class extends SharedGroup {
 
     this._subscriptions.call(current.route, current.params, current.queryParams);
   }
-}
+};
