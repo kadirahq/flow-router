@@ -1,89 +1,74 @@
-Tinytest.addAsync(
-'SSR Context - getCollection - should create a collection if there is not',
-function(test, done) {
-  var ssrContext = new SsrContext();
-  var collection = ssrContext.getCollection('collName');
+describe('SSR Context', () => {
+  context('getCollection', () => {
+    it('should create a collection if there is not', () => {
+      const ssrContext = new SsrContext();
+      const collection = ssrContext.getCollection('collName');
+      expect(collection).to.be.ok;
+    });
 
-  test.isNotUndefined(collection);
-  done();
-});
+    it('should return the collection already created if exists', () => {
+      const ssrContext = new SsrContext();
+      const collection1 = ssrContext.getCollection('collName1');
+      const collection2 = ssrContext.getCollection('collName1');
 
-Tinytest.addAsync(
-'SSR Context - getCollection - should return the collection already created if exists',
-function(test, done) {
-  var ssrContext = new SsrContext();
-  var collection1 = ssrContext.getCollection('collName1');
-  var collection2 = ssrContext.getCollection('collName1');
+      expect(collection1).to.be.deep.equal(collection2);
+    })
+  });
 
-  test.equal(collection1, collection2);
-  done();
-});
+  context('body', () => {
+    it('should add and get body', () => {
+      const ssrContext = new SsrContext();
 
+      const html1 = '<p>Sample <em>Html</em> Strings</p>';
+      ssrContext.setHtml(html1);
+      const html2 = ssrContext.getHtml();
 
-Tinytest.addAsync(
-'SSR Context - body - should add and get body',
-function(test, done) {
-  var ssrContext = new SsrContext();
+      expect(html1).to.be.equal(html2);
+    });
 
-  var html1 = "<p>Sample <em>Html</em> Strings</p>";
-  ssrContext.setHtml(html1);
-  var html2 = ssrContext.getHtml();
+    it('should override existing body', () => {
+      const ssrContext = new SsrContext();
 
-  test.equal(html1, html2);
-  done();
-});
+      const body = '<p>Sample <em>Html</em> Strings</p>';
+      ssrContext.setHtml(body);
+      let existingBody = ssrContext.getHtml();
+      expect(body).to.be.equal(existingBody);
 
-Tinytest.addAsync(
-'SSR Context - body - should override existing body',
-function(test, done) {
-  var ssrContext = new SsrContext();
+      const bodyToOverride = '<div>Demo HTML Content</div>';
+      ssrContext.setHtml(bodyToOverride);
+      existingBody = ssrContext.getHtml();
+      expect(bodyToOverride).to.be.equal(existingBody);
+    });
+  });
 
-  var body = '<p>Sample <em>Html</em> Strings</p>';
-  ssrContext.setHtml(body);
-  var existingBody = ssrContext.getHtml();
+  context('head', () => {
+    it('should get the existing head', () => {
+      const ssrContext = new SsrContext();
+      
+      const headHtml = '<h1>Head</h1>';
+      ssrContext.addToHead(headHtml);
+      const existingHead = ssrContext.getHead();
+      const expectedHead = `\n${headHtml}`;
 
-  test.equal(body, existingBody);
+      expect(expectedHead).to.be.equal(existingHead);
+    });
 
-  var bodyToOverride = '<div>Demo HTML Content</div>';
-  ssrContext.setHtml(bodyToOverride);
-  var existingBody = ssrContext.getHtml();
+    it('should append to the existing head', () => {
+      const ssrContext = new SsrContext();
 
-  test.equal(bodyToOverride, existingBody);
-  done();
-});
+      const headHtml = '<h1>Head</h1>';
+      ssrContext.addToHead(headHtml);
+      let existingHead = ssrContext.getHead();
+      let expectedHead = `\n${headHtml}`;
+      
+      expect(expectedHead).to.be.equal(existingHead);
 
-Tinytest.addAsync(
-'SSR Context - head - should get the existing head',
-function(test, done) {
-  var ssrContext = new SsrContext();
+      const headHtmlToAppend = '<h2>Head 2</h2>';
+      ssrContext.addToHead(headHtmlToAppend);
+      existingHead = ssrContext.getHead();
+      expectedHead += `\n${headHtmlToAppend}`;
 
-  var headHtml = '<h1>Head</h1>';
-  ssrContext.addToHead(headHtml);
-  var existingHead = ssrContext.getHead();
-  var expectedHead = '\n' + headHtml;
-
-  test.equal(expectedHead, existingHead);
-  done();
-});
-
-Tinytest.addAsync(
-'SSR Context - head - should append to the existing head',
-function(test, done) {
-  var ssrContext = new SsrContext();
-
-  var headHtml = '<h1>Head</h1>';
-  ssrContext.addToHead(headHtml);
-  var existingHead = ssrContext.getHead();
-  var expectedHead = '\n' + headHtml;
-  
-  test.equal(expectedHead, existingHead);
-
-  var headHtmlToAppend = '<h2>Head 2</h2>';
-  ssrContext.addToHead(headHtmlToAppend);
-  var existingHead = ssrContext.getHead();
-  var expectedHead = expectedHead + '\n' + headHtmlToAppend;
-
-  test.equal(expectedHead, existingHead);
-
-  done();
+      expect(expectedHead).to.be.equal(existingHead);
+    });
+  });
 });
