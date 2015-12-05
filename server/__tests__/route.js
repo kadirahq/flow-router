@@ -55,7 +55,7 @@ describe('Route', () => {
           const route = new Route();
           const isHtml = route._isHtmlPage('/anc/sds/aa.htm');
           expect(isHtml).to.be.true;
-        })
+        });
       });
     });
   });
@@ -233,19 +233,19 @@ describe('Route', () => {
     context('res.write() input data in not a string', () => {
       it('should not alter the input', done => {
         const router = {};
-          const route = new Route(router);
-          const req = {url: '/aaa/aa.html'};
-          const writeData = {something: 'else'};
+        const route = new Route(router);
+        const req = {url: '/aaa/aa.html'};
+        const writeData = {something: 'else'};
 
-          const res = {
-            write: data => {
+        const res = {
+          write: data => {
               expect(data).to.be.deep.equal(writeData);
               done();
             }
-          };
+        };
 
-          route._injectHtml(req, res);
-          res.write(writeData);
+        route._injectHtml(req, res);
+        res.write(writeData);
       });
     });
   });
@@ -377,7 +377,7 @@ describe('Route', () => {
         const route = new Route();
         const req = {url: '/aa.html'};
         const res = {write: () => {}};
-        const next = () => {throw new Error('should not call next')};
+        const next = () => {throw new Error('should not call next');};
         const pageInfo = {aa: 10};
 
         route._processFromCache = (c, r, n) => {
@@ -398,8 +398,7 @@ describe('Route', () => {
         const route = new Route();
         const req = {url: '/aa.html'};
         const res = {write: () => {}};
-        const next = () => {throw new Error('should not call next')};
-        const pageInfo = {aa: 10};
+        const next = () => {throw new Error('should not call next');};
         const params = {};
 
         const originalHandleRoute = FastRender.handleRoute;
@@ -408,15 +407,18 @@ describe('Route', () => {
           expect(_params).to.be.equal(params);
           expect(_req).to.be.equal(req);
           expect(_res).to.be.equal(res);
+
           done();
         };
-        
+
         FastRender.handleRoute = (processFromSsr, _params, _req, _res, _next) => {
           expect(_params).to.be.equal(params);
           expect(_req).to.be.equal(req);
           expect(_res).to.be.equal(res);
           expect(_next).to.be.equal(next);
 
+          // restore FastRender's original handleRoute
+          FastRender.handleRoute = originalHandleRoute;
           processFromSsr();
         };
 
