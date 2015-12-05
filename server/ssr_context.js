@@ -35,6 +35,12 @@ SsrContext = class {
 
   addSubscription(name, params) {
     const fastRenderContext = FastRender.frContext.get();
+    if(!fastRenderContext) {
+      throw new Error(
+        `Cannot add a subscription: ${name} without FastRender Context`
+      );
+    }
+
     const args = [name].concat(params);
     const data = fastRenderContext.subscribe(...args);
     this.addData(data);

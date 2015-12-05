@@ -109,4 +109,36 @@ describe('SSR Context', () => {
       });
     });
   });
+
+  context('addSubscription', () => {
+    context('without a FastRender context', () => {
+      it('should throw an error', () => {
+        const ssrContext = new SsrContext();
+        expect(() => ssrContext.addSubscription('abc')).to.throw(/Cannot add a subscription/);
+      });
+    });
+
+    context('with a FastRender context', () => {
+      it('should fetch data from the fastRender context and add it', (done) => {
+        const ssrContext = new SsrContext();
+        const data = [[{_id: 'aa'}]];
+        const frContext = {
+          subscribe: (name, ...params) => {
+            expect(name).to.be.equal('mysub');
+            expect(params).to.be.deep.equal(['one', 'two']);
+            return data;
+          }
+        };
+
+        ssrContext.addData = _data => {
+          expect(_data).to.be.deep.equal(data);
+          done();
+        };
+
+        FastRender.frContext.withValue(frContext, () => {
+          ssrContext.addSubscription('mysub', ['one', 'two']);
+        });
+      });
+    });
+  });
 });
