@@ -10,7 +10,7 @@ SsrContext = class {
   getCollection(collName) {
     let collection = this._collections[collName];
     if (!collection) {
-      const minimongo = Package['minimongo'];
+      const minimongo = Package.minimongo;
       collection = this._collections[collName] = new minimongo.LocalCollection();
     }
 
@@ -26,7 +26,7 @@ SsrContext = class {
   }
 
   addToHead(headHtml) {
-    this._head += '\n' + headHtml;
+    this._head += `\n${headHtml}`;
   }
 
   getHead() {
@@ -36,7 +36,7 @@ SsrContext = class {
   addSubscription(name, params) {
     const fastRenderContext = FastRender.frContext.get();
     const args = [name].concat(params);
-    const data = fastRenderContext.subscribe.apply(fastRenderContext, args);
+    const data = fastRenderContext.subscribe(...args);
     this.addData(data);
   }
 

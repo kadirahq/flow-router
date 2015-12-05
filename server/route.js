@@ -1,5 +1,6 @@
 const Url = Npm.require('url');
 const Cheerio = Npm.require('cheerio');
+const logger = console;
 
 Route = class extends SharedRoute {
   constructor(router, pathDef, options, group) {
@@ -51,8 +52,8 @@ Route = class extends SharedRoute {
             );
           }
         } catch (ex) {
-          console.error(`Error when doing SSR. path:${req.url}: ${ex.message}`);
-          console.error(ex.stack);
+          logger.error(`Error when doing SSR. path:${req.url}: ${ex.message}`);
+          logger.error(ex.stack);
         }
       });
 
@@ -106,7 +107,7 @@ Route = class extends SharedRoute {
 
   _processFromCache(pageInfo, res, next) {
     const originalWrite = res.write;
-    res.write = function(data) {
+    res.write = function() {
       originalWrite.call(this, pageInfo.html);
     };
 

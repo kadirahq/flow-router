@@ -19,7 +19,7 @@ Meteor.subscribe = function(pubName) {
   };
 };
 
-const Mongo = Package['mongo'].Mongo;
+const Mongo = Package.mongo.Mongo;
 const originalFind = Mongo.Collection.prototype.find;
 
 Mongo.Collection.prototype.find = function(selector, options) {
@@ -50,9 +50,9 @@ Tracker.autorun = (fn) => {
     const c = { firstRun: true, stop: () => {} };
     fn(c);
     return c;
-  } else {
-    return originalAutorun.call(Tracker, fn);
   }
+
+  return originalAutorun.call(Tracker, fn);
 };
 
 // By default, Meteor[call,apply] also inherit SsrContext

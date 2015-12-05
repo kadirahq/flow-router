@@ -18,12 +18,17 @@
   "globals": {
     "FlowRouter": true,
     "Router": true,
-    "page": true,
-    "qs": true,
-    "Triggers": true,
-    "FastRenderColl": true,
     "Route": true,
-    "Group": true
+    "Group": true,
+    "SharedRouter": true,
+    "SharedRoute": true,
+    "SharedGroup": true,
+    "Triggers": true,
+    "SsrContext": true,
+    "FastRender": true,
+    "Picker": true,
+    "__meteor_runtime_config__": true,
+    "qs": true,
+    "page": true
   }
-
 }

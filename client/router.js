@@ -1,3 +1,5 @@
+const logger = console;
+
 Router = class extends SharedRouter {
   constructor() {
     super();
@@ -57,7 +59,7 @@ Router = class extends SharedRouter {
     const route = super.route(pathDef, options, group);
 
     // calls when the page route being activates
-    route._actionHandle = (context, next) => {
+    route._actionHandle = (context) => {
       const oldRoute = this._current.route;
       this._oldRouteChain.push(oldRoute);
 
@@ -160,7 +162,7 @@ Router = class extends SharedRouter {
     // Object.assign can be used instead of _.extend
     Object.assign(queryParams, newParams);
 
-    for (let k in queryParams) {
+    for (const k in queryParams) {
       if (queryParams[k] === null || queryParams[k] === undefined) {
         delete queryParams[k];
       }
@@ -187,7 +189,7 @@ Router = class extends SharedRouter {
     // XXX this.notfound kept for backwards compatibility
     this.notFound = this.notFound || this.notfound;
     if (!this.notFound) {
-      console.error('There is no route for the path:', context.path);
+      logger.error('There is no route for the path:', context.path);
       return;
     }
 
@@ -242,7 +244,6 @@ Router = class extends SharedRouter {
     // see the definition of `this._processingContexts`
     const currentContext = this._current;
     const route = currentContext.route;
-    const path = currentContext.path;
 
     // otherwise, computations inside action will trigger to re-run
     // this computation. which we do not need.
@@ -335,13 +336,6 @@ Router = class extends SharedRouter {
   _getCurrentRouteContext() {
     return this._current;
   }
-
-  // reactive apis, defined below
-
-  // getParam() {}
-  // getQueryParam() {}
-  // getRouteName() {}
-  // watchPathChange() {}
 };
 
 // Implementing Reactive APIs
@@ -359,7 +353,7 @@ reactiveApis.forEach((api) => {
     const currentRoute = this._current.route;
     if (!currentRoute) {
       this._onEveryPath.depend();
-      return;
+      return null;
     }
 
     // currently, there is only one argument. If we've more let's add more args

@@ -1,17 +1,15 @@
-if (!Package['meteorhacks:fast-render']) {
-  return;
+if (Package['meteorhacks:fast-render']) {
+  FastRender = Package['meteorhacks:fast-render'].FastRender;
+
+  // hack to run after eveything else on startup
+  Meteor.startup(() => {
+    Meteor.startup(() => {
+      setupFastRender();
+    });
+  });
 }
 
-FastRender = Package['meteorhacks:fast-render'].FastRender;
-
-// hack to run after eveything else on startup
-Meteor.startup(() => {
-  Meteor.startup(() => {
-    setupFastRender();
-  });
-});
-
-function setupFastRender () {
+function setupFastRender() {
   FlowRouter._routes.forEach((route) => {
     FastRender.route(route.pathDef, (routeParams, path) => {
       // anyone using Meteor.subscribe for something else?
@@ -28,7 +26,7 @@ function setupFastRender () {
         route.subscriptions(params, queryParams);
       }
       route._subsMap.forEach((args) => {
-        this.subscribe.apply(this, args);
+        this.subscribe(...args);
       });
 
       // restore Meteor.subscribe, ... on server side

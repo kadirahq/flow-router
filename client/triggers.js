@@ -52,8 +52,8 @@ Triggers.createRouteBoundTriggers = (triggers, names, negate) => {
   const filteredTriggers = triggers.map((originalTrigger) => {
     const modifiedTrigger = (context, next) => {
       const routeName = context.route.name;
-      let matched = (namesMap[routeName]) ? 1 : -1;
-      matched = (negate) ? matched * -1 : matched;
+      let matched = namesMap[routeName] ? 1 : -1;
+      matched = negate ? matched * -1 : matched;
 
       if (matched === 1) {
         originalTrigger(context, next);
