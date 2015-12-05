@@ -35,6 +35,8 @@ Mongo.Collection.prototype.find = function(selector, options) {
   return originalFind.call(this, selector, options);
 };
 
+// We must implement this. Otherwise, it'll call the origin prototype's
+// find method
 Mongo.Collection.prototype.findOne = function(selector, options) {
   options = options || {};
   options.limit = 1;
