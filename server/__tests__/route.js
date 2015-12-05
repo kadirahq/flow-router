@@ -55,4 +55,64 @@ describe('Route', () => {
       });
     });
   });
+
+  context('._buildContext', () => {
+    it('should build the desired context', () => {
+      const route = new Route();
+      const req = {url: '/the-url'};
+      const params = {
+        aa: 10, query: {bb: 20}
+      };
+
+      const context = route._buildContext(req, params);
+      expect(context.route).to.be.equal(route);
+
+      delete context.route;
+      expect(context).to.be.deep.equal({
+        path: req.url,
+        params: {aa: 10},
+        queryParams: {bb: 20}
+      });
+    });
+  });
+
+  context('._moveScriptsToBottom', () => {
+    it('should move all the scripts tags to bottom of body', () => {
+      const inputPage = `
+<html>
+  <head>
+    <title>The Title</title>
+    <script type="text/javascript" src="aa.js"></script>
+    <script type="text/javascript" src="bb.js"></script>
+  </head>
+
+  <body>
+    <div id="abc"></div>
+  </body>
+</html>
+      `;
+
+      const expectedPage = `
+<html>
+  <head>
+    <title>The Title</title>
+  </head>
+
+  <body>
+    <div id="abc"></div>
+    <script type="text/javascript" src="aa.js"></script>
+    <script type="text/javascript" src="bb.js"></script>
+  </body>
+</html>
+      `;
+
+      const trimIt = str => {
+        return str.split('\n').map(line => line.trim()).join('');
+      };
+
+      const route = new Route();
+      const returnedPage = route._moveScriptsToBottom(trimIt(inputPage));
+      expect(trimIt(returnedPage)).to.be.equal(trimIt(expectedPage));
+    });
+  });
 });
