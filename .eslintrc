@@ -16,6 +16,8 @@
   "plugins": ["meteor"],
 
   "globals": {
+    /* Internal Globals */
+
     "FlowRouter": true,
     "Router": true,
     "Route": true,
@@ -25,10 +27,20 @@
     "SharedGroup": true,
     "Triggers": true,
     "SsrContext": true,
+    "__meteor_runtime_config__": true,
+    
+    /* Meteor Packges */
     "FastRender": true,
     "Picker": true,
-    "__meteor_runtime_config__": true,
+
+    /* Browserify packages */
     "qs": true,
-    "page": true
+    "page": true,
+
+    /* Test env */
+    "describe": true,
+    "context": true,
+    "it": true,
+    "expect": true
   }
 }

@@ -32,6 +32,7 @@ Package.onTest(function(api) {
   api.use('meteorhacks:fast-render');
   api.use('meteorhacks:inject-data');
   api.use('tmeasday:html5-history-api');
+  api.use('smithy:describe@1.0.0');
 
   api.addFiles('test/client/_helpers.js', 'client');
   api.addFiles('test/server/_helpers.js', 'server');
@@ -50,6 +51,8 @@ Package.onTest(function(api) {
   api.addFiles('test/common/router.addons.spec.js', ['client', 'server']);
   api.addFiles('test/common/route.spec.js', ['client', 'server']);
   api.addFiles('test/common/group.spec.js', ['client', 'server']);
+
+  api.addFiles('server/__tests__/ssr_context.js', 'server');  
 });
 
 function configure(api) {

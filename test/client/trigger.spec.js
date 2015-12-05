@@ -17,7 +17,7 @@ Tinytest.addAsync('Client - Triggers - global enter triggers', function(test, ne
   });
 
   FlowRouter.triggers.enter([function(context) {
-    if(done) return;
+    if (done) return;
     test.equal(context.path, paths.pop());
     log.push(0);
   }]);
@@ -35,7 +35,7 @@ Tinytest.addAsync('Client - Triggers - global enter triggers', function(test, ne
   }, 100);
 });
 
-Tinytest.addAsync('Client - Triggers - global enter triggers with "only"', function (test, next) {
+Tinytest.addAsync('Client - Triggers - global enter triggers with "only"', function(test, next) {
   var rand = Random.id(), rand2 = Random.id();
   var log = [];
   var done = false;
@@ -54,7 +54,7 @@ Tinytest.addAsync('Client - Triggers - global enter triggers with "only"', funct
   });
 
   FlowRouter.triggers.enter([function(context) {
-    if(done) return;
+    if (done) return;
     test.equal(context.path, '/' + rand2);
     log.push(8);
   }], {only: ['foo']});
@@ -72,7 +72,7 @@ Tinytest.addAsync('Client - Triggers - global enter triggers with "only"', funct
   }, 100);
 });
 
-Tinytest.addAsync('Client - Triggers - global enter triggers with "except"', function (test, next) {
+Tinytest.addAsync('Client - Triggers - global enter triggers with "except"', function(test, next) {
   var rand = Random.id(), rand2 = Random.id();
   var log = [];
   var done = false;
@@ -91,7 +91,7 @@ Tinytest.addAsync('Client - Triggers - global enter triggers with "except"', fun
   });
 
   FlowRouter.triggers.enter([function(context) {
-    if(done) return;
+    if (done) return;
     test.equal(context.path, '/' + rand);
     log.push(8);
   }], {except: ['foo']});
@@ -109,10 +109,10 @@ Tinytest.addAsync('Client - Triggers - global enter triggers with "except"', fun
   }, 100);
 });
 
-Tinytest.addAsync('Client - Triggers - global exit triggers', function (test, next) {
+Tinytest.addAsync('Client - Triggers - global exit triggers', function(test, next) {
   var rand = Random.id(), rand2 = Random.id();
   var log = [];
-  var done =false;
+  var done = false;
 
   FlowRouter.route('/' + rand, {
     action: function(_params) {
@@ -129,7 +129,7 @@ Tinytest.addAsync('Client - Triggers - global exit triggers', function (test, ne
   FlowRouter.go('/' + rand);
 
   FlowRouter.triggers.exit([function(context) {
-    if(done) return;
+    if (done) return;
     test.equal(context.path, '/' + rand);
     log.push(0);
   }]);
@@ -145,7 +145,7 @@ Tinytest.addAsync('Client - Triggers - global exit triggers', function (test, ne
   }, 100);
 });
 
-Tinytest.addAsync('Client - Triggers - global exit triggers with "only"', function (test, next) {
+Tinytest.addAsync('Client - Triggers - global exit triggers with "only"', function(test, next) {
   var rand = Random.id(), rand2 = Random.id();
   var log = [];
   var done = false;
@@ -164,7 +164,7 @@ Tinytest.addAsync('Client - Triggers - global exit triggers with "only"', functi
   });
 
   FlowRouter.triggers.exit([function(context) {
-    if(done) return;
+    if (done) return;
     test.equal(context.path, '/' + rand2);
     log.push(8);
   }], {only: ['foo']});
@@ -186,7 +186,7 @@ Tinytest.addAsync('Client - Triggers - global exit triggers with "only"', functi
   }, 100);
 });
 
-Tinytest.addAsync('Client - Triggers - global exit triggers with "except"', function (test, next) {
+Tinytest.addAsync('Client - Triggers - global exit triggers with "except"', function(test, next) {
   var rand = Random.id(), rand2 = Random.id();
   var log = [];
   var done = false;
@@ -207,7 +207,7 @@ Tinytest.addAsync('Client - Triggers - global exit triggers with "except"', func
   FlowRouter.go('/' + rand);
 
   FlowRouter.triggers.exit([function(context) {
-    if(done) return;
+    if (done) return;
     test.equal(context.path, '/' + rand);
     log.push(9);
   }], {except: ['foo']});
@@ -228,11 +228,11 @@ Tinytest.addAsync('Client - Triggers - global exit triggers with "except"', func
   }, 100);
 });
 
-Tinytest.addAsync('Client - Triggers - route enter triggers', function (test, next) {
+Tinytest.addAsync('Client - Triggers - route enter triggers', function(test, next) {
   var rand = Random.id();
   var log = [];
 
-  var triggerFn = function (context) {
+  var triggerFn = function(context) {
     test.equal(context.path, '/' + rand);
     log.push(5);
   };
@@ -252,11 +252,11 @@ Tinytest.addAsync('Client - Triggers - route enter triggers', function (test, ne
   }, 100);
 });
 
-Tinytest.addAsync('Client - Triggers - router exit triggers', function (test, next) {
+Tinytest.addAsync('Client - Triggers - router exit triggers', function(test, next) {
   var rand = Random.id();
   var log = [];
 
-  var triggerFn = function (context) {
+  var triggerFn = function(context) {
     test.equal(context.path, '/' + rand);
     log.push(6);
   };
@@ -280,12 +280,12 @@ Tinytest.addAsync('Client - Triggers - router exit triggers', function (test, ne
   }, 100);
 });
 
-Tinytest.addAsync('Client - Triggers - group enter triggers', function (test, next) {
+Tinytest.addAsync('Client - Triggers - group enter triggers', function(test, next) {
   var rand = Random.id(), rand2 = Random.id();
   var log = [];
   var paths = ['/' + rand2, '/' + rand];
 
-  var triggerFn = function (context) {
+  var triggerFn = function(context) {
     test.equal(context.path, paths.pop());
     log.push(3);
   };
@@ -318,11 +318,11 @@ Tinytest.addAsync('Client - Triggers - group enter triggers', function (test, ne
   }, 100);
 });
 
-Tinytest.addAsync('Client - Triggers - group exit triggers', function (test, next) {
+Tinytest.addAsync('Client - Triggers - group exit triggers', function(test, next) {
   var rand = Random.id(), rand2 = Random.id();
   var log = [];
 
-  var triggerFn = function (context) {
+  var triggerFn = function(context) {
     log.push(4);
   };
 
@@ -360,9 +360,9 @@ Tinytest.addAsync('Client - Triggers - redirect from enter', function(test, next
 
   FlowRouter.route('/' + rand, {
     triggersEnter: [function(context, redirect) {
-      redirect("/" + rand2);
+      redirect('/' + rand2);
     }, function() {
-      throw new Error("should not execute this trigger");
+      throw new Error('should not execute this trigger');
     }],
     action: function(_params) {
       log.push(1);
@@ -393,9 +393,9 @@ Tinytest.addAsync('Client - Triggers - redirect by routeName', function(test, ne
   FlowRouter.route('/' + rand, {
     name: rand,
     triggersEnter: [function(context, redirect) {
-      redirect(rand2, null, {aa: "bb"});
+      redirect(rand2, null, {aa: 'bb'});
     }, function() {
-      throw new Error("should not execute this trigger");
+      throw new Error('should not execute this trigger');
     }],
     action: function(_params) {
       log.push(1);
@@ -407,7 +407,7 @@ Tinytest.addAsync('Client - Triggers - redirect by routeName', function(test, ne
     name: rand2,
     action: function(_params, queryParams) {
       log.push(2);
-      test.equal(queryParams, {aa: "bb"});
+      test.equal(queryParams, {aa: 'bb'});
     },
     name: rand2
   });
@@ -434,7 +434,7 @@ Tinytest.addAsync('Client - Triggers - redirect from exit', function(test, next)
         redirect('/' + rand3);
       },
       function() {
-        throw new Error("should not call this trigger");
+        throw new Error('should not call this trigger');
       }
     ]
   });
@@ -455,7 +455,7 @@ Tinytest.addAsync('Client - Triggers - redirect from exit', function(test, next)
 
   setTimeout(function() {
     FlowRouter.go('/' + rand2);
-    
+
     setTimeout(function() {
       test.equal(log, [1, 3]);
       next();
@@ -471,8 +471,8 @@ Tinytest.addAsync('Client - Triggers - redirect to external URL fails', function
   FlowRouter.route('/' + rand, {
     triggersEnter: [function(context, redirect) {
       test.throws(function() {
-          redirect("http://example.com/")
-      }, "Redirects to URLs outside of the app are not supported")
+        redirect('http://example.com/');
+      }, 'Redirects to URLs outside of the app are not supported');
     }],
     action: function(_params) {
       log.push(1);
@@ -484,8 +484,8 @@ Tinytest.addAsync('Client - Triggers - redirect to external URL fails', function
   FlowRouter.route('/' + rand2, {
     triggersEnter: [function(context, redirect) {
       test.throws(function() {
-          redirect("https://example.com/")
-      })
+        redirect('https://example.com/');
+      });
     }],
     action: function(_params) {
       log.push(2);
@@ -512,10 +512,10 @@ Tinytest.addAsync('Client - Triggers - stop callback from enter', function(test,
       log.push(10);
       stop();
     }, function() {
-      throw new Error("should not execute this trigger");
+      throw new Error('should not execute this trigger');
     }],
     action: function(_params) {
-      throw new Error("should not execute the action");
+      throw new Error('should not execute the action');
     }
   });
 
@@ -529,7 +529,7 @@ Tinytest.addAsync('Client - Triggers - stop callback from enter', function(test,
 });
 
 Tinytest.addAsync(
-'Client - Triggers - invalidate inside an autorun', 
+'Client - Triggers - invalidate inside an autorun',
 function(test, next) {
   var rand = Random.id(), rand2 = Random.id();
   var log = [];
@@ -549,7 +549,7 @@ function(test, next) {
   });
 
   FlowRouter.triggers.enter([function(context) {
-    if(done) return;
+    if (done) return;
     test.equal(context.path, paths.pop());
     log.push(0);
   }]);

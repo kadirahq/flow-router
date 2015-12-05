@@ -13,10 +13,10 @@ Tinytest.addAsync(
 'Triggers - runTriggers - redirect with url',
 function(test, done) {
   var store = [];
-  var url = "http://google.com";
+  var url = 'http://google.com';
   var triggers = MakeTriggers(2, store);
   triggers.splice(1, 0, function(context, redirect) {
-    redirect(url); 
+    redirect(url);
   });
 
   Triggers.runTriggers(triggers, null, function(u) {
@@ -30,12 +30,12 @@ Tinytest.addAsync(
 'Triggers - runTriggers - redirect without url',
 function(test, done) {
   var store = [];
-  var url = "http://google.com";
+  var url = 'http://google.com';
   var triggers = MakeTriggers(2, store);
   triggers.splice(1, 0, function(context, redirect) {
     try {
-      redirect(); 
-    } catch(ex) {
+      redirect();
+    } catch (ex) {
       test.isTrue(/requires an URL/.test(ex.message));
       test.equal(store, [0]);
       done();
@@ -49,15 +49,15 @@ Tinytest.addAsync(
 'Triggers - runTriggers - redirect in a different event loop',
 function(test, done) {
   var store = [];
-  var url = "http://google.com";
+  var url = 'http://google.com';
   var triggers = MakeTriggers(2, store);
   var doneCalled = false;
 
   triggers.splice(1, 0, function(context, redirect) {
     setTimeout(function() {
       try {
-        redirect(url); 
-      } catch(ex) {
+        redirect(url);
+      } catch (ex) {
         test.isTrue(/sync/.test(ex.message));
         test.equal(store, [0, 1]);
         test.isTrue(doneCalled);
@@ -75,15 +75,15 @@ Tinytest.addAsync(
 'Triggers - runTriggers - redirect called multiple times',
 function(test, done) {
   var store = [];
-  var url = "http://google.com";
+  var url = 'http://google.com';
   var triggers = MakeTriggers(2, store);
   var redirectCalled = false;
 
   triggers.splice(1, 0, function(context, redirect) {
-    redirect(url); 
+    redirect(url);
     try {
       redirect(url);
-    } catch(ex) {
+    } catch (ex) {
       test.isTrue(/already redirected/.test(ex.message));
       test.equal(store, [0]);
       test.isTrue(redirectCalled);
@@ -129,7 +129,7 @@ function(test, done) {
 Tinytest.addAsync(
 'Triggers - createRouteBoundTriggers - matching trigger',
 function(test, done) {
-  var context = {route: {name: "abc"}};
+  var context = {route: {name: 'abc'}};
   var redirect = function() {};
 
   var trigger = function(c, r) {
@@ -138,14 +138,14 @@ function(test, done) {
     done();
   };
 
-  var triggers = Triggers.createRouteBoundTriggers([trigger], ["abc"]);
+  var triggers = Triggers.createRouteBoundTriggers([trigger], ['abc']);
   triggers[0](context, redirect);
 });
 
 Tinytest.addAsync(
 'Triggers - createRouteBoundTriggers - multiple matching triggers',
 function(test, done) {
-  var context = {route: {name: "abc"}};
+  var context = {route: {name: 'abc'}};
   var redirect = function() {};
   var doneCount = 0;
 
@@ -155,7 +155,7 @@ function(test, done) {
     doneCount++;
   };
 
-  var triggers = Triggers.createRouteBoundTriggers([trigger, trigger], ["abc"]);
+  var triggers = Triggers.createRouteBoundTriggers([trigger, trigger], ['abc']);
   triggers[0](context, redirect);
   triggers[1](context, redirect);
 
@@ -166,7 +166,7 @@ function(test, done) {
 Tinytest.addAsync(
 'Triggers - createRouteBoundTriggers - no matching trigger',
 function(test, done) {
-  var context = {route: {name: "some-other-route"}};
+  var context = {route: {name: 'some-other-route'}};
   var redirect = function() {};
   var doneCount = 0;
 
@@ -176,7 +176,7 @@ function(test, done) {
     doneCount++;
   };
 
-  var triggers = Triggers.createRouteBoundTriggers([trigger], ["abc"]);
+  var triggers = Triggers.createRouteBoundTriggers([trigger], ['abc']);
   triggers[0](context, redirect);
 
   test.equal(doneCount, 0);
@@ -186,7 +186,7 @@ function(test, done) {
 Tinytest.addAsync(
 'Triggers - createRouteBoundTriggers - negate logic',
 function(test, done) {
-  var context = {route: {name: "some-other-route"}};
+  var context = {route: {name: 'some-other-route'}};
   var redirect = function() {};
   var doneCount = 0;
 
@@ -196,7 +196,7 @@ function(test, done) {
     doneCount++;
   };
 
-  var triggers = Triggers.createRouteBoundTriggers([trigger], ["abc"], true);
+  var triggers = Triggers.createRouteBoundTriggers([trigger], ['abc'], true);
   triggers[0](context, redirect);
 
   test.equal(doneCount, 1);
@@ -225,7 +225,7 @@ function(test, done) {
   var original = [];
   try {
     Triggers.applyFilters(original, {only: [], except: []});
-  } catch(ex) {
+  } catch (ex) {
     test.isTrue(/only and except/.test(ex.message));
     done();
   }
@@ -236,8 +236,8 @@ Tinytest.addAsync(
 function(test, done) {
   var original = [];
   try {
-    Triggers.applyFilters(original, {only: "name"});
-  } catch(ex) {
+    Triggers.applyFilters(original, {only: 'name'});
+  } catch (ex) {
     test.isTrue(/to be an array/.test(ex.message));
     done();
   }
@@ -248,8 +248,8 @@ Tinytest.addAsync(
 function(test, done) {
   var original = [];
   try {
-    Triggers.applyFilters(original, {except: "name"});
-  } catch(ex) {
+    Triggers.applyFilters(original, {except: 'name'});
+  } catch (ex) {
     test.isTrue(/to be an array/.test(ex.message));
     done();
   }
@@ -261,7 +261,7 @@ function(test, done) {
   var original = [];
   try {
     Triggers.applyFilters(original, {wowFilter: []});
-  } catch(ex) {
+  } catch (ex) {
     test.isTrue(/not supported/.test(ex.message));
     done();
   }
@@ -270,15 +270,15 @@ function(test, done) {
 Tinytest.addAsync(
 'Triggers - applyFilters - just only filter',
 function(test, done) {
-  var bounded = Triggers.applyFilters(done, {only: ["abc"]});
-  bounded[0]({route: {name: "abc"}});
+  var bounded = Triggers.applyFilters(done, {only: ['abc']});
+  bounded[0]({route: {name: 'abc'}});
 });
 
 Tinytest.addAsync(
 'Triggers - applyFilters - just except filter',
 function(test, done) {
-  var bounded = Triggers.applyFilters(done, {except: ["abc"]});
-  bounded[0]({route: {name: "some-other"}});
+  var bounded = Triggers.applyFilters(done, {except: ['abc']});
+  bounded[0]({route: {name: 'some-other'}});
 });
 
 function MakeTriggers(count, store) {
@@ -290,7 +290,7 @@ function MakeTriggers(count, store) {
     });
   }
 
-  for(var lc=0; lc<count; lc++) {
+  for (var lc = 0; lc < count; lc++) {
     addTrigger(lc);
   }
   return triggers;

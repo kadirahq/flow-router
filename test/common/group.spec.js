@@ -1,5 +1,5 @@
-Tinytest.add('Common - Group - expose group options', function (test) {
-  var pathDef = "/" + Random.id();
+Tinytest.add('Common - Group - expose group options', function(test) {
+  var pathDef = '/' + Random.id();
   var name = Random.id();
   var data = {aa: 10};
   var layout = 'blah';
@@ -15,7 +15,7 @@ Tinytest.add('Common - Group - expose group options', function (test) {
   test.equal(group.options.layout, layout);
 });
 
-Tinytest.add('Common - Group - validate path definition', function (test, next) {
+Tinytest.add('Common - Group - validate path definition', function(test, next) {
   // path & prefix must start with '/'
   test.throws(function() {
     new Group(null, {prefix: Random.id()});
@@ -28,8 +28,8 @@ Tinytest.add('Common - Group - validate path definition', function (test, next) 
   });
 });
 
-Tinytest.add('Common - Group - expose group options on a route', function (test) {
-  var pathDef = "/" + Random.id();
+Tinytest.add('Common - Group - expose group options on a route', function(test) {
+  var pathDef = '/' + Random.id();
   var name = Random.id();
   var groupName = Random.id();
   var data = {aa: 10};

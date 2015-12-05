@@ -1,24 +1,24 @@
-Meteor.publish('foo', function () {
+Meteor.publish('foo', function() {
   this.ready();
 });
 
-Meteor.publish('fooNotReady', function () {
+Meteor.publish('fooNotReady', function() {
 });
 
-Meteor.publish('bar', function () {
+Meteor.publish('bar', function() {
   this.ready();
 });
 
 // use this only to test global subs
-Meteor.publish('baz', function () {
+Meteor.publish('baz', function() {
   this.ready();
 });
 
-Meteor.publish('bazNotReady', function () {
+Meteor.publish('bazNotReady', function() {
 });
 
-Meteor.publish('readyness', function (doIt) {
-  if(doIt) {
+Meteor.publish('readyness', function(doIt) {
+  if (doIt) {
     this.ready();
   }
 });
@@ -28,7 +28,7 @@ var urlResolve = Npm.require('url').resolve;
 GetFRData = function GetFRData(path) {
   var url = urlResolve(process.env.ROOT_URL, path);
   // FastRender only servers if there is a accept header with html in it
-  var options  = {
+  var options = {
     headers: {'accept': 'html'}
   };
   var res = HTTP.get(url, options);

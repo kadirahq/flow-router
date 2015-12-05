@@ -1,4 +1,4 @@
-Tinytest.addAsync('Client - Group - define and go to route with prefix', function (test, next) {
+Tinytest.addAsync('Client - Group - define and go to route with prefix', function(test, next) {
   var prefix = Random.id();
   var rand = Random.id();
   var rendered = 0;
@@ -19,7 +19,7 @@ Tinytest.addAsync('Client - Group - define and go to route with prefix', functio
   }, 100);
 });
 
-Tinytest.addAsync('Client - Group - define and go to route without prefix', function (test, next) {
+Tinytest.addAsync('Client - Group - define and go to route without prefix', function(test, next) {
   var rand = Random.id();
   var rendered = 0;
 
@@ -40,7 +40,7 @@ Tinytest.addAsync('Client - Group - define and go to route without prefix', func
 });
 
 
-Tinytest.addAsync('Client - Group - set and retrieve group name', function (test, next) {
+Tinytest.addAsync('Client - Group - set and retrieve group name', function(test, next) {
   var rand = Random.id();
   var name = Random.id();
 
