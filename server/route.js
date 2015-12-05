@@ -72,18 +72,18 @@ Route = class extends SharedRoute {
         }
 
         const body = ssrContext.getHtml();
+        data = data.replace('<body>', `<body>\n${body}`);
+        
         if (self._router.deferScriptLoading) {
           data = self._moveScriptsToBottom(data);
         }
-        data = data.replace('<body>', `<body>\n${body}`);
-
-        const pageInfo = {
-          frData: res.getData('fast-render-data'),
-          html: data
-        };
 
         // cache the page if mentioned a timeout
         if (self._router.pageCacheTimeout) {
+          const pageInfo = {
+            frData: res.getData('fast-render-data'),
+            html: data
+          };
           self._cachePage(req.url, pageInfo, self._router.pageCacheTimeout);
         }
       }
