@@ -47,9 +47,7 @@ Route = class extends SharedRoute {
           }
 
           if (self.options.action) {
-            self.options.action.call(
-              self, routeContext.params, routeContext.queryParams
-            );
+            self.options.action(routeContext.params, routeContext.queryParams);
           }
         } catch (ex) {
           logger.error(`Error when doing SSR. path:${req.url}: ${ex.message}`);
@@ -73,7 +71,7 @@ Route = class extends SharedRoute {
 
         const body = ssrContext.getHtml();
         data = data.replace('<body>', `<body>\n${body}`);
-        
+
         if (self._router.deferScriptLoading) {
           data = self._moveScriptsToBottom(data);
         }

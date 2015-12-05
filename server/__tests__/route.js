@@ -249,4 +249,83 @@ describe('Route', () => {
       });
     });
   });
+
+  context('_processFromSsr', () => {
+    context('always', () => {
+      it('should call the action properly', done => {
+        const params = {aa: 10};
+        const context = {
+          params: {aa: 10}, queryParams: {bb: 10}
+        };
+        const req = {url: 'the-url'};
+        const res = {
+          getData: () => null
+        };
+
+        const router = new Router();
+        const action = (p, q) => {
+          const c = router.routeContext.get();
+          expect(p).to.be.deep.equal(c.params);
+          expect(q).to.be.deep.equal(c.queryParams);
+
+          expect(router.ssrContext).to.be.ok;
+          done();
+        };
+
+        const route = new Route(router, '/', {action});
+        route._buildContext = (r, p) => {
+          expect(r.url).to.be.equal(req.url);
+          expect(p).to.be.deep.equal(params);
+          return context;
+        };
+
+        route._processFromSsr(params, req, res);
+      });
+
+      it('should call the ._injectHtml()', done => {
+        const req = {url: 'the-url'};
+        const res = {
+          getData: () => null
+        };
+
+        const router = new Router();
+        const route = new Route(router, '/', {});
+
+        route._buildContext = () => null;
+        route._injectHtml = (_req, _res, _ssrContext) => {
+          expect(_req).to.be.equal(req);
+          expect(_res).to.be.equal(res);
+          expect(_ssrContext).to.be.instanceOf(SsrContext);
+          done();
+        };
+        route._processFromSsr(null, req, res);
+      });
+    });
+
+    context('with frData', () => {
+      it('should add it to the ssr context', done => {
+        const req = {url: 'the-url'};
+        const doc = {_id: 'aa', aa: 10};
+        const frData = {
+          collectionData: {
+            posts: [[doc]]
+          }
+        };
+        const res = {
+          getData: () => frData
+        };
+
+        const router = new Router();
+        const route = new Route(router, '/', {});
+
+        route._buildContext = () => null;
+        route._injectHtml = (_req, _res, ssrContext) => {
+          const docs = ssrContext.getCollection('posts').find().fetch();
+          expect(docs).to.be.deep.equal([doc]);
+          done();
+        };
+        route._processFromSsr(null, req, res);
+      });
+    });
+  });
 });
