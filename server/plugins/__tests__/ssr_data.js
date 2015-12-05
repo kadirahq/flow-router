@@ -17,7 +17,7 @@ describe('SSR Data', () => {
 
       it('should have the FlowRouter.inSubscription env', done => {
         const ssrContext = {
-          addSubscription: (name, params) => {
+          addSubscription: () => {
             expect(FlowRouter.inSubscription.get()).to.be.true;
             done();
           }
@@ -31,7 +31,7 @@ describe('SSR Data', () => {
 
     context('always', () => {
       it('should return ready => true', () => {
-        const handle = Meteor.subscribe('aa','bb');
+        const handle = Meteor.subscribe('aa', 'bb');
         expect(handle.ready()).to.be.true;
       });
     });
@@ -71,11 +71,9 @@ describe('SSR Data', () => {
       });
 
       context('inside a subscription', () => {
-        it('should call the original collection', () => {
-          const cursor = {};
+        it('should call the original collection', done => {
           const collName = Random.id();
-
-          const ssrContext = {};
+          const ssrContext = new SsrContext();
 
           FlowRouter.ssrContext.withValue(ssrContext, () => {
             const coll = new Mongo.Collection(collName);
@@ -83,9 +81,9 @@ describe('SSR Data', () => {
             coll.insert(doc);
             coll.insert({_id: '200', aa: 20});
             coll.insert({_id: '300', aa: 10});
-            
+
             FlowRouter.inSubscription.withValue(true, () => {
-              const options = {sort: {_id: 1}, limit: 1}
+              const options = {sort: {_id: 1}, limit: 1};
               const data = coll.find({aa: 10}, options).fetch();
               expect(data).to.be.equal([doc]);
               done();
@@ -103,10 +101,45 @@ describe('SSR Data', () => {
         coll.insert(doc);
         coll.insert({_id: '200', aa: 20});
         coll.insert({_id: '300', aa: 10});
-        
-        const options = {sort: {_id: 1}, limit: 1}
+
+        const options = {sort: {_id: 1}, limit: 1};
         const data = coll.find({aa: 10}, options).fetch();
         expect(data).to.be.equal([doc]);
+      });
+    });
+  });
+
+  context('Mongo.findOne()', () => {
+    it('should call the new wrapped Mongo.find()', done => {
+      const collName = Random.id();
+      const selector = {aa: 10};
+      const options = {bb: 20};
+      const data = [{_id: 'one', aa: 10}, {_id: 'two', aa: 20}];
+
+      const cursor = {
+        fetch: () => data
+      };
+
+      const ssrCollection = {
+        find: (s, o) => {
+          expect(s).to.be.deep.equal(selector);
+          expect(o).to.be.deep.equal(options);
+          return cursor;
+        }
+      };
+
+      const ssrContext = {
+        getCollection: name => {
+          expect(name).to.be.equal(collName);
+          return ssrCollection;
+        }
+      };
+
+      FlowRouter.ssrContext.withValue(ssrContext, () => {
+        const coll = new Mongo.Collection(collName);
+        const doc = coll.findOne(selector, options);
+        expect(doc).to.be.equal(data[0]);
+        done();
       });
     });
   });
@@ -147,6 +180,79 @@ describe('SSR Data', () => {
             Meteor.call(methodName);
           });
         });
+      });
+    });
+  });
+
+  context('Meteor.loggingIn', () => {
+    context('always', () => {
+      it('should return false', () => {
+        expect(Meteor.loggingIn()).to.be.false;
+      });
+    });
+  });
+
+  context('Tracker.autorun', () => {
+    context('with a SSR Context', () => {
+      it('should call the function immediately & stop invalidating', done => {
+        const ssrContext = new SsrContext();
+        const someVar = new ReactiveVar();
+        let runCount = 0;
+
+        FlowRouter.ssrContext.withValue(ssrContext, () => {
+          Tracker.autorun(() => {
+            someVar.get();
+            runCount++;
+          });
+
+          // this is to check the autorun function runs immediately.
+          expect(runCount).to.be.equal(1);
+
+          // this is to check autorun won't run again for invalidations
+          someVar.set(200);
+          Meteor.setTimeout(() => {
+            expect(runCount).to.be.equal(1);
+            done();
+          }, 200);
+        });
+      });
+
+      it('should has the firstRun=true option', done => {
+        FlowRouter.ssrContext.withValue(new SsrContext(), () => {
+          Tracker.autorun(c => {
+            expect(c.firstRun).to.be.true;
+            done();
+          });
+        });
+      });
+
+      it('should has a stop option which does nothing', done => {
+        FlowRouter.ssrContext.withValue(new SsrContext(), () => {
+          Tracker.autorun(c => {
+            // this is just a test to make sure we've a stop function
+            c.stop();
+            done();
+          });
+        });
+      });
+    });
+
+    context('without a SSR Context', () => {
+      it('should call the original Tracker.autorun', done => {
+        const someVar = new ReactiveVar();
+        let runCount = 0;
+
+        const c = Tracker.autorun(() => {
+          someVar.get();
+          runCount++;
+        });
+
+        someVar.set(200);
+        Meteor.setTimeout(() => {
+          expect(runCount).to.be.equal(2);
+          c.stop();
+          done();
+        }, 200);
       });
     });
   });
