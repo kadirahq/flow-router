@@ -239,9 +239,9 @@ describe('Route', () => {
 
         const res = {
           write: data => {
-              expect(data).to.be.deep.equal(writeData);
-              done();
-            }
+            expect(data).to.be.deep.equal(writeData);
+            done();
+          }
         };
 
         route._injectHtml(req, res);
