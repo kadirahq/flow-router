@@ -12,7 +12,7 @@ describe('SSR Context', () => {
       const collection2 = ssrContext.getCollection('collName1');
 
       expect(collection1).to.be.deep.equal(collection2);
-    })
+    });
   });
 
   context('body', () => {
@@ -44,7 +44,7 @@ describe('SSR Context', () => {
   context('head', () => {
     it('should get the existing head', () => {
       const ssrContext = new SsrContext();
-      
+
       const headHtml = '<h1>Head</h1>';
       ssrContext.addToHead(headHtml);
       const existingHead = ssrContext.getHead();
@@ -60,7 +60,7 @@ describe('SSR Context', () => {
       ssrContext.addToHead(headHtml);
       let existingHead = ssrContext.getHead();
       let expectedHead = `\n${headHtml}`;
-      
+
       expect(expectedHead).to.be.equal(existingHead);
 
       const headHtmlToAppend = '<h2>Head 2</h2>';

@@ -1,6 +1,6 @@
 Router = FlowRouter.Router;
 
-Tinytest.addAsync('Common - Addons - onRouteRegister basic usage', function (test, done) {
+Tinytest.addAsync('Common - Addons - onRouteRegister basic usage', function(test, done) {
   var name = Random.id();
   var customField = Random.id();
   var pathDef = '/' + name;
