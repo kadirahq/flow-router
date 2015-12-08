@@ -77,6 +77,11 @@ describe('Route', () => {
         params: {aa: 10},
         queryParams: {bb: 20}
       });
+
+      // check that the original params object wasn't modified
+      expect(params).to.be.deep.equal({
+        aa: 10, query: {bb: 20}
+      });
     });
   });
 
