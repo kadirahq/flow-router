@@ -51,10 +51,10 @@ describe('Route', () => {
       });
 
       context('otherwise', () => {
-        it('should be true', () => {
+        it('should be false', () => {
           const route = new Route();
-          const isHtml = route._isHtmlPage('/anc/sds/aa.htm');
-          expect(isHtml).to.be.true;
+          const isHtml = route._isHtmlPage('/anc/sds/aa.xyz');
+          expect(isHtml).to.be.false;
         });
       });
     });
@@ -76,6 +76,11 @@ describe('Route', () => {
         path: req.url,
         params: {aa: 10},
         queryParams: {bb: 20}
+      });
+
+      // check that the original params object wasn't modified
+      expect(params).to.be.deep.equal({
+        aa: 10, query: {bb: 20}
       });
     });
   });
