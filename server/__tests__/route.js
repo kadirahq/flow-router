@@ -27,7 +27,7 @@ describe('Route', () => {
         const pageInfo = {aa: 10};
         const cachePage = () => route._cachePage('/the-url', pageInfo, 100);
         cachePage();
-        expect(cachePage).to.throw(/Cannot cache a existing cahced page/);
+        expect(cachePage).to.throw(/Cannot cache an existing cached page/);
       });
     });
   });
