@@ -172,7 +172,7 @@ Route = class extends SharedRoute {
   _cachePage(url, data, timeout) {
     const existingInfo = this._cache[url];
     if (existingInfo) {
-      throw new Error(`Cannot cache a existing cahced page: ${url}`);
+      throw new Error(`Cannot cache an existing cached page: ${url}`);
     }
 
     const info = {
