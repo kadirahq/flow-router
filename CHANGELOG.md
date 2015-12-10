@@ -1,5 +1,8 @@
 # Changelog
 
+### v3.7.2
+* Add _serverRequest to the context in server side. It's current request's HTTP request object. You can get more information from if needed. See: [#414](https://github.com/kadirahq/flow-router/pull/414)
+
 ### v3.7.1
 * Fix a bug related to head injection. See: [#434](https://github.com/kadirahq/flow-router/pull/434)
 
