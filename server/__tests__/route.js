@@ -70,8 +70,10 @@ describe('Route', () => {
 
       const context = route._buildContext(req, params);
       expect(context.route).to.be.equal(route);
+      expect(context._serverRequest).to.be.equal(req);
 
       delete context.route;
+      delete context._serverRequest;
       expect(context).to.be.deep.equal({
         path: req.url,
         params: {aa: 10},

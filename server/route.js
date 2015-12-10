@@ -137,7 +137,9 @@ Route = class extends SharedRoute {
       route: this,
       path: req.url,
       params,
-      queryParams
+      queryParams,
+      // We might change this later on. That's why it's starting with _
+      _serverRequest: req
     };
 
     return context;
