@@ -52,7 +52,7 @@ Router = class extends SharedRouter {
   }
 
   setPageCacheTimeout(timeout) {
-    this._pageCacheTimeout = timeout;
+    this.pageCacheTimeout = timeout;
   }
 
   _getCurrentRouteContext() {
