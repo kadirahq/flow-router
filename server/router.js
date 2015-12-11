@@ -11,7 +11,13 @@ Router = class extends SharedRouter {
     this.inSubscription = new Meteor.EnvironmentVariable();
     this.routeContext = new Meteor.EnvironmentVariable();
 
-    this.pageCacheTimeout = 1000 * 30;
+    // FlowRouter can defer the script loading after rendered the body
+    // It's turned off by default
+    this.deferScriptLoading = false;
+    
+    // FlowRouter can cache it's pages to improve SSR performance.
+    // It's turned off by default
+    this.pageCacheTimeout = 0;
 
     // holds onRoute callbacks
     this._onRouteCallbacks = [];
