@@ -14,7 +14,7 @@ Router = class extends SharedRouter {
     // FlowRouter can defer the script loading after rendered the body
     // It's turned off by default
     this.deferScriptLoading = false;
-    
+
     // FlowRouter can cache it's pages to improve SSR performance.
     // It's turned off by default
     this.pageCacheTimeout = 0;

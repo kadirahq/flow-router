@@ -25,13 +25,13 @@ describe('Route', () => {
       it('should throw an error when trying to cache again', () => {
         const route = new Route();
         const pageInfo = {aa: 10};
-        
+
         route._cachePage('/the-url', pageInfo, 100);
         // doing it for the second time.
         route._cachePage('/the-url', {aa: 2323}, 100);
 
         const cachedPage = route._getCachedPage('/the-url');
-        expect(cachedPage).to.be.deep.equal(pageInfo);        
+        expect(cachedPage).to.be.deep.equal(pageInfo);
       });
     });
   });
