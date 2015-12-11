@@ -1,5 +1,10 @@
 # Changelog
 
+### v3.7.3
+
+* Make caching a page idempotant. Fix issues like this. [See](https://github.com/arunoda/hello-react-meteor/issues/13)
+* Disable caching by default.
+
 ### v3.7.2
 * Add _serverRequest to the context in server side. It's current request's HTTP request object. You can get more information from if needed. See: [#414](https://github.com/kadirahq/flow-router/pull/414)
 

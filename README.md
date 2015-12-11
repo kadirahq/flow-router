@@ -35,7 +35,7 @@ if(Meteor.isServer) {
 }
 ~~~
 
-> Use `0` as `timeInMillis` to turn off caching
+> Use `0` as `timeInMillis` to turn off caching. By default, caching is **turned off**.
 
 This is a smart cache and once your DDP connection sends actual data, cache will get invalidated locally.
 
