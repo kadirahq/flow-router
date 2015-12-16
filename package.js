@@ -54,8 +54,9 @@ Package.onTest(function(api) {
 
   api.addFiles('server/__tests__/ssr_context.js', 'server');
   api.addFiles('server/__tests__/route.js', 'server');
-  api.addFiles('server/__tests__/group.js', 'server');
   api.addFiles('server/plugins/__tests__/ssr_data.js', 'server');
+
+  api.addFiles('lib/__tests__/group.js', ['client', 'server']);
 });
 
 function configure(api) {
