@@ -1,76 +1,61 @@
 describe('Group', () => {
+  const router = new Router();
+  context('class', () => {
+    it('should exist', () => {
+      expect(Group).to.exist;
+    });
 
-	const router = new Router();		
+    it('should be an extension of the SharedGroup', () => {
+      const newGroup = new Group(router);
+      expect(newGroup).to.be.an.instanceof(Group);
+      expect(newGroup).to.be.an.instanceof(SharedGroup);
+    });
+  });
 
-	context('class', () => {
+  context('functionalities', () => {
+    it('should set and retrieve group name', () => {
+      // const prefix = Random.id();
+      const name = Random.id();
+      const newName = '';
+      // const newGroup = new Group(router, {prefix: '/' + prefix, name});
 
-		it('should exist', () => {
-			expect(Group).to.exist;
-		});
+      // no way to check if route is working
+      expect(newName).to.be.equal(name);
+    });
 
-		it('should be an extension of the SharedGroup', () => {
-			const newGroup = new Group(router);
-			expect(newGroup).to.be.an.instanceof(Group)
-			expect(newGroup).to.be.an.instanceof(SharedGroup)
-		});
+    context('define and go to route', () => {
+      const prefix = Random.id();
+      const rand = Random.id();
 
-	});
+      it('should work with prefix', () => {
+        const newGroup = new Group(router, {prefix: `/${prefix}`});
+        let rendered = 0;
 
-	context('functionalities', () => {
+        newGroup.route(`/${rand}`, {
+          action() {
+            rendered++;
+          }
+        });
 
-		it('should set and retrieve group name', () => {
+        // No way to check if route is working
 
-			const prefix = "/" +Random.id();
-  		const name = Random.id();
-  		let newName = ""
+        expect(rendered).to.be.equal(1);
+      });
 
-			const newGroup = new Group(router, {prefix, name})
+      it('should work without prefix', () => {
+        const newGroup = new Group(router);
+        let rendered = 0;
 
-			// no way to check if route is working
+        newGroup.route(rand, {
+          action() {
+            rendered++;
+          }
+        });
 
-			expect(newName).to.be.equal(name)
+        // No way to check if route is working
 
-		})
-
-		context('define and go to route', () => {
-
-			const prefix = '/' + Random.id();
-			const rand = '/' + Random.id();
-
-			it('should work with prefix', () => {
-			  const newGroup = new Group(router ,{prefix})
-			  let rendered = 0;
-			 
-			  newGroup.route(rand, {
-			  	action(_params) {			  		
-			  		rendered++
-			  	}
-			  });
-
-			  // No way to check if route is working
-
-			  expect(rendered).to.be.equal(1);
-
-			});
-
-			it('should work without prefix', () => {
-				
-			  const newGroup = new Group(router)
-			  let rendered = 0;
-			 
-			  newGroup.route(rand, {
-			  	action(_params) {			  		
-			  		rendered++
-			  	}
-			  })
-
-			  // No way to check if route is working
-
-			  expect(rendered).to.be.equal(1)
-
-			});
-		});
-
-		
-	})
-})
+        expect(rendered).to.be.equal(1);
+      });
+    });
+  });
+});
