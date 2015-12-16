@@ -18,10 +18,24 @@ describe('Group', () => {
 
 	context('functionalities', () => {
 
+		it('should set and retrieve group name', () => {
+
+			const prefix = "/" +Random.id();
+  		const name = Random.id();
+  		let newName = ""
+
+			const newGroup = new Group(router, {prefix, name})
+
+			// no way to check if route is working
+
+			expect(newName).to.be.equal(name)
+
+		})
+
 		context('define and go to route', () => {
 
 			const prefix = '/' + Random.id();
-			 const rand = '/' + Random.id();
+			const rand = '/' + Random.id();
 
 			it('should work with prefix', () => {
 			  const newGroup = new Group(router ,{prefix})
@@ -57,18 +71,6 @@ describe('Group', () => {
 			});
 		});
 
-		it('should set and retrieve group name', () => {
-
-			const prefix = "/" +Random.id();
-  		const name = Random.id();
-  		let newName = ""
-
-			const newGroup = new Group(router, {prefix, name})
-
-			// no way to check if route is working
-
-			expect(newName).to.be.equal(name)
-
-		})
+		
 	})
 })
