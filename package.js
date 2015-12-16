@@ -41,7 +41,6 @@ Package.onTest(function(api) {
   api.addFiles('test/client/route.reactivity.spec.js', 'client');
   api.addFiles('test/client/router.core.spec.js', 'client');
   api.addFiles('test/client/router.reactivity.spec.js', 'client');
-  api.addFiles('test/client/group.spec.js', 'client');
   api.addFiles('test/client/trigger.spec.js', 'client');
   api.addFiles('test/client/triggers.js', 'client');
 
@@ -55,6 +54,8 @@ Package.onTest(function(api) {
   api.addFiles('server/__tests__/ssr_context.js', 'server');
   api.addFiles('server/__tests__/route.js', 'server');
   api.addFiles('server/plugins/__tests__/ssr_data.js', 'server');
+
+  api.addFiles('lib/__tests__/group.js', ['client', 'server']);
 });
 
 function configure(api) {

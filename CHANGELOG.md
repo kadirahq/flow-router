@@ -49,8 +49,6 @@
 * Add initial SSR support
 * It's implemented as extendable manner. Currently ReactLayout supports it.
 
-------------
-
 ### v2.9.0
 * Add FlowRouter.url() See: [#374](https://github.com/kadirahq/flow-router/pull/374)
 

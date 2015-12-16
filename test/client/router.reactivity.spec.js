@@ -194,15 +194,15 @@ function(test, done) {
   FlowRouter.go(name1, {}, {id: 'one'});
   Meteor.setTimeout(function() {
     FlowRouter.go(name1, {}, {id: 'two'});
-  }, 10);
+  }, 20);
 
   Meteor.setTimeout(function() {
     FlowRouter.go(name2, {}, {id: 'three'});
-  }, 20);
+  }, 40);
 
   Meteor.setTimeout(function() {
     test.equal(ids, [undefined, 'one', 'two', 'three']);
     c.stop();
     done();
-  }, 40);
+  }, 60);
 });
