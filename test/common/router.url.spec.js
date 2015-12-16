@@ -1,8 +1,8 @@
-Tinytest.add('Common - Router - url - generic', function (test) {
-  var pathDef = "/blog/:blogId/some/:name";
+Tinytest.add('Common - Router - url - generic', function(test) {
+  var pathDef = '/blog/:blogId/some/:name';
   var fields = {
-    blogId: "1001",
-    name: "superb"
+    blogId: '1001',
+    name: 'superb'
   };
   var expectedUrl = Meteor.absoluteUrl('blog/1001/some/superb');
 

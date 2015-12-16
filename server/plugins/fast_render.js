@@ -1,36 +1,32 @@
-if(!Package['meteorhacks:fast-render']) {
-  return;
+if (Package['meteorhacks:fast-render']) {
+  FastRender = Package['meteorhacks:fast-render'].FastRender;
+
+  // hack to run after eveything else on startup
+  Meteor.startup(() => {
+    Meteor.startup(() => {
+      setupFastRender();
+    });
+  });
 }
 
-FastRender = Package['meteorhacks:fast-render'].FastRender;
-
-// hack to run after eveything else on startup
-Meteor.startup(function () {
-  Meteor.startup(function () {
-    setupFastRender();
-  });
-});
-
-function setupFastRender () {
-  _.each(FlowRouter._routes, function (route) {
-    FastRender.route(route.pathDef, function (routeParams, path) {
-      var self = this;
-
+function setupFastRender() {
+  FlowRouter._routes.forEach((route) => {
+    FastRender.route(route.pathDef, (routeParams, path) => {
       // anyone using Meteor.subscribe for something else?
-      var original = Meteor.subscribe;
-      Meteor.subscribe = function () {
-        return _.toArray(arguments);
+      const original = Meteor.subscribe;
+      Meteor.subscribe = (...args) => {
+        return _.toArray(args);
       };
 
       route._subsMap = {};
       FlowRouter.subscriptions.call(route, path);
-      if(route.subscriptions) {
-        var queryParams = routeParams.query;
-        var params = _.omit(routeParams, 'query');
+      if (route.subscriptions) {
+        const queryParams = routeParams.query;
+        const params = _.omit(routeParams, 'query');
         route.subscriptions(params, queryParams);
       }
-      _.each(route._subsMap, function (args) {
-        self.subscribe.apply(self, args);
+      route._subsMap.forEach((args) => {
+        this.subscribe(...args);
       });
 
       // restore Meteor.subscribe, ... on server side

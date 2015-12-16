@@ -1,0 +1,4 @@
+.npm/
+.node_modules/
+test
+package.js
