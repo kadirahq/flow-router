@@ -32,7 +32,7 @@ Package.onTest(function(api) {
   api.use('meteorhacks:fast-render');
   api.use('meteorhacks:inject-data');
   api.use('tmeasday:html5-history-api');
-  api.use('smithy:describe@1.0.0');
+  api.use('smithy:describe@1.0.1');
 
   api.addFiles('test/client/_helpers.js', 'client');
   api.addFiles('test/server/_helpers.js', 'server');
