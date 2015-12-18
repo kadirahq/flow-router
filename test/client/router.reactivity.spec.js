@@ -1,17 +1,17 @@
 Tinytest.addAsync(
-'Client - Router - Reactivity - detectChange only once', 
-function (test, done) {
-  var route = "/" + Random.id();
+'Client - Router - Reactivity - detectChange only once',
+function(test, done) {
+  var route = '/' + Random.id();
   var name = Random.id();
   FlowRouter.route(route, {name: name});
-  
+
   var ranCount = 0;
   var pickedId = null;
   var c = Tracker.autorun(function() {
     ranCount++;
-    pickedId = FlowRouter.getQueryParam("id");
-    if(pickedId) {
-      test.equal(pickedId, "hello");
+    pickedId = FlowRouter.getQueryParam('id');
+    if (pickedId) {
+      test.equal(pickedId, 'hello');
       test.equal(ranCount, 2);
       c.stop();
       Meteor.defer(done);
@@ -19,37 +19,37 @@ function (test, done) {
   });
 
   setTimeout(function() {
-    FlowRouter.go(name, {}, {id: "hello"});
+    FlowRouter.go(name, {}, {id: 'hello'});
   }, 2);
 });
 
 Tinytest.addAsync(
-'Client - Router - Reactivity - detectChange in the action', 
-function (test, done) {
-  var route = "/" + Random.id();
+'Client - Router - Reactivity - detectChange in the action',
+function(test, done) {
+  var route = '/' + Random.id();
   var name = Random.id();
   FlowRouter.route(route, {
     name: name,
     action: function() {
-      var id = FlowRouter.getQueryParam("id");
-      test.equal(id, "hello");
+      var id = FlowRouter.getQueryParam('id');
+      test.equal(id, 'hello');
       Meteor.defer(done);
     }
   });
 
   setTimeout(function() {
-    FlowRouter.go(name, {}, {id: "hello"});
+    FlowRouter.go(name, {}, {id: 'hello'});
   }, 2);
 });
 
 Tinytest.addAsync(
-'Client - Router - Reactivity - detect prev routeChange after new action', 
-function (test, done) {
-  var route1 = "/" + Random.id();
+'Client - Router - Reactivity - detect prev routeChange after new action',
+function(test, done) {
+  var route1 = '/' + Random.id();
   var name1 = Random.id();
   var pickedName1 = null;
 
-  var route2 = "/" + Random.id();
+  var route2 = '/' + Random.id();
   var name2 = Random.id();
   var pickedName2 = Random.id();
 
@@ -58,7 +58,7 @@ function (test, done) {
     action: function() {
       Tracker.autorun(function(c) {
         pickedName1 = FlowRouter.getRouteName();
-        if(pickedName1 == name2) {
+        if (pickedName1 === name2) {
           test.equal(pickedName1, pickedName2);
           c.stop();
           Meteor.defer(done);
@@ -85,11 +85,11 @@ function (test, done) {
 Tinytest.addAsync(
 'Client - Router - Reactivity - defer watchPathChange until new route rendered',
 function(test, done) {
-  var route1 = "/" + Random.id();
+  var route1 = '/' + Random.id();
   var name1 = Random.id();
   var pickedName1 = null;
 
-  var route2 = "/" + Random.id();
+  var route2 = '/' + Random.id();
   var name2 = Random.id();
   var pickedName2 = Random.id();
 
@@ -99,7 +99,7 @@ function(test, done) {
       Tracker.autorun(function(c) {
         FlowRouter.watchPathChange();
         pickedName1 = FlowRouter.current().route.name;
-        if(pickedName1 == name2) {
+        if (pickedName1 === name2) {
           test.equal(pickedName1, pickedName2);
           c.stop();
           Meteor.defer(done);
@@ -127,13 +127,13 @@ Tinytest.addAsync(
 'Client - Router - Reactivity - reactive changes and trigger redirects',
 function(test, done) {
   var name1 = Random.id();
-  var route1 = "/" + name1;
+  var route1 = '/' + name1;
   FlowRouter.route(route1, {
     name: name1
   });
 
   var name2 = Random.id();
-  var route2 = "/" + name2;
+  var route2 = '/' + name2;
   FlowRouter.route(route2, {
     name: name2,
     triggersEnter: [function(context, redirect) {
@@ -143,7 +143,7 @@ function(test, done) {
 
 
   var name3 = Random.id();
-  var route3 = "/" + name3;
+  var route3 = '/' + name3;
   FlowRouter.route(route3, {
     name: name3
   });
@@ -169,11 +169,11 @@ function(test, done) {
 Tinytest.addAsync(
 'Client - Router - Reactivity - watchPathChange for every route change',
 function(test, done) {
-  var route1 = "/" + Random.id();
+  var route1 = '/' + Random.id();
   var name1 = Random.id();
   var pickedName1 = null;
 
-  var route2 = "/" + Random.id();
+  var route2 = '/' + Random.id();
   var name2 = Random.id();
   var pickedName2 = Random.id();
 
@@ -191,18 +191,18 @@ function(test, done) {
     ids.push(FlowRouter.current().queryParams['id']);
   });
 
-  FlowRouter.go(name1, {}, {id: "one"});
+  FlowRouter.go(name1, {}, {id: 'one'});
   Meteor.setTimeout(function() {
-    FlowRouter.go(name1, {}, {id: "two"});
-  }, 10);
-
-  Meteor.setTimeout(function() {
-    FlowRouter.go(name2, {}, {id: "three"});
+    FlowRouter.go(name1, {}, {id: 'two'});
   }, 20);
 
   Meteor.setTimeout(function() {
-    test.equal(ids, [undefined, "one", "two", "three"]);
+    FlowRouter.go(name2, {}, {id: 'three'});
+  }, 40);
+
+  Meteor.setTimeout(function() {
+    test.equal(ids, [undefined, 'one', 'two', 'three']);
     c.stop();
     done();
-  }, 40);
+  }, 60);
 });
