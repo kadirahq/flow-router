@@ -32,19 +32,25 @@ Package.onTest(function(api) {
   api.use('meteorhacks:fast-render');
   api.use('meteorhacks:inject-data');
   api.use('tmeasday:html5-history-api');
-  api.use('smithy:describe@1.0.0');
+  api.use('smithy:describe@1.0.1');
 
   api.addFiles('test/client/_helpers.js', 'client');
   api.addFiles('test/server/_helpers.js', 'server');
 
-  api.addFiles('test/client/loader.spec.js', 'client');
+  api.addFiles('lib/__tests__/loader.js', ['client', 'server']);
+  api.addFiles('lib/__tests__/router.core.js', ['client', 'server']);
+  api.addFiles('lib/__tests__/router.path.js', ['client', 'server']);
+  api.addFiles('lib/__tests__/router.method.js', ['client', 'server']);
+  api.addFiles('lib/__tests__/group.method.js', ['client', 'server']);
+
+  api.addFiles('client/__tests__/loader.js', 'client');
+
   api.addFiles('test/client/route.reactivity.spec.js', 'client');
   api.addFiles('test/client/router.core.spec.js', 'client');
   api.addFiles('test/client/router.reactivity.spec.js', 'client');
   api.addFiles('test/client/trigger.spec.js', 'client');
   api.addFiles('test/client/triggers.js', 'client');
 
-  api.addFiles('test/common/loader.spec.js', ['client', 'server']);
   api.addFiles('test/common/router.path.spec.js', ['client', 'server']);
   api.addFiles('test/common/router.url.spec.js', ['client', 'server']);
   api.addFiles('test/common/router.addons.spec.js', ['client', 'server']);
@@ -55,7 +61,7 @@ Package.onTest(function(api) {
   api.addFiles('server/__tests__/route.js', 'server');
   api.addFiles('server/plugins/__tests__/ssr_data.js', 'server');
 
-  api.addFiles('lib/__tests__/group.js', ['client', 'server']);
+
 });
 
 function configure(api) {
