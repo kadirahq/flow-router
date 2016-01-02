@@ -571,7 +571,7 @@ After you've registered your subscriptions, you can reactively check for the sta
 ~~~js
 Tracker.autorun(function() {
     console.log("Is myPost ready?:", FlowRouter.subsReady("myPost"));
-    console.log("Does all subscriptions ready?:", FlowRouter.subsReady());
+    console.log("Are all subscriptions ready?:", FlowRouter.subsReady());
 });
 ~~~
 
