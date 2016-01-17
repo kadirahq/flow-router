@@ -58,7 +58,7 @@ Router = class extends SharedRouter {
 
   reload() {
     this.env.reload.withValue(true, () => {
-      this._page.replace(this._current.path);
+      this.go(this._current.path);
     });
   }
 
@@ -87,7 +87,7 @@ Router = class extends SharedRouter {
 
     const queryParams = {
       ...this._current.queryParams,
-      newParams
+      ...newParams
     };
 
     for (const k in queryParams) {
@@ -132,6 +132,12 @@ Router = class extends SharedRouter {
     return route;
   }
 
+  path(pathDef, fields={}, queryParams={}) {
+    const encodedFields = this._encodeValues(fields);
+    const encodedQueryParams = this._encodeValues(queryParams);
+    return super.path(pathDef, encodedFields, encodedQueryParams);
+  }
+
   go(pathDef, fields, queryParams) {
     const path = this.path(pathDef, fields, queryParams);
 
@@ -145,8 +151,6 @@ Router = class extends SharedRouter {
       return;
     }
 
-    // XXX: Implement Meteor base path based routing.
-
     const qsStartIndex = path.indexOf('?');
     let pathWithoutQs = path;
     let queryString = "";
@@ -154,12 +158,16 @@ Router = class extends SharedRouter {
       pathWithoutQs = path.substr(0, qsStartIndex);
       queryString = path.substr(qsStartIndex + 1);
     }
-    const parsedQueryParams = Qs.parse(queryString);
+    const parsedQueryParams = this._decodeValues(Qs.parse(queryString));
 
     // Remove basePath from the path
     let pathWithoutBasepath = pathWithoutQs;
     if (this._basePath) {
-      pathWithoutBasepath = pathWithoutQs.replace(`/${this._basePath}/`, '');
+      const cleanedBasePath = this._basePath
+        .trim()
+        .replace(/^\//, '')
+        .replace(/$\//, '');
+      pathWithoutBasepath = pathWithoutQs.replace(`/${cleanedBasePath}`, '');
     }
 
     for (const index in this._routeDefs) {
@@ -168,7 +176,7 @@ Router = class extends SharedRouter {
       if (matched) {
         const params = {};
         routeDef.keys.forEach(({name}, index) => {
-          params[name] = matched[index + 1];
+          params[name] = decodeURIComponent(matched[index + 1]);
         });
 
         return this._navigate(path, routeDef.route, params, parsedQueryParams);
@@ -193,10 +201,11 @@ Router = class extends SharedRouter {
     this._current = context;
 
     const useReplaceState = this.env.replaceState.get();
+    const urlState = {path, params, queryParams};
     if (useReplaceState) {
-      history.replaceState({}, window.title, path);
+      history.replaceState(urlState, window.title, path);
     } else {
-      history.pushState({}, window.title, path);
+      history.pushState(urlState, window.title, path);
     }
 
     const oldRoute = this._oldRoute;
@@ -213,6 +222,24 @@ Router = class extends SharedRouter {
     }
 
     this._applyRoute();
+  }
+
+  _encodeValues(obj) {
+    const newObj = {};
+    Object.keys(obj).forEach(key => {
+      newObj[key] = encodeURIComponent(obj[key]);
+    });
+
+    return newObj;
+  }
+
+  _decodeValues(obj) {
+    const newObj = {};
+    Object.keys(obj).forEach(key => {
+      newObj[key] = decodeURIComponent(obj[key]);
+    });
+
+    return newObj;
   }
 
   _applyRoute() {
