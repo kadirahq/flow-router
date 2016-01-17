@@ -10,6 +10,8 @@ Router = class extends SharedRouter {
 
     // tracks the current path change
     this._onEveryPath = new Tracker.Dependency();
+    this._params = new ReactiveDict();
+    this._queryParams = new ReactiveDict();
 
     this._globalRoute = new Route(this);
 
@@ -121,6 +123,23 @@ Router = class extends SharedRouter {
     return this.env.replaceState.withValue(true, fn);
   }
 
+  watchPathChange() {
+    this._onEveryPath.depend();
+  }
+
+  getParam(key) {
+    return this._params.get(key);
+  }
+
+  getQueryParam(key) {
+    return this._queryParams.get(key);
+  }
+
+  getRouteName() {
+    this.watchPathChange();
+    return this._current.route.name;
+  }
+
   go(pathDef, fields, queryParams) {
     const path = this.path(pathDef, fields, queryParams);
 
@@ -192,6 +211,7 @@ Router = class extends SharedRouter {
     }
 
     this._oldRoute = route;
+    // XXX: Implement exit triggers
     this._applyRoute();
   }
 
@@ -221,27 +241,29 @@ Router = class extends SharedRouter {
         isRouteChange = false;
       }
 
-      const oldRoute = this._oldRoute;
-      this._oldRoute = null;
-
-      currentContext.route.registerRouteChange(currentContext, isRouteChange);
       route.callAction(currentContext);
 
       Tracker.afterFlush(() => {
         this._onEveryPath.changed();
-        if (isRouteChange) {
-          // We need to trigger that route (definition itself) has changed.
-          // So, we need to re-run all the register callbacks to current route
-          // This is pretty important, otherwise tracker
-          // can't identify new route's items
-
-          // We also need to afterFlush, otherwise this will re-run
-          // helpers on templates which are marked for destroying
-          if (oldRoute) {
-            oldRoute.registerRouteClose();
-          }
-        }
+        this._updateReactiveDict(this._params, currentContext.params);
+        this._updateReactiveDict(this._queryParams, currentContext.queryParams);
       });
+    });
+  }
+
+  _updateReactiveDict(dict, newValues) {
+    const currentKeys = _.keys(newValues);
+    const oldKeys = _.keys(dict.keyDeps);
+
+    // set new values
+    currentKeys.forEach((key) => {
+      dict.set(key, newValues[key]);
+    });
+
+    // remove keys which does not exisits here
+    const removedKeys = _.difference(oldKeys, currentKeys);
+    removedKeys.forEach((key) => {
+      dict.set(key, undefined);
     });
   }
 
@@ -337,22 +359,5 @@ Router = class extends SharedRouter {
 const reactiveApis = [
   'getParam',
   'getQueryParam',
-  'getRouteName',
-  'watchPathChange'
+  'getRouteName'
 ];
-
-reactiveApis.forEach((api) => {
-  Router.prototype[api] = function(arg1) {
-    // when this is calling, there may not be any route initiated
-    // so we need to handle it
-    const currentRoute = this._current.route;
-    if (!currentRoute) {
-      this._onEveryPath.depend();
-      return null;
-    }
-
-    // currently, there is only one argument. If we've more let's add more args
-    // this is not clean code, but better in performance
-    return currentRoute[api].call(currentRoute, arg1);
-  };
-});
