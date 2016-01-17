@@ -4,8 +4,7 @@ Router = class extends SharedRouter {
   constructor() {
     super();
 
-    this.globals = [];
-
+    // holds the current context
     this._current = {};
 
     // tracks the current path change
@@ -13,26 +12,19 @@ Router = class extends SharedRouter {
     this._params = new ReactiveDict();
     this._queryParams = new ReactiveDict();
 
-    this._globalRoute = new Route(this);
-
     // if _askedToWait is true. We don't automatically start the router
     // in Meteor.startup callback. (see client/_init.js)
     // Instead user need to call `.initialize()
     this._askedToWait = false;
     this._initialized = false;
+
     this._triggersEnter = [];
     this._triggersExit = [];
-    this.notFound = this.notfound = null;
 
     // Meteor exposes to the client the path prefix that was defined using the
     // ROOT_URL environement variable on the server using the global runtime
     // configuration. See #315.
     this._basePath = __meteor_runtime_config__.ROOT_URL_PATH_PREFIX || '';
-
-    // this is a chain contains a list of old routes
-    // most of the time, there is only one old route
-    // but when it's the time for a trigger redirect we've a chain
-    this._oldRouteChain = [];
 
     this.env.replaceState = new Meteor.EnvironmentVariable();
     this.env.reload = new Meteor.EnvironmentVariable();
@@ -41,16 +33,7 @@ Router = class extends SharedRouter {
     this._routeDefs = [];
 
     this._initTriggersAPI();
-    this._initClickHandlers();
-  }
-
-  route(pathDef, options, group) {
-    const route = super.route(pathDef, options, group);
-    const keys = [];
-    const regexp = PathToRegexp(pathDef, keys);
-    this._routeDefs.push({regexp, keys, pathDef, route});
-
-    return route;
+    this._initClickAnchorHandlers();
   }
 
   initialize(options) {
@@ -140,6 +123,15 @@ Router = class extends SharedRouter {
     return this._current.route.name;
   }
 
+  route(pathDef, options, group) {
+    const route = super.route(pathDef, options, group);
+    const keys = [];
+    const regexp = PathToRegexp(pathDef, keys);
+    this._routeDefs.push({regexp, keys, pathDef, route});
+
+    return route;
+  }
+
   go(pathDef, fields, queryParams) {
     const path = this.path(pathDef, fields, queryParams);
 
@@ -153,20 +145,26 @@ Router = class extends SharedRouter {
       return;
     }
 
+    // XXX: Implement Meteor base path based routing.
+
     const qsStartIndex = path.indexOf('?');
     let pathWithoutQs = path;
     let queryString = "";
-
     if (qsStartIndex >= 0) {
       pathWithoutQs = path.substr(0, qsStartIndex);
       queryString = path.substr(qsStartIndex + 1);
     }
-
     const parsedQueryParams = Qs.parse(queryString);
+
+    // Remove basePath from the path
+    let pathWithoutBasepath = pathWithoutQs;
+    if (this._basePath) {
+      pathWithoutBasepath = pathWithoutQs.replace(`/${this._basePath}/`, '');
+    }
 
     for (const index in this._routeDefs) {
       const routeDef = this._routeDefs[index];
-      const matched = routeDef.regexp.exec(pathWithoutQs);
+      const matched = routeDef.regexp.exec(pathWithoutBasepath);
       if (matched) {
         const params = {};
         routeDef.keys.forEach(({name}, index) => {
@@ -184,23 +182,14 @@ Router = class extends SharedRouter {
   _navigate(path, route, params, queryParams) {
     const context = {path, route, params, queryParams};
 
-    let redirectArgs;
-    const redirectFn = (...args) => {
-      redirectArgs = args;
-    };
-
-    var triggers = this._triggersEnter.concat(route._triggersEnter);
-    Triggers.runTriggers(
-      triggers,
-      context,
-      redirectFn,
-      () => {}
-    );
+    const triggersEnter = this._triggersEnter.concat(route._triggersEnter);
+    const redirectArgs = this._runTriggers(triggersEnter, context);
 
     if (redirectArgs) {
       return this.go(...redirectArgs);
     }
 
+    // Set the current context
     this._current = context;
 
     const useReplaceState = this.env.replaceState.get();
@@ -210,9 +199,37 @@ Router = class extends SharedRouter {
       history.pushState({}, window.title, path);
     }
 
+    const oldRoute = this._oldRoute;
     this._oldRoute = route;
-    // XXX: Implement exit triggers
+
+    // Run exit handlers
+    if (oldRoute) {
+      const triggersExit = this._triggersExit.concat(oldRoute._triggersExit);
+      const exitRedirectArgs = this._runTriggers(triggersExit, context);
+
+      if (exitRedirectArgs) {
+        return this.go(...exitRedirectArgs);
+      }
+    }
+
     this._applyRoute();
+  }
+
+  _applyRoute() {
+    const currentContext = this._current;
+    const route = currentContext.route;
+
+    // otherwise, computations inside action will trigger to re-run
+    // this computation. which we do not need.
+    Tracker.nonreactive(() => {
+      route.callAction(currentContext);
+
+      Tracker.afterFlush(() => {
+        this._onEveryPath.changed();
+        this._updateReactiveDict(this._params, currentContext.params);
+        this._updateReactiveDict(this._queryParams, currentContext.queryParams);
+      });
+    });
   }
 
   _getNotFoundRoute() {
@@ -226,29 +243,20 @@ Router = class extends SharedRouter {
     return new Route(this, "*", notFoundOptions);
   }
 
-  _applyRoute() {
-    // see the definition of `this._processingContexts`
-    const currentContext = this._current;
-    const route = currentContext.route;
+  _runTriggers(triggers, context) {
+    let redirectArgs;
+    const redirectFn = (...args) => {
+      redirectArgs = args;
+    };
 
-    // otherwise, computations inside action will trigger to re-run
-    // this computation. which we do not need.
-    Tracker.nonreactive(() => {
-      let isRouteChange = currentContext.oldRoute !== currentContext.route;
-      const isFirstRoute = !currentContext.oldRoute;
-      // first route is not a route change
-      if (isFirstRoute) {
-        isRouteChange = false;
-      }
+    Triggers.runTriggers(
+      triggers,
+      context,
+      redirectFn,
+      () => {}
+    );
 
-      route.callAction(currentContext);
-
-      Tracker.afterFlush(() => {
-        this._onEveryPath.changed();
-        this._updateReactiveDict(this._params, currentContext.params);
-        this._updateReactiveDict(this._queryParams, currentContext.queryParams);
-      });
-    });
+    return redirectArgs;
   }
 
   _updateReactiveDict(dict, newValues) {
@@ -285,11 +293,12 @@ Router = class extends SharedRouter {
     };
   }
 
+  // This is required for implementing a router class.
   _getCurrentRouteContext() {
     return this._current;
   }
 
-  _initClickHandlers() {
+  _initClickAnchorHandlers() {
     var clickEvent =
       ('undefined' !== typeof document) && document.ontouchstart ?
       'touchstart' : 'click';
@@ -354,10 +363,3 @@ Router = class extends SharedRouter {
     }
   }
 };
-
-// Implementing Reactive APIs
-const reactiveApis = [
-  'getParam',
-  'getQueryParam',
-  'getRouteName'
-];
