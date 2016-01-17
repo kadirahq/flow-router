@@ -4,9 +4,6 @@ Router = class extends SharedRouter {
   constructor() {
     super();
 
-    this._qs = qs;
-    this._page = page;
-
     this.globals = [];
 
     this._current = {};
@@ -23,7 +20,6 @@ Router = class extends SharedRouter {
     this._initialized = false;
     this._triggersEnter = [];
     this._triggersExit = [];
-    this._updateCallbacks();
     this.notFound = this.notfound = null;
 
     // Meteor exposes to the client the path prefix that was defined using the
@@ -39,98 +35,46 @@ Router = class extends SharedRouter {
     this.env.replaceState = new Meteor.EnvironmentVariable();
     this.env.reload = new Meteor.EnvironmentVariable();
 
-    // redirect function used inside triggers
-    this._redirectFn = (pathDef, fields, queryParams) => {
-      if (/^http(s)?:\/\//.test(pathDef)) {
-        const message = "Redirects to URLs outside of the app are not supported in this version of Flow Router. Use 'window.location = yourUrl' instead";
-        throw new Error(message);
-      }
-
-      this.withReplaceState(() => {
-        const path = FlowRouter.path(pathDef, fields, queryParams);
-        this._page.redirect(path);
-      });
-    };
+    // this holds route pathDefs
+    this._routeDefs = [];
 
     this._initTriggersAPI();
+    this._initClickHandlers();
   }
 
   route(pathDef, options, group) {
     const route = super.route(pathDef, options, group);
-
-    // calls when the page route being activates
-    route._actionHandle = (context) => {
-      const oldRoute = this._current.route;
-      this._oldRouteChain.push(oldRoute);
-
-      let queryParams = this._qs.parse(context.querystring);
-      // _qs.parse() gives us a object without prototypes,
-      // created with Object.create(null)
-      // Meteor's check doesn't play nice with it.
-      // So, we need to fix it by cloning it.
-      // see more: https://github.com/meteorhacks/flow-router/issues/164
-      queryParams = JSON.parse(JSON.stringify(queryParams));
-
-      this._current = {
-        path: context.path,
-        context: context,
-        params: context.params,
-        queryParams: queryParams,
-        route: route,
-        oldRoute: oldRoute
-      };
-
-      // we need to invalidate if all the triggers have been completed
-      // if not that means, we've been redirected to another path
-      // then we don't need to invalidate
-      const afterAllTriggersRan = () => {
-        this._applyRoute();
-      };
-
-      const triggers = this._triggersEnter.concat(route._triggersEnter);
-      Triggers.runTriggers(
-        triggers,
-        this._current,
-        this._redirectFn,
-        afterAllTriggersRan
-      );
-    };
-
-    // calls when you exit from the page js route
-    route._exitHandle = (context, next) => {
-      const triggers = this._triggersExit.concat(route._triggersExit);
-      Triggers.runTriggers(
-        triggers,
-        this._current,
-        this._redirectFn,
-        next
-      );
-    };
-
-    this._updateCallbacks();
+    const keys = [];
+    const regexp = PathToRegexp(pathDef, keys);
+    this._routeDefs.push({regexp, keys, pathDef, route});
 
     return route;
   }
 
-  go(pathDef, fields, queryParams) {
-    const path = this.path(pathDef, fields, queryParams);
+  initialize(options) {
+    options = options || {};
 
-    const useReplaceState = this.env.replaceState.get();
-    if (useReplaceState) {
-      this._page.replace(path);
-    } else {
-      this._page(path);
+    if (this._initialized) {
+      throw new Error('FlowRouter is already initialized');
     }
+
+    this._initialized = true;
+    const path = location.pathname + location.search + (location.hash || '');
+    this.go(path);
+  }
+
+  wait() {
+    if (this._initialized) {
+      throw new Error("can't wait after FlowRouter has been initialized");
+    }
+
+    this._askedToWait = true;
   }
 
   reload() {
     this.env.reload.withValue(true, () => {
       this._page.replace(this._current.path);
     });
-  }
-
-  redirect(path) {
-    this._page.redirect(path);
   }
 
   setParams(newParams) {
@@ -140,13 +84,11 @@ Router = class extends SharedRouter {
 
     const pathDef = this._current.route.pathDef;
     const existingParams = this._current.params;
-    let params = {};
-    Object.keys(existingParams).forEach((key) => {
-      params[key] = existingParams[key];
-    });
 
-    // _.extend(dst, src1, src2) can be replaced with Object.assign(dst, src1, src2) in ES2015
-    params = Object.assign(params, newParams);
+    const params = {
+      ...existingParams,
+      ...newParams
+    };
     const queryParams = this._current.queryParams;
 
     this.go(pathDef, params, queryParams);
@@ -158,9 +100,10 @@ Router = class extends SharedRouter {
       return false;
     }
 
-    const queryParams = _.clone(this._current.queryParams);
-    // Object.assign can be used instead of _.extend
-    Object.assign(queryParams, newParams);
+    const queryParams = {
+      ...this._current.queryParams,
+      newParams
+    };
 
     for (const k in queryParams) {
       if (queryParams[k] === null || queryParams[k] === undefined) {
@@ -178,66 +121,89 @@ Router = class extends SharedRouter {
     return this.env.replaceState.withValue(true, fn);
   }
 
-  _notfoundRoute(context) {
-    this._current = {
-      path: context.path,
-      context: context,
-      params: [],
-      queryParams: {},
-    };
+  go(pathDef, fields, queryParams) {
+    const path = this.path(pathDef, fields, queryParams);
 
-    // XXX this.notfound kept for backwards compatibility
-    this.notFound = this.notFound || this.notfound;
-    if (!this.notFound) {
-      logger.error('There is no route for the path:', context.path);
+    if (!path) {
+      return logger.error('Path is required for FlowRouter.go()');
+    }
+
+    // Implement idempotant routing
+    const insideAReload = this.env.reload.get();
+    if (this._current.path === path && !insideAReload) {
       return;
     }
 
-    this._current.route = new Route(this, '*', this.notFound);
+    const qsStartIndex = path.indexOf('?');
+    let pathWithoutQs = path;
+    let queryString = "";
+
+    if (qsStartIndex >= 0) {
+      pathWithoutQs = path.substr(0, qsStartIndex);
+      queryString = path.substr(qsStartIndex + 1);
+    }
+
+    const parsedQueryParams = Qs.parse(queryString);
+
+    for (const index in this._routeDefs) {
+      const routeDef = this._routeDefs[index];
+      const matched = routeDef.regexp.exec(pathWithoutQs);
+      if (matched) {
+        const params = {};
+        routeDef.keys.forEach(({name}, index) => {
+          params[name] = matched[index + 1];
+        });
+
+        return this._navigate(path, routeDef.route, params, parsedQueryParams);
+      }
+    }
+
+    const notFoundRoute = this._getNotFoundRoute();
+    this._navigate(path, notFoundRoute, {}, parsedQueryParams);
+  }
+
+  _navigate(path, route, params, queryParams) {
+    const context = {path, route, params, queryParams};
+
+    let redirectArgs;
+    const redirectFn = (...args) => {
+      redirectArgs = args;
+    };
+
+    var triggers = this._triggersEnter.concat(route._triggersEnter);
+    Triggers.runTriggers(
+      triggers,
+      context,
+      redirectFn,
+      () => {}
+    );
+
+    if (redirectArgs) {
+      return this.go(...redirectArgs);
+    }
+
+    this._current = context;
+
+    const useReplaceState = this.env.replaceState.get();
+    if (useReplaceState) {
+      history.replaceState({}, window.title, path);
+    } else {
+      history.pushState({}, window.title, path);
+    }
+
+    this._oldRoute = route;
     this._applyRoute();
   }
 
-  initialize(options) {
-    options = options || {};
+  _getNotFoundRoute() {
+    const notFoundOptions = this.notFound || {
+      action() {
+        const current = FlowRouter.current();
+        logger.error('There is no route for the path:', current.path);
+      }
+    };
 
-    if (this._initialized) {
-      throw new Error('FlowRouter is already initialized');
-    }
-
-    this._updateCallbacks();
-
-    // Implementing idempotent routing
-    // by overriding page.js`s "show" method.
-    // Why?
-    // It is impossible to bypass exit triggers,
-    // because they execute before the handler and
-    // can not know what the next path is, inside exit trigger.
-    //
-    // we need override both show, replace to make this work
-    // since we use redirect when we are talking about withReplaceState
-    ['show', 'replace'].forEach((fnName) => {
-      const original = this._page[fnName];
-      this._page[fnName] = (path, state, dispatch, push) => {
-        const reload = this.env.reload.get();
-        if (!reload && this._current.path === path) {
-          return;
-        }
-
-        original.call(this, path, state, dispatch, push);
-      };
-    });
-
-    // this is very ugly part of pagejs and it does decoding few times
-    // in unpredicatable manner. See #168
-    // this is the defa_ult behaviour and we need keep it like that
-    // we are doing a hack. see .path()
-    this._page.base(this._basePath);
-    this._page({
-      decodeURLComponents: true,
-      hashbang: !!options.hashbang
-    });
-
-    this._initialized = true;
+    return new Route(this, "*", notFoundOptions);
   }
 
   _applyRoute() {
@@ -255,12 +221,8 @@ Router = class extends SharedRouter {
         isRouteChange = false;
       }
 
-      // Clear oldRouteChain just before calling the action
-      // We still need to get a copy of the oldestRoute first
-      // It's very important to get the oldest route and registerRouteClose() it
-      // See: https://github.com/kadirahq/flow-router/issues/314
-      const oldestRoute = this._oldRouteChain[0];
-      this._oldRouteChain = [];
+      const oldRoute = this._oldRoute;
+      this._oldRoute = null;
 
       currentContext.route.registerRouteChange(currentContext, isRouteChange);
       route.callAction(currentContext);
@@ -275,35 +237,11 @@ Router = class extends SharedRouter {
 
           // We also need to afterFlush, otherwise this will re-run
           // helpers on templates which are marked for destroying
-          if (oldestRoute) {
-            oldestRoute.registerRouteClose();
+          if (oldRoute) {
+            oldRoute.registerRouteClose();
           }
         }
       });
-    });
-  }
-
-  _updateCallbacks() {
-    this._page.callbacks = [];
-    this._page.exits = [];
-
-    this._routes.forEach((route) => {
-      this._page(route.pathDef, route._actionHandle);
-      this._page.exit(route.pathDef, (context, next) => {
-        // XXX: With React, exit handler gets called twice
-        // We've not debugged into why yet, but it's an issue
-        // so, we need to manually handle it like this
-        if (this._oldExitPath === context.path) {
-          return next();
-        }
-
-        this._oldExitPath = context.path;
-        route._exitHandle(context, next);
-      });
-    });
-
-    this._page('*', (context) => {
-      this._notfoundRoute(context);
     });
   }
 
@@ -325,16 +263,73 @@ Router = class extends SharedRouter {
     };
   }
 
-  wait() {
-    if (this._initialized) {
-      throw new Error("can't wait after FlowRouter has been initialized");
-    }
-
-    this._askedToWait = true;
-  }
-
   _getCurrentRouteContext() {
     return this._current;
+  }
+
+  _initClickHandlers() {
+    var clickEvent =
+      ('undefined' !== typeof document) && document.ontouchstart ?
+      'touchstart' : 'click';
+    document.addEventListener(clickEvent, onclick, false);
+
+    function onclick(e) {
+      if (1 !== which(e)) {
+        return;
+      }
+
+      if (e.metaKey || e.ctrlKey || e.shiftKey) {
+        return;
+      }
+
+      if (e.defaultPrevented) {
+        return;
+      }
+
+      // ensure link
+      let el = e.target;
+      while (el && 'A' !== el.nodeName) el = el.parentNode;
+      if (!el || 'A' !== el.nodeName) {
+        return;
+      }
+
+      // Ignore if tag has
+      // 1. "download" attribute
+      // 2. rel="external" attribute
+      const externalLink =
+        el.hasAttribute('download') ||
+        el.getAttribute('rel') === 'external';
+
+      if (externalLink) {
+        return;
+      }
+
+      // ensure non-hash for the same path
+      let link = el.getAttribute('href');
+      if (el.pathname === location.pathname && (el.hash || '#' === link)) {
+        return;
+      }
+
+      // Check for mailto: in the href
+      if (link && link.indexOf('mailto:') > -1) {
+        return;
+      }
+
+      // check target
+      if (el.target) {
+        return;
+      }
+
+      // rebuild path
+      let path = el.pathname + el.search + (el.hash || '');
+      e.preventDefault();
+      this.go(path);
+    }
+
+    function which(e) {
+      e = e || window.event;
+      return null === e.which ? e.button : e.which;
+    }
   }
 };
 
