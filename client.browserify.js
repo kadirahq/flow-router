@@ -1,2 +1,2 @@
-page = require('page');
-qs = require('qs');
+Qs = require('qs');
+PathToRegexp = require('path-to-regexp');
