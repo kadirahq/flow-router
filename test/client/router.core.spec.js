@@ -329,22 +329,11 @@ Tinytest.addAsync('Client - Router - notFound', function(test, done) {
 Tinytest.addAsync('Client - Router - withReplaceState - enabled',
 function(test, done) {
   var pathDef = '/' + Random.id() + '/:id';
-  var originalRedirect = FlowRouter._page.replace;
-  var callCount = 0;
-  FlowRouter._page.replace = function(path) {
-    callCount++;
-    originalRedirect.call(FlowRouter._page, path);
-  };
 
   FlowRouter.route(pathDef, {
     name: name,
     action: function(params) {
       test.equal(params.id, 'awesome');
-      test.equal(callCount, 1);
-      FlowRouter._page.replace = originalRedirect;
-      // We don't use Meteor.defer here since it carries
-      // Meteor.Environment vars too
-      // Which breaks our test below
       setTimeout(done, 0);
     }
   });
@@ -357,19 +346,11 @@ function(test, done) {
 Tinytest.addAsync('Client - Router - withReplaceState - disabled',
 function(test, done) {
   var pathDef = '/' + Random.id() + '/:id';
-  var originalRedirect = FlowRouter._page.replace;
-  var callCount = 0;
-  FlowRouter._page.replace = function(path) {
-    callCount++;
-    originalRedirect.call(FlowRouter._page, path);
-  };
 
   FlowRouter.route(pathDef, {
     name: name,
     action: function(params) {
       test.equal(params.id, 'awesome');
-      test.equal(callCount, 0);
-      FlowRouter._page.replace = originalRedirect;
       Meteor.defer(done);
     }
   });
@@ -571,6 +552,8 @@ Tinytest.addAsync(
 function(test, done) {
   var simulatedBasePath = '/flow';
   var rand = Random.id();
+  setBasePath(simulatedBasePath);
+
   FlowRouter.route('/' + rand, {
     action: function() {
       resetBasePath();
@@ -578,7 +561,6 @@ function(test, done) {
     }
   });
 
-  setBasePath(simulatedBasePath);
   FlowRouter.go('/' + rand);
 });
 
@@ -595,9 +577,7 @@ function(test, done) {
 
 
 function setBasePath(path) {
-  FlowRouter._initialized = false;
   FlowRouter._basePath = path;
-  FlowRouter.initialize();
 }
 
 var defaultBasePath = FlowRouter._basePath;
