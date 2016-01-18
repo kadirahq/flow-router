@@ -211,7 +211,10 @@ Router = class extends SharedRouter {
   _navigate(path, route, params, queryParams) {
     const context = {path, route, params, queryParams};
 
-    const triggersEnter = this._triggersEnter.concat(route._triggersEnter);
+    const triggersEnter = [
+      ...this._triggersEnter,
+      ...route._triggersEnter
+    ];
     const redirectArgs = this._runTriggers(triggersEnter, context);
 
     if (redirectArgs) {
@@ -219,6 +222,7 @@ Router = class extends SharedRouter {
     }
 
     // Set the current context
+    const oldContext = this._current;
     this._current = context;
 
     const useReplaceState = this.env.replaceState.get();
@@ -229,13 +233,13 @@ Router = class extends SharedRouter {
       history.pushState(urlState, window.title, path);
     }
 
-    const oldRoute = this._oldRoute;
-    this._oldRoute = route;
-
     // Run exit handlers
-    if (oldRoute) {
-      const triggersExit = this._triggersExit.concat(oldRoute._triggersExit);
-      const exitRedirectArgs = this._runTriggers(triggersExit, context);
+    if (oldContext && oldContext.route) {
+      const triggersExit = [
+        ...this._triggersExit,
+        ...oldContext.route._triggersExit
+      ];
+      const exitRedirectArgs = this._runTriggers(triggersExit, oldContext);
 
       if (exitRedirectArgs) {
         return this.go(...exitRedirectArgs);
@@ -279,6 +283,14 @@ Router = class extends SharedRouter {
   _runTriggers(triggers, context) {
     let redirectArgs;
     const redirectFn = (...args) => {
+      if (/^http(s)?:\/\//.test(args[0])) {
+        var message = `
+          Redirects to URLs outside of the app are not supported
+          in this version of Flow Router.
+          Use 'window.location = yourUrl' instead.
+        `;
+        throw new Error(message);
+      }
       redirectArgs = args;
     };
 
