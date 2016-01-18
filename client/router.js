@@ -362,7 +362,8 @@ Router = class extends SharedRouter {
   }
 
   _initClickAnchorHandlers() {
-    var clickEvent =
+    const self = this;
+    const clickEvent =
       ('undefined' !== typeof document) && document.ontouchstart ?
       'touchstart' : 'click';
     document.addEventListener(clickEvent, onclick, false);
@@ -417,7 +418,7 @@ Router = class extends SharedRouter {
       // rebuild path
       let path = el.pathname + el.search + (el.hash || '');
       e.preventDefault();
-      this.go(path);
+      self.go(path);
     }
 
     function which(e) {
