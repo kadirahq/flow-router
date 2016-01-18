@@ -48,7 +48,7 @@ Tinytest.add('Common - Router - path - just queryParams', function(test) {
 
   var expectedPath = '/blog/abc?aa=100&bb=200';
 
-  var path = FlowRouter.path(pathDef, null, queryParams);
+  var path = FlowRouter.path(pathDef, {}, queryParams);
   test.equal(path, expectedPath);
 });
 
