@@ -2,16 +2,15 @@ Tinytest.addAsync(
 'Client - Router - Reactivity - detectChange only once',
 function(test, done) {
   var route = '/' + Random.id();
+  var idValue = Random.id();
   var name = Random.id();
   FlowRouter.route(route, {name: name});
 
   var ranCount = 0;
-  var pickedId = null;
-  var c = Tracker.autorun(function() {
+  Tracker.autorun(function(c) {
     ranCount++;
-    pickedId = FlowRouter.getQueryParam('id');
-    if (pickedId) {
-      test.equal(pickedId, 'hello');
+    var pickedId = FlowRouter.getQueryParam('id');
+    if (pickedId === idValue) {
       test.equal(ranCount, 2);
       c.stop();
       Meteor.defer(done);
@@ -19,8 +18,8 @@ function(test, done) {
   });
 
   setTimeout(function() {
-    FlowRouter.go(name, {}, {id: 'hello'});
-  }, 2);
+    FlowRouter.go(name, {}, {id: idValue});
+  }, 20);
 });
 
 Tinytest.addAsync(
@@ -28,17 +27,19 @@ Tinytest.addAsync(
 function(test, done) {
   var route = '/' + Random.id();
   var name = Random.id();
+  var idValue = Random.id();
+
   FlowRouter.route(route, {
     name: name,
     action: function() {
       var id = FlowRouter.getQueryParam('id');
-      test.equal(id, 'hello');
+      test.equal(id, idValue);
       Meteor.defer(done);
     }
   });
 
   setTimeout(function() {
-    FlowRouter.go(name, {}, {id: 'hello'});
+    FlowRouter.go(name, {}, {id: idValue});
   }, 2);
 });
 
