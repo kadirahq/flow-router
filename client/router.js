@@ -1,3 +1,4 @@
+/* eslint new-cap: 0 no-loop-func: 0 */
 const logger = console;
 
 Router = class extends SharedRouter {
@@ -153,7 +154,7 @@ Router = class extends SharedRouter {
     return route;
   }
 
-  path(pathDef, fields={}, queryParams={}) {
+  path(pathDef, fields = {}, queryParams = {}) {
     const encodedFields = this._encodeValues(fields);
     const encodedQueryParams = this._encodeValues(queryParams);
     return super.path(pathDef, encodedFields, encodedQueryParams);
@@ -163,7 +164,8 @@ Router = class extends SharedRouter {
     const path = this.path(pathDef, fields, queryParams);
 
     if (!path) {
-      return logger.error('Path is required for FlowRouter.go()');
+      logger.error('Path is required for FlowRouter.go()');
+      return;
     }
 
     // Implement idempotant routing
@@ -174,7 +176,7 @@ Router = class extends SharedRouter {
 
     const qsStartIndex = path.indexOf('?');
     let pathWithoutQs = path;
-    let queryString = "";
+    let queryString = '';
     if (qsStartIndex >= 0) {
       pathWithoutQs = path.substr(0, qsStartIndex);
       queryString = path.substr(qsStartIndex + 1);
@@ -191,8 +193,8 @@ Router = class extends SharedRouter {
       pathWithoutBasepath = pathWithoutQs.replace(`/${cleanedBasePath}`, '');
     }
 
-    for (const index in this._routeDefs) {
-      const routeDef = this._routeDefs[index];
+    for (let lc = 0; lc < this._routeDefs.length; lc++) {
+      const routeDef = this._routeDefs[lc];
       const matched = routeDef.regexp.exec(pathWithoutBasepath);
       if (matched) {
         const params = {};
@@ -200,7 +202,8 @@ Router = class extends SharedRouter {
           params[name] = decodeURIComponent(matched[index + 1]);
         });
 
-        return this._navigate(path, routeDef.route, params, parsedQueryParams);
+        this._navigate(path, routeDef.route, params, parsedQueryParams);
+        return;
       }
     }
 
@@ -256,7 +259,6 @@ Router = class extends SharedRouter {
     // otherwise, computations inside action will trigger to re-run
     // this computation. which we do not need.
     Tracker.nonreactive(() => {
-
       this.env.inAction.withValue(true, () => {
         route.callAction(currentContext);
       });
@@ -277,14 +279,14 @@ Router = class extends SharedRouter {
       }
     };
 
-    return new Route(this, "*", notFoundOptions);
+    return new Route(this, '*', notFoundOptions);
   }
 
   _runTriggers(triggers, context) {
     let redirectArgs;
     const redirectFn = (...args) => {
       if (/^http(s)?:\/\//.test(args[0])) {
-        var message = `
+        const message = `
           Redirects to URLs outside of the app are not supported
           in this version of Flow Router.
           Use 'window.location = yourUrl' instead.
@@ -364,12 +366,12 @@ Router = class extends SharedRouter {
   _initClickAnchorHandlers() {
     const self = this;
     const clickEvent =
-      ('undefined' !== typeof document) && document.ontouchstart ?
+      typeof document !== 'undefined' && document.ontouchstart ?
       'touchstart' : 'click';
     document.addEventListener(clickEvent, onclick, false);
 
     function onclick(e) {
-      if (1 !== which(e)) {
+      if (which(e) !== 1) {
         return;
       }
 
@@ -383,8 +385,8 @@ Router = class extends SharedRouter {
 
       // ensure link
       let el = e.target;
-      while (el && 'A' !== el.nodeName) el = el.parentNode;
-      if (!el || 'A' !== el.nodeName) {
+      while (el && el.nodeName !== 'A') el = el.parentNode;
+      if (!el || el.nodeName !== 'A') {
         return;
       }
 
@@ -400,8 +402,8 @@ Router = class extends SharedRouter {
       }
 
       // ensure non-hash for the same path
-      let link = el.getAttribute('href');
-      if (el.pathname === location.pathname && (el.hash || '#' === link)) {
+      const link = el.getAttribute('href');
+      if (el.pathname === location.pathname && (el.hash || link === '#')) {
         return;
       }
 
@@ -416,14 +418,14 @@ Router = class extends SharedRouter {
       }
 
       // rebuild path
-      let path = el.pathname + el.search + (el.hash || '');
+      const path = el.pathname + el.search + (el.hash || '');
       e.preventDefault();
       self.go(path);
     }
 
     function which(e) {
       e = e || window.event;
-      return null === e.which ? e.button : e.which;
+      return e.which === null ? e.button : e.which;
     }
   }
 };

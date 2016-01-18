@@ -28,14 +28,14 @@
     "Triggers": true,
     "SsrContext": true,
     "__meteor_runtime_config__": true,
-    
+
     /* Meteor Packges */
     "FastRender": true,
     "Picker": true,
 
     /* Browserify packages */
-    "qs": true,
-    "page": true,
+    "Qs": true,
+    "PathToRegexp": true,
 
     /* Test env */
     "describe": true,
