@@ -393,7 +393,7 @@ Tinytest.addAsync('Client - Triggers - redirect by routeName', function(test, ne
   FlowRouter.route('/' + rand, {
     name: rand,
     triggersEnter: [function(context, redirect) {
-      redirect(rand2, null, {aa: 'bb'});
+      redirect(rand2, {}, {aa: 'bb'});
     }, function() {
       throw new Error('should not execute this trigger');
     }],
@@ -463,16 +463,14 @@ Tinytest.addAsync('Client - Triggers - redirect from exit', function(test, next)
   }, 100);
 });
 
-Tinytest.addAsync('Client - Triggers - redirect to external URL fails', function(test, next) {
+Tinytest.addAsync('Client - Triggers - redirect to external URL fails - aa', function(test, next) {
   var rand = Random.id(), rand2 = Random.id();
   var log = [];
 
   // testing "http://" URLs
   FlowRouter.route('/' + rand, {
     triggersEnter: [function(context, redirect) {
-      test.throws(function() {
-        redirect('http://example.com/');
-      }, 'Redirects to URLs outside of the app are not supported');
+      redirect('http://example.com/');
     }],
     action: function(_params) {
       log.push(1);
@@ -483,9 +481,7 @@ Tinytest.addAsync('Client - Triggers - redirect to external URL fails', function
   // testing "https://" URLs
   FlowRouter.route('/' + rand2, {
     triggersEnter: [function(context, redirect) {
-      test.throws(function() {
-        redirect('https://example.com/');
-      });
+      redirect('https://example.com/');
     }],
     action: function(_params) {
       log.push(2);
@@ -494,8 +490,19 @@ Tinytest.addAsync('Client - Triggers - redirect to external URL fails', function
   });
 
   FlowRouter.go('/');
-  FlowRouter.go('/' + rand);
-  FlowRouter.go('/' + rand2);
+  try {
+    FlowRouter.go('/' + rand);
+  } catch(e) {
+    var regexp = /Redirects to URLs outside of the app are not supported/;
+    test.isTrue(regexp.test(e.message));
+  }
+
+  try {
+    FlowRouter.go('/' + rand2);
+  } catch(e) {
+    var regexp = /Redirects to URLs outside of the app are not supported/;
+    test.isTrue(regexp.test(e.message));
+  }
 
   setTimeout(function() {
     test.equal(log, []);
@@ -515,17 +522,13 @@ Tinytest.addAsync('Client - Triggers - stop callback from enter', function(test,
       throw new Error('should not execute this trigger');
     }],
     action: function(_params) {
-      throw new Error('should not execute the action');
+      test.equal(log, [10]);
+      next();
     }
   });
 
   FlowRouter.go('/');
   FlowRouter.go('/' + rand);
-
-  setTimeout(function() {
-    test.equal(log, [10]);
-    next();
-  }, 100);
 });
 
 Tinytest.addAsync(
