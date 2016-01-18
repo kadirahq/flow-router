@@ -1,5 +1,9 @@
 # Changelog
 
+### v3.8.0
+
+* Remove page.js dependancy and implement an inbuild routing system.
+
 ### v3.7.3
 
 * Make caching a page idempotant. Fix issues like this. [See](https://github.com/arunoda/hello-react-meteor/issues/13)
