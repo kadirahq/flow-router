@@ -28,6 +28,7 @@ Router = class extends SharedRouter {
 
     this.env.replaceState = new Meteor.EnvironmentVariable();
     this.env.reload = new Meteor.EnvironmentVariable();
+    this.env.inAction = new Meteor.EnvironmentVariable();
 
     // this holds route pathDefs
     this._routeDefs = [];
@@ -111,11 +112,31 @@ Router = class extends SharedRouter {
   }
 
   getParam(key) {
-    return this._params.get(key);
+    // We update this._params reactive store only after we Tracker.afterFlush
+    // event to make sure, older routes does not get the updated value even
+    // before the new UI is rendered.
+    //
+    // But, then it cause issues for the new route(in the action)
+    // where if picks up older data.
+    //
+    // That's why we directly get values from the context when called
+    // inside an action.
+    const value = this._params.get(key);
+    if (this.env.inAction.get()) {
+      return this._current.params[key];
+    }
+
+    return value;
   }
 
   getQueryParam(key) {
-    return this._queryParams.get(key);
+    // See above .getParam() for more information.
+    const value = this._queryParams.get(key);
+    if (this.env.inAction.get()) {
+      return this._current.queryParams[key];
+    }
+
+    return value;
   }
 
   getRouteName() {
@@ -224,24 +245,6 @@ Router = class extends SharedRouter {
     this._applyRoute();
   }
 
-  _encodeValues(obj) {
-    const newObj = {};
-    Object.keys(obj).forEach(key => {
-      newObj[key] = encodeURIComponent(obj[key]);
-    });
-
-    return newObj;
-  }
-
-  _decodeValues(obj) {
-    const newObj = {};
-    Object.keys(obj).forEach(key => {
-      newObj[key] = decodeURIComponent(obj[key]);
-    });
-
-    return newObj;
-  }
-
   _applyRoute() {
     const currentContext = this._current;
     const route = currentContext.route;
@@ -249,7 +252,10 @@ Router = class extends SharedRouter {
     // otherwise, computations inside action will trigger to re-run
     // this computation. which we do not need.
     Tracker.nonreactive(() => {
-      route.callAction(currentContext);
+
+      this.env.inAction.withValue(true, () => {
+        route.callAction(currentContext);
+      });
 
       Tracker.afterFlush(() => {
         this._onEveryPath.changed();
@@ -284,6 +290,24 @@ Router = class extends SharedRouter {
     );
 
     return redirectArgs;
+  }
+
+  _encodeValues(obj) {
+    const newObj = {};
+    Object.keys(obj).forEach(key => {
+      newObj[key] = encodeURIComponent(obj[key]);
+    });
+
+    return newObj;
+  }
+
+  _decodeValues(obj) {
+    const newObj = {};
+    Object.keys(obj).forEach(key => {
+      newObj[key] = decodeURIComponent(obj[key]);
+    });
+
+    return newObj;
   }
 
   _updateReactiveDict(dict, newValues) {
