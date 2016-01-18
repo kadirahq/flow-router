@@ -228,14 +228,6 @@ Router = class extends SharedRouter {
     const oldContext = this._current;
     this._current = context;
 
-    const useReplaceState = this.env.replaceState.get();
-    const urlState = {path, params, queryParams};
-    if (useReplaceState) {
-      history.replaceState(urlState, window.title, path);
-    } else {
-      history.pushState(urlState, window.title, path);
-    }
-
     // Run exit handlers
     if (oldContext && oldContext.route) {
       const triggersExit = [
@@ -247,6 +239,14 @@ Router = class extends SharedRouter {
       if (exitRedirectArgs) {
         return this.go(...exitRedirectArgs);
       }
+    }
+
+    const useReplaceState = this.env.replaceState.get();
+    const urlState = {path, params, queryParams};
+    if (useReplaceState) {
+      history.replaceState(urlState, window.title, path);
+    } else {
+      history.pushState(urlState, window.title, path);
     }
 
     this._applyRoute();
