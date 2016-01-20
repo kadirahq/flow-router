@@ -36,6 +36,7 @@ Router = class extends SharedRouter {
 
     this._initTriggersAPI();
     this._initClickAnchorHandlers();
+    this._initHistoryHandler();
   }
 
   initialize(options) {
@@ -426,6 +427,20 @@ Router = class extends SharedRouter {
     function which(e) {
       e = e || window.event;
       return e.which === null ? e.button : e.which;
+    }
+  }
+
+  _initHistoryHandler() {
+    // Detect clicks on the navigator's back button and go to the previous path.
+    const self = this;
+    if (typeof history.pushState === 'function') {
+      history.pushState('myState', null, null);
+      window.onpopstate = function() {
+        const path = location.pathname + location.search + (location.hash || '');
+        self.withReplaceState(function() {
+          self.go(path);
+        });
+      };
     }
   }
 };
