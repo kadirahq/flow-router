@@ -36,6 +36,7 @@ Router = class extends SharedRouter {
 
     this._initTriggersAPI();
     this._initClickAnchorHandlers();
+    this._initHistoryHandler();
   }
 
   initialize(options) {
@@ -52,7 +53,7 @@ Router = class extends SharedRouter {
 
   wait() {
     if (this._initialized) {
-      throw new Error("can't wait after FlowRouter has been initialized");
+      throw new Error('can\'t wait after FlowRouter has been initialized');
     }
 
     this._askedToWait = true;
@@ -74,7 +75,7 @@ Router = class extends SharedRouter {
 
     const params = {
       ...existingParams,
-      ...newParams
+      ...newParams,
     };
     const queryParams = this._current.queryParams;
 
@@ -89,7 +90,7 @@ Router = class extends SharedRouter {
 
     const queryParams = {
       ...this._current.queryParams,
-      ...newParams
+      ...newParams,
     };
 
     for (const k in queryParams) {
@@ -181,6 +182,7 @@ Router = class extends SharedRouter {
       pathWithoutQs = path.substr(0, qsStartIndex);
       queryString = path.substr(qsStartIndex + 1);
     }
+
     const parsedQueryParams = this._decodeValues(Qs.parse(queryString));
 
     // Remove basePath from the path
@@ -216,7 +218,7 @@ Router = class extends SharedRouter {
 
     const triggersEnter = [
       ...this._triggersEnter,
-      ...route._triggersEnter
+      ...route._triggersEnter,
     ];
     const redirectArgs = this._runTriggers(triggersEnter, context);
 
@@ -232,7 +234,7 @@ Router = class extends SharedRouter {
     if (oldContext && oldContext.route) {
       const triggersExit = [
         ...this._triggersExit,
-        ...oldContext.route._triggersExit
+        ...oldContext.route._triggersExit,
       ];
       const exitRedirectArgs = this._runTriggers(triggersExit, oldContext);
 
@@ -276,7 +278,7 @@ Router = class extends SharedRouter {
       action() {
         const current = FlowRouter.current();
         logger.error('There is no route for the path:', current.path);
-      }
+      },
     };
 
     return new Route(this, '*', notFoundOptions);
@@ -293,6 +295,7 @@ Router = class extends SharedRouter {
         `;
         throw new Error(message);
       }
+
       redirectArgs = args;
     };
 
@@ -354,7 +357,7 @@ Router = class extends SharedRouter {
         if (triggers.length) {
           this._triggersExit = this._triggersExit.concat(triggers);
         }
-      }
+      },
     };
   }
 
@@ -426,6 +429,19 @@ Router = class extends SharedRouter {
     function which(e) {
       e = e || window.event;
       return e.which === null ? e.button : e.which;
+    }
+  }
+
+  _initHistoryHandler() {
+    const self = this;
+    if (typeof history.pushState === 'function') {
+      history.pushState('myState', null, null);
+      window.onpopstate = function() {
+        const path = location.pathname + location.search + (location.hash || '');
+        self.withReplaceState(function() {
+          self.go(path);
+        });
+      };
     }
   }
 };
