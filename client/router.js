@@ -1,4 +1,4 @@
-/* eslint new-cap: 0 no-loop-func: 0 */
+/* eslint new-cap: 0, no-loop-func: 0, prefer-arrow-callback: 0 */
 const logger = console;
 
 Router = class extends SharedRouter {
@@ -243,7 +243,7 @@ Router = class extends SharedRouter {
       }
     }
 
-    // If we are inside a popstate event, 
+    // If we are inside a popstate event,
     // we should not change the history
     if (!this.env.inPopstate.get()) {
       const useReplaceState = this.env.replaceState.get();
@@ -439,7 +439,7 @@ Router = class extends SharedRouter {
     const self = this;
     window.addEventListener('popstate', onpopstate, false);
 
-    function onpopstate(e) {
+    function onpopstate() {
       // In some browsers they fire popstate event right after page has loaded.
       // That's not the correct way for the popstate.
       // Normally, we need to handle it.
