@@ -201,7 +201,8 @@ Router = class extends SharedRouter {
       if (matched) {
         const params = {};
         routeDef.keys.forEach(({name}, index) => {
-          params[name] = decodeURIComponent(matched[index + 1]);
+          const match = matched[index + 1];
+          params[name] = typeof match !== 'undefined' ? decodeURIComponent(match) : match;
         });
 
         this._navigate(path, routeDef.route, params, parsedQueryParams);
@@ -315,7 +316,8 @@ Router = class extends SharedRouter {
   _encodeValues(obj) {
     const newObj = {};
     Object.keys(obj).forEach(key => {
-      newObj[key] = encodeURIComponent(obj[key]);
+      const value = obj[key];
+      newObj[key] = typeof value !== 'undefined' ? encodeURIComponent(value) : value;
     });
 
     return newObj;
@@ -324,7 +326,8 @@ Router = class extends SharedRouter {
   _decodeValues(obj) {
     const newObj = {};
     Object.keys(obj).forEach(key => {
-      newObj[key] = decodeURIComponent(obj[key]);
+      const value = obj[key];
+      newObj[key] = typeof value !== 'undefined' ? decodeURIComponent(value) : value;
     });
 
     return newObj;

@@ -39,6 +39,48 @@ function(test, next) {
   }, 100);
 });
 
+Tinytest.addAsync('Client - Router - define and go to route with optional fields',
+function(test, next) {
+  var rand = Random.id();
+  var pathDef = '/' + rand + '/:key?';
+  var rendered = 0;
+
+  FlowRouter.route(pathDef, {
+    action: function(params) {
+      test.equal(params.key, 'abc +@%');
+      rendered++;
+    }
+  });
+
+  FlowRouter.go(pathDef, {key: 'abc +@%'});
+
+  setTimeout(function() {
+    test.equal(rendered, 1);
+    setTimeout(next, 100);
+  }, 100);
+});
+
+Tinytest.addAsync('Client - Router - define and go to route with undefined optional fields',
+function(test, next) {
+  var rand = Random.id();
+  var pathDef = '/' + rand + '/:key?';
+  var rendered = 0;
+
+  FlowRouter.route(pathDef, {
+    action: function(params) {
+      test.isUndefined(params.key);
+      rendered++;
+    }
+  });
+
+  FlowRouter.go(pathDef, {});
+
+  setTimeout(function() {
+    test.equal(rendered, 1);
+    setTimeout(next, 100);
+  }, 100);
+});
+
 Tinytest.addAsync('Client - Router - parse params and query', function(test, next) {
   var rand = Random.id();
   var rendered = 0;
@@ -133,6 +175,41 @@ Tinytest.addAsync('Client - Router - setParams - generic', function(test, done) 
     test.equal(paramsList.length, 2);
     test.equal(_.pick(paramsList[0], 'id', 'cat'), {cat: 'meteor', id: '200'});
     test.equal(_.pick(paramsList[1], 'id', 'cat'), {cat: 'meteor', id: '700'});
+    done();
+  }
+});
+
+Tinytest.addAsync('Client - Router - setParams - optional', function(test, done) {
+  var randomKey = Random.id();
+  var pathDef = '/' + randomKey + '/:cat/:id?';
+  var paramsList = [];
+  FlowRouter.route(pathDef, {
+    action: function(params) {
+      paramsList.push(params);
+    }
+  });
+
+  FlowRouter.go(pathDef, {cat: 'meteor', id: '200'});
+  setTimeout(function() {
+    // return done();
+    var success = FlowRouter.setParams({id: '700'});
+    test.isTrue(success);
+    setTimeout(withUndefined, 50);
+  }, 50);
+
+  function withUndefined() {
+     var success = FlowRouter.setParams({id: undefined});
+     test.isTrue(success);
+     setTimeout(validate, 50);
+  }
+
+  function validate() {
+    test.equal(paramsList.length, 3);
+    test.equal(_.pick(paramsList[0], 'id', 'cat'), {cat: 'meteor', id: '200'});
+    test.equal(_.pick(paramsList[1], 'id', 'cat'), {cat: 'meteor', id: '700'});
+    test.equal(paramsList[2].cat, 'meteor');
+    test.isUndefined(paramsList[2].id);
+
     done();
   }
 });
