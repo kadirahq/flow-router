@@ -575,6 +575,39 @@ function(test, done) {
   resetBasePath();
 });
 
+Tinytest.addAsync('Client - Router - handling back button', function(test, next) {
+  var rand = Random.id();
+  var rand2 = Random.id();
+  var rendered = [];
+
+  FlowRouter.route('/' + rand, {
+    action: function(_params) {
+      rendered.push(1);
+    }
+  });
+
+  FlowRouter.route('/' + rand2, {
+    action: function(_params) {
+      rendered.push(2);
+    }
+  });
+
+  FlowRouter.go('/' + rand);
+
+  setTimeout(function() {
+    FlowRouter.go('/' + rand2);
+  }, 20);
+
+  setTimeout(function() {
+    history.back();
+  }, 40);
+
+  setTimeout(function() {
+    test.equal(rendered, [1, 2, 1]);
+    next();
+  }, 60);
+});
+
 
 function setBasePath(path) {
   FlowRouter._basePath = path;

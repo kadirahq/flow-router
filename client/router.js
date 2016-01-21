@@ -30,12 +30,14 @@ Router = class extends SharedRouter {
     this.env.replaceState = new Meteor.EnvironmentVariable();
     this.env.reload = new Meteor.EnvironmentVariable();
     this.env.inAction = new Meteor.EnvironmentVariable();
+    this.env.inPopstate = new Meteor.EnvironmentVariable();
 
     // this holds route pathDefs
     this._routeDefs = [];
 
     this._initTriggersAPI();
     this._initClickAnchorHandlers();
+    this._initiateHandlingBackButton();
   }
 
   initialize(options) {
@@ -241,12 +243,16 @@ Router = class extends SharedRouter {
       }
     }
 
-    const useReplaceState = this.env.replaceState.get();
-    const urlState = {path, params, queryParams};
-    if (useReplaceState) {
-      history.replaceState(urlState, window.title, path);
-    } else {
-      history.pushState(urlState, window.title, path);
+    // If we are inside a popstate event, 
+    // we should not change the history
+    if (!this.env.inPopstate.get()) {
+      const useReplaceState = this.env.replaceState.get();
+      const urlState = {path, params, queryParams};
+      if (useReplaceState) {
+        history.replaceState(urlState, window.title, path);
+      } else {
+        history.pushState(urlState, window.title, path);
+      }
     }
 
     this._applyRoute();
@@ -426,6 +432,22 @@ Router = class extends SharedRouter {
     function which(e) {
       e = e || window.event;
       return e.which === null ? e.button : e.which;
+    }
+  }
+
+  _initiateHandlingBackButton() {
+    const self = this;
+    window.addEventListener('popstate', onpopstate, false);
+
+    function onpopstate(e) {
+      // In some browsers they fire popstate event right after page has loaded.
+      // That's not the correct way for the popstate.
+      // Normally, we need to handle it.
+      // But, we don't want to do it since self.go() is already idempotent.
+      const path = location.pathname + location.search + (location.hash || '');
+      self.env.inPopstate.withValue(true, function() {
+        self.go(path);
+      });
     }
   }
 };
