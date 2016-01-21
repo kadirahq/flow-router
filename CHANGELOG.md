@@ -1,5 +1,9 @@
 # Changelog
 
+### v3.8.2
+
+* Fix issues is handling optional params. See: [#495](https://github.com/kadirahq/flow-router/issues/495)
+
 ### v3.8.1
 
 * Handle the back button properly.
