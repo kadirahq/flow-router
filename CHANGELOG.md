@@ -1,5 +1,9 @@
 # Changelog
 
+### v3.8.1
+
+* Handle the back button properly.
+
 ### v3.8.0
 
 * Remove page.js dependancy and implement an inbuild routing system.
