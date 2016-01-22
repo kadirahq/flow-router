@@ -373,6 +373,8 @@ Router = class extends SharedRouter {
   }
 
   _initClickAnchorHandlers() {
+    // This logic is taken from page.js
+    // See: https://github.com/visionmedia/page.js
     const self = this;
     const clickEvent =
       typeof document !== 'undefined' && document.ontouchstart ?
@@ -393,8 +395,12 @@ Router = class extends SharedRouter {
       }
 
       // ensure link
-      let el = e.target;
-      while (el && el.nodeName !== 'A') el = el.parentNode;
+      // use shadow dom when available
+      let el = e.path ? e.path[0] : e.target;
+      while (el && el.nodeName !== 'A' ) {
+        el = el.parentNode;
+      }
+
       if (!el || el.nodeName !== 'A') {
         return;
       }
@@ -402,11 +408,7 @@ Router = class extends SharedRouter {
       // Ignore if tag has
       // 1. "download" attribute
       // 2. rel="external" attribute
-      const externalLink =
-        el.hasAttribute('download') ||
-        el.getAttribute('rel') === 'external';
-
-      if (externalLink) {
+      if (el.hasAttribute('download') || el.getAttribute('rel') === 'external') {
         return;
       }
 
@@ -426,8 +428,19 @@ Router = class extends SharedRouter {
         return;
       }
 
+      // x-origin
+      if (!sameOrigin(el.href)) {
+        return;
+      }
+
       // rebuild path
-      const path = el.pathname + el.search + (el.hash || '');
+      let path = el.pathname + el.search + (el.hash || '');
+
+      // strip leading "/[drive letter]:" on NW.js on Windows
+      if (typeof process !== 'undefined' && path.match(/^\/[a-zA-Z]:\//)) {
+        path = path.replace(/^\/[a-zA-Z]:\//, '/');
+      }
+
       e.preventDefault();
       self.go(path);
     }
@@ -435,6 +448,15 @@ Router = class extends SharedRouter {
     function which(e) {
       e = e || window.event;
       return e.which === null ? e.button : e.which;
+    }
+
+    function sameOrigin(href) {
+      let origin = `${location.protocol}//${location.hostname}`;
+      if (location.port) {
+        origin += `:${location.port}`;
+      }
+
+      return href && href.indexOf(origin) === 0;
     }
   }
 
