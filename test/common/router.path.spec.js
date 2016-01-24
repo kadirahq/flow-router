@@ -60,8 +60,11 @@ Tinytest.add('Common - Router - path - missing fields', function(test) {
   };
   var expectedPath = '/blog/1001/some';
 
-  var path = FlowRouter.path(pathDef, fields);
-  test.equal(path, expectedPath);
+  try {
+    FlowRouter.path(pathDef, fields)
+  } catch (ex) {
+    test.isTrue(/Expected "name" to be defined/.test(ex.message));
+  }
 });
 
 Tinytest.add('Common - Router - path - no fields', function(test) {

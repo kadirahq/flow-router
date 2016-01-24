@@ -26,7 +26,7 @@ function(test, next) {
 
   FlowRouter.route(pathDef, {
     action: function(params) {
-      test.equal(params.key, 'abc +@%');
+      test.equal(params.key, encodeURIComponent('abc +@%'));
       rendered++;
     }
   });
@@ -47,7 +47,7 @@ function(test, next) {
 
   FlowRouter.route(pathDef, {
     action: function(params) {
-      test.equal(params.key, 'abc +@%');
+      test.equal(params.key, encodeURIComponent('abc +@%'));
       rendered++;
     }
   });
@@ -239,8 +239,8 @@ Tinytest.addAsync('Client - Router - setParams - preserve query strings', functi
     test.equal(paramsList.length, 2);
     test.equal(queryParamsList.length, 2);
 
-    test.equal(_.pick(paramsList[0], 'id', 'cat'), {cat: 'meteor', id: '200 +% / ad'});
-    test.equal(_.pick(paramsList[1], 'id', 'cat'), {cat: 'meteor', id: '700 +% / ad'});
+    test.equal(_.pick(paramsList[0], 'id', 'cat'), {cat: 'meteor', id: encodeURIComponent('200 +% / ad')});
+    test.equal(_.pick(paramsList[1], 'id', 'cat'), {cat: 'meteor', id: encodeURIComponent('700 +% / ad')});
     test.equal(queryParamsList, [{aa: '20 +%'}, {aa: '20 +%'}]);
     done();
   }
