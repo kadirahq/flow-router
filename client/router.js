@@ -78,6 +78,13 @@ Router = class extends SharedRouter {
       ...existingParams,
       ...newParams
     };
+
+    for (const k in params) {
+      if (params[k] === null || params[k] === undefined) {
+        delete params[k];
+      }
+    }
+
     const queryParams = this._current.queryParams;
 
     this.go(pathDef, params, queryParams);
