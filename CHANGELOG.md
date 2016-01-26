@@ -1,5 +1,9 @@
 # Changelog
 
+### v3.9.0
+
+* Use path-to-regexp to compile paths. See: [#499](https://github.com/kadirahq/flow-router/pull/499)
+
 ### v3.8.3
 
 * Fix ignore navigation to external links
