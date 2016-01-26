@@ -78,6 +78,13 @@ Router = class extends SharedRouter {
       ...existingParams,
       ...newParams
     };
+
+    for (const k in params) {
+      if (params[k] === null || params[k] === undefined) {
+        delete params[k];
+      }
+    }
+
     const queryParams = this._current.queryParams;
 
     this.go(pathDef, params, queryParams);
@@ -154,12 +161,6 @@ Router = class extends SharedRouter {
     this._routeDefs.push({regexp, keys, pathDef, route});
 
     return route;
-  }
-
-  path(pathDef, fields = {}, queryParams = {}) {
-    const encodedFields = this._encodeValues(fields);
-    const encodedQueryParams = this._encodeValues(queryParams);
-    return super.path(pathDef, encodedFields, encodedQueryParams);
   }
 
   go(pathDef, fields, queryParams) {
@@ -311,16 +312,6 @@ Router = class extends SharedRouter {
     );
 
     return redirectArgs;
-  }
-
-  _encodeValues(obj) {
-    const newObj = {};
-    Object.keys(obj).forEach(key => {
-      const value = obj[key];
-      newObj[key] = typeof value !== 'undefined' ? encodeURIComponent(value) : value;
-    });
-
-    return newObj;
   }
 
   _decodeValues(obj) {
