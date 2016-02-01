@@ -1,6 +1,6 @@
 # Changelog
 
-### next
+### v2.10.1
 * Fix the url generation for prefixed paths. See: [#508](https://github.com/kadirahq/flow-router/issues/508)
 
 ### v2.10.0
