@@ -1,5 +1,8 @@
 # Changelog
 
+### next
+* Fix the url generation for prefixed paths. See: [#508](https://github.com/kadirahq/flow-router/issues/508)
+
 ### v2.10.0
 * Update few dependencies to the latest versions: pagejs, qs, cosmos:browserify
 
@@ -17,7 +20,7 @@
 
 ### v2.6.1
 
-* Fix [#143](https://github.com/kadirahq/flow-router/issues/314). 
+* Fix [#143](https://github.com/kadirahq/flow-router/issues/314).
   This says that when we are doing a trigger redirect,
   We won't get reactive changes like: `getRouteName()`
 
@@ -53,7 +56,7 @@
 * Use pagejs.redirect() for our redirection process.
 * Above fixes [#239](https://github.com/kadirahq/flow-router/issues/239)
 
-### v2.0.0 
+### v2.0.0
 
 * Released 2.0  :)
 * Now flow-router comes as `kadira:flow-router`
