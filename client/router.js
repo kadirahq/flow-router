@@ -172,7 +172,7 @@ Router.prototype.path = function(pathDef, fields, queryParams) {
   path = path.match(/^\/{1}$/) ? path: path.replace(/\/$/, "");
 
   // explictly asked to add a trailing slash
-  if(this.env.trailingSlash.get() && _.last(path) !== "/") {
+  if((this.env.trailingSlash.get() || this._addTrailingSlash) && _.last(path) !== "/") {
     path += "/";
   }
 
@@ -392,6 +392,8 @@ Router.prototype.initialize = function(options) {
     decodeURLComponents: true,
     hashbang: !!options.hashbang
   });
+
+  this._addTrailingSlash = !!options.addTrailingSlash;
 
   this._initialized = true;
 };
