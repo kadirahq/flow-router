@@ -155,12 +155,12 @@ Router = class extends SharedRouter {
   }
 
   route(pathDef, options, group) {
-    const route = super.route(pathDef, options, group);
+    const innerRoute = super.route(pathDef, options, group);
     const keys = [];
     const regexp = PathToRegexp(pathDef, keys);
-    this._routeDefs.push({regexp, keys, pathDef, route});
+    this._routeDefs.push({regexp, keys, pathDef, innerRoute});
 
-    return route;
+    return innerRoute;
   }
 
   go(pathDef, fields, queryParams) {
