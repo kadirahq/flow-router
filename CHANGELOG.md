@@ -1,5 +1,9 @@
 # Changelog
 
+### v3.9.1
+
+* Fix issue [#505](https://github.com/kadirahq/flow-router/issues/505) which cause errors on babel5 (Meteor 1.3-update-5)
+
 ### v3.9.0
 
 * Use path-to-regexp to compile paths. See: [#499](https://github.com/kadirahq/flow-router/pull/499)
