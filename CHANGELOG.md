@@ -1,5 +1,9 @@
 # Changelog
 
+### v3.9.2
+
+* Fix URL generation for prefixed paths. See: [#514](https://github.com/kadirahq/flow-router/pull/514)
+
 ### v3.9.1
 
 * Fix issue [#505](https://github.com/kadirahq/flow-router/issues/505) which cause errors on babel5 (Meteor 1.3-update-5)
