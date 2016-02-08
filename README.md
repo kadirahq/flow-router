@@ -14,6 +14,7 @@ It exposes a great API for changing the URL and reactively getting data from the
 * [Meteor Routing Guide](#meteor-routing-guide)
 * [Getting Started](#getting-started)
 * [Routes Definition](#routes-definition)
+* [Group Routes](#group-routes)
 * [Rendering and Layout Management](#rendering-and-layout-management)
 * [Triggers](#triggers)
 * [Not Found Routes](#not-found-routes)
