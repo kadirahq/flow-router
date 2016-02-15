@@ -171,34 +171,29 @@ Router = class extends SharedRouter {
       return;
     }
 
+    const context = this._buildContext(path);
+
     // Implement idempotant routing
     const insideAReload = this.env.reload.get();
     if (this._current.path === path && !insideAReload) {
       return;
     }
 
-    const qsStartIndex = path.indexOf('?');
-    let pathWithoutQs = path;
-    let queryString = '';
-    if (qsStartIndex >= 0) {
-      pathWithoutQs = path.substr(0, qsStartIndex);
-      queryString = path.substr(qsStartIndex + 1);
-    }
-    const parsedQueryParams = this._decodeValues(Qs.parse(queryString));
+    const allQueryParams = this._decodeValues(Qs.parse(context.queryString));
 
     // Remove basePath from the path
-    let pathWithoutBasepath = pathWithoutQs;
+    let pathname = context.pathname;
     if (this._basePath) {
       const cleanedBasePath = this._basePath
         .trim()
         .replace(/^\//, '')
         .replace(/$\//, '');
-      pathWithoutBasepath = pathWithoutQs.replace(`/${cleanedBasePath}`, '');
+      pathname = context.pathname.replace(`/${cleanedBasePath}`, '');
     }
 
     for (let lc = 0; lc < this._routeDefs.length; lc++) {
       const routeDef = this._routeDefs[lc];
-      const matched = routeDef.regexp.exec(pathWithoutBasepath);
+      const matched = routeDef.regexp.exec(pathname);
       if (matched) {
         const params = {};
         routeDef.keys.forEach(({name}, index) => {
@@ -206,21 +201,32 @@ Router = class extends SharedRouter {
           params[name] = typeof match !== 'undefined' ? decodeURIComponent(match) : match;
         });
 
-        this._navigate(path, routeDef.route, params, parsedQueryParams);
+        const matchedContext = {
+          ...context,
+          params,
+          queryParams: allQueryParams,
+          route: routeDef.route
+        };
+
+        this._navigate(matchedContext);
         return;
       }
     }
 
     const notFoundRoute = this._getNotFoundRoute();
-    this._navigate(path, notFoundRoute, {}, parsedQueryParams);
+    const notFoundContext = {
+      ...context,
+      route: notFoundRoute,
+      params: {},
+      queryParams: allQueryParams
+    };
+    this._navigate(notFoundContext);
   }
 
-  _navigate(path, route, params, queryParams) {
-    const context = {path, route, params, queryParams};
-
+  _navigate(context) {
     const triggersEnter = [
       ...this._triggersEnter,
-      ...route._triggersEnter
+      ...context.route._triggersEnter
     ];
     const redirectArgs = this._runTriggers(triggersEnter, context);
 
@@ -249,6 +255,7 @@ Router = class extends SharedRouter {
     // we should not change the history
     if (!this.env.inPopstate.get()) {
       const useReplaceState = this.env.replaceState.get();
+      const {path, params, queryParams} = context;
       const urlState = {path, params, queryParams};
       if (useReplaceState) {
         history.replaceState(urlState, window.title, path);
@@ -465,5 +472,19 @@ Router = class extends SharedRouter {
         self.go(path);
       });
     }
+  }
+
+  _buildContext(path) {
+    const parser = document.createElement('a');
+    parser.href = path;
+
+    const context = {
+      path,
+      pathname: parser.pathname,
+      hash: parser.hash ? parser.hash.substr(1) : null,
+      queryString: parser.search ? parser.search.substr(1) : null
+    };
+
+    return context;
   }
 };
