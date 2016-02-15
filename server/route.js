@@ -24,7 +24,13 @@ Route = class extends SharedRoute {
       return next();
     }
 
-    const cachedPage = this._getCachedPage(req.url);
+    // This userId will be useful in the at the later on when
+    // it's time to cache the page.
+    // Normally, we can't access `Meteor.userId()` outside of a method
+    // But here, we could do it because we call `FastRender.handleOnAllRoutes`.
+    // It creates a FastRender context and assign it for the current fiber.
+    req.__userId = Meteor.userId();
+    const cachedPage = this._getCachedPage(req.url, req.__userId);
     if (cachedPage) {
       return this._processFromCache(cachedPage, res, next);
     }
@@ -104,7 +110,7 @@ Route = class extends SharedRoute {
             frData: res.getData('fast-render-data'),
             html: data
           };
-          self._cachePage(req.url, pageInfo, self._router.pageCacheTimeout);
+          self._cachePage(req.url, req.__userId, pageInfo, self._router.pageCacheTimeout);
         }
       }
 
@@ -164,15 +170,19 @@ Route = class extends SharedRoute {
     return false;
   }
 
-  _getCachedPage(url) {
-    const info = this._cache[url];
+  _getCachedPage(url, userId) {
+    const cacheInfo = {url, userId};
+    const cacheKey = this._getCacheKey(cacheInfo);
+    const info = this._cache[cacheKey];
     if (info) {
       return info.data;
     }
   }
 
-  _cachePage(url, data, timeout) {
-    const existingInfo = this._cache[url];
+  _cachePage(url, userId, data, timeout) {
+    const cacheInfo = {url, userId};
+    const cacheKey = this._getCacheKey(cacheInfo);
+    const existingInfo = this._cache[cacheKey];
     if (existingInfo) {
       // Sometimes, it's possible get this called multiple times
       // due to race conditions. So, in that case, simply discard
@@ -183,10 +193,14 @@ Route = class extends SharedRoute {
     const info = {
       data: data,
       timeoutHandle: setTimeout(() => {
-        delete this._cache[url];
+        delete this._cache[cacheKey];
       }, timeout)
     };
 
-    this._cache[url] = info;
+    this._cache[cacheKey] = info;
+  }
+
+  _getCacheKey({userId = '', url}) {
+    return `${userId}::${url}`;
   }
 };

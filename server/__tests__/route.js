@@ -8,16 +8,20 @@ describe('Route', () => {
       it('should be able to cache the page and get it back', () => {
         const route = new Route();
         const pageInfo = {aa: 10};
-        route._cachePage('/the-url', pageInfo, 100);
-        expect(route._getCachedPage('/the-url')).to.be.deep.equal(pageInfo);
+        const userId = 'aaaa';
+
+        route._cachePage('/the-url', userId, pageInfo, 100);
+        expect(route._getCachedPage('/the-url', userId)).to.be.deep.equal(pageInfo);
       });
 
       it('should expire the page after a timeout', () => {
         const route = new Route();
         const pageInfo = {aa: 10};
-        route._cachePage('/the-url', pageInfo, 100);
+        const userId = 'aaaa';
+
+        route._cachePage('/the-url', userId, pageInfo, 100);
         Meteor._sleepForMs(200);
-        expect(route._getCachedPage('/the-url')).to.be.null;
+        expect(route._getCachedPage('/the-url', userId)).to.be.null;
       });
     });
 
@@ -25,12 +29,13 @@ describe('Route', () => {
       it('should throw an error when trying to cache again', () => {
         const route = new Route();
         const pageInfo = {aa: 10};
+        const userId = 'aaaa';
 
-        route._cachePage('/the-url', pageInfo, 100);
+        route._cachePage('/the-url', userId, pageInfo, 100);
         // doing it for the second time.
-        route._cachePage('/the-url', {aa: 2323}, 100);
+        route._cachePage('/the-url', userId, {aa: 2323}, 100);
 
-        const cachedPage = route._getCachedPage('/the-url');
+        const cachedPage = route._getCachedPage('/the-url', userId);
         expect(cachedPage).to.be.deep.equal(pageInfo);
       });
     });
@@ -379,7 +384,9 @@ describe('Route', () => {
       it('should simply call next', done => {
         const route = new Route();
         const req = {url: '/aa.jpg'};
-        route._handleRoute(null, req, null, done);
+        DDP._CurrentInvocation.withValue({userId: 'someId'}, () => {
+          route._handleRoute(null, req, null, done);
+        });
       });
     });
 
@@ -399,8 +406,11 @@ describe('Route', () => {
         };
 
         // let's cache the page
-        route._cachePage(req.url, pageInfo, 100);
-        route._handleRoute(null, req, res, next);
+        const userId = 'aaa';
+        route._cachePage(req.url, userId, pageInfo, 100);
+        DDP._CurrentInvocation.withValue({userId}, () => {
+          route._handleRoute(null, req, res, next);
+        });
       });
     });
 
@@ -433,7 +443,9 @@ describe('Route', () => {
           processFromSsr();
         };
 
-        route._handleRoute(params, req, res, next);
+        DDP._CurrentInvocation.withValue({userId: 'someId'}, () => {
+          route._handleRoute(params, req, res, next);
+        });
       });
     });
   });

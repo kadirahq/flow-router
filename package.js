@@ -30,6 +30,9 @@ Package.onTest(function(api) {
   api.use('minimongo');
   api.use('http');
   api.use('random');
+  // We use accounts-base to get `Meteor.user()`. 
+  // It's used for page caching.
+  api.use('accounts-base');
   api.use('practicalmeteor:sinon');
   api.use('meteorhacks:fast-render');
   api.use('meteorhacks:inject-data');
