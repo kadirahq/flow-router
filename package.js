@@ -13,7 +13,8 @@ Npm.depends({
   // this PR: https://github.com/visionmedia/page.js/pull/288
   page: 'https://github.com/kadirahq/page.js/archive/34ddf45ea8e4c37269ce3df456b44fc0efc595c6.tar.gz',
   qs: '5.2.0',
-  'path-to-regexp': '1.2.1'
+  'path-to-regexp': '1.2.1',
+  'parseurl': '1.3.1'
 });
 
 Package.onUse(function(api) {

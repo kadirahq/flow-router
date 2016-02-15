@@ -36,6 +36,7 @@
     /* Browserify packages */
     "Qs": true,
     "PathToRegexp": true,
+    "ParseUrl": true,
 
     /* Test env */
     "describe": true,

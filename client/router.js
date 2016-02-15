@@ -475,14 +475,13 @@ Router = class extends SharedRouter {
   }
 
   _buildContext(path) {
-    const parser = document.createElement('a');
-    parser.href = path;
+    const parsedUrl = ParseUrl({url: path});
 
     const context = {
       path,
-      pathname: parser.pathname,
-      hash: parser.hash ? parser.hash.substr(1) : null,
-      queryString: parser.search ? parser.search.substr(1) : null
+      pathname: parsedUrl.pathname,
+      hash: parsedUrl.hash ? parsedUrl.hash.substr(1) : null,
+      queryString: parsedUrl.search ? parsedUrl.search.substr(1) : null
     };
 
     return context;
