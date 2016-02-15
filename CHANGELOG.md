@@ -1,5 +1,8 @@
 # Changelog
 
+### v3.10.0
+* Add userId into the page cache logic. So, now a page is cache key is generate using the userId and the url. So, now there won't be data leaks with caching
+
 ### v3.9.4
 
 * Use a pure JS URL parser
