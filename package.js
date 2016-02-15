@@ -1,7 +1,7 @@
 Package.describe({
   name: 'kadira:flow-router-ssr',
   summary: 'Same as kadira:flow-router, but with SSR support',
-  version: '3.9.2',
+  version: '3.9.3',
   git: 'https://github.com/kadirahq/flow-router.git'
 });
 
