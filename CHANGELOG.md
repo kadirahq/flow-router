@@ -1,5 +1,9 @@
 # Changelog
 
+### v3.9.4
+
+* Use a pure JS URL parser
+
 ### v3.9.3
 
 * Remove hash from the client side routing logic. Fixes: [519](https://github.com/kadirahq/flow-router/issues/519)
