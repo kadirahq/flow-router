@@ -24,9 +24,13 @@ You need to write your app with FlowRouter and [ReactLayout](https://github.com/
 
 ## Caching
 
-Rendering React Components are extremely [CPU intensive](https://twitter.com/kadirahq/status/620467416749838336) on the server. We can't really expect that for a production app.
+Rendering React Components are extremely [CPU intensive](https://twitter.com/kadirahq/status/620467416749838336) on the server. This will negatively impact your app's peformance specially if you've high page view throughput.
 
-So, we must run some sort of caching layer. So, FlowRouter by default has a 30 sec cache for all the pages. We define page by a unique URL. Currently cache timeout is set globally. You can change it with:
+To get rid of this, we must run our app with a some sort of caching layer. 
+
+So, FlowRouter comes with a built-in caching layer. It caches pages based on the loggedIn user and the URL.
+
+This how you can enable the cache:
 
 ~~~js
 if(Meteor.isServer) {
@@ -35,9 +39,11 @@ if(Meteor.isServer) {
 }
 ~~~
 
-> Use `0` as `timeInMillis` to turn off caching. By default, caching is **turned off**.
+With this, FlowRouter will cache pages and clear them after 10 seconds.
 
-This is a smart cache and once your DDP connection sends actual data, cache will get invalidated locally.
+> By default, page cache is **turned off**.
+
+**This is a smart cache and once your DDP connection sends actual data, cache will get invalidated locally.**
 
 ## Defer Script Loading
 
