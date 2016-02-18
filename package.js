@@ -30,13 +30,10 @@ Package.onTest(function(api) {
   api.use('minimongo');
   api.use('http');
   api.use('random');
-  // We use accounts-base to get `Meteor.user()`. 
+  // We use accounts-base to get `Meteor.user()`.
   // It's used for page caching.
   api.use('accounts-base');
   api.use('practicalmeteor:sinon');
-  api.use('meteorhacks:fast-render');
-  api.use('meteorhacks:inject-data');
-  api.use('tmeasday:html5-history-api');
   api.use('smithy:describe@1.0.0');
 
   api.addFiles('test/client/_helpers.js', 'client');
@@ -71,10 +68,10 @@ function configure(api) {
   api.use('reactive-var');
   api.use('ddp');
   api.use('ejson');
-  api.use('meteorhacks:fast-render@2.11.0', ['client', 'server']);
+  api.use('meteorhacks:fast-render@2.12.0', ['client', 'server']);
   api.use('cosmos:browserify@0.9.2', 'client');
   api.use('meteorhacks:picker@1.0.3', 'server');
-  api.use('meteorhacks:inject-data@1.4.1');
+  api.use('meteorhacks:inject-data@2.0.0');
 
   api.addFiles('lib/router.js', ['client', 'server']);
   api.addFiles('lib/group.js', ['client', 'server']);

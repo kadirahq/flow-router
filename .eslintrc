@@ -32,6 +32,7 @@
     /* Meteor Packges */
     "FastRender": true,
     "Picker": true,
+    "InjectData": true,
 
     /* Browserify packages */
     "Qs": true,

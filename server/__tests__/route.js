@@ -226,9 +226,10 @@ describe('Route', () => {
               expect(minifyHtml(cachedPage.html)).to.be.equal(minifyHtml(expectedHtml));
               expect(cachedPage.frData).to.be.deep.equal(frData);
               done();
-            },
-            getData: () => frData
+            }
           };
+          InjectData.pushData(res, 'fast-render-data', frData);
+
           const ssrContext = {
             getHtml: () => '<body-content />',
             getHead: () => '<head-content />'
@@ -274,9 +275,7 @@ describe('Route', () => {
           params: {aa: 10}, queryParams: {bb: 10}
         };
         const req = {url: 'the-url'};
-        const res = {
-          getData: () => null
-        };
+        const res = {};
 
         const router = new Router();
         const action = (p, q) => {
@@ -300,9 +299,7 @@ describe('Route', () => {
 
       it('should call the ._injectHtml()', done => {
         const req = {url: 'the-url'};
-        const res = {
-          getData: () => null
-        };
+        const res = {};
 
         const router = new Router();
         const route = new Route(router, '/', {});
@@ -327,9 +324,8 @@ describe('Route', () => {
             posts: [[doc]]
           }
         };
-        const res = {
-          getData: () => frData
-        };
+        const res = {};
+        InjectData.pushData(res, 'fast-render-data', frData);
 
         const router = new Router();
         const route = new Route(router, '/', {});
@@ -354,8 +350,7 @@ describe('Route', () => {
         write: data => {
           expect(data).to.be.equal(pageInfo.html);
           done();
-        },
-        pushData: () => {}
+        }
       };
 
       route._processFromCache(pageInfo, res, () => {
@@ -363,19 +358,15 @@ describe('Route', () => {
       });
     });
 
-    it('should inject the frData', done => {
+    it('should inject the frData', () => {
       const route = new Route();
       const pageInfo = {frData: {aa: 10}};
 
-      const res = {
-        pushData: (key, data) => {
-          expect(key).to.be.equal('fast-render-data');
-          expect(data).to.be.deep.equal(pageInfo.frData);
-          done();
-        }
-      };
+      const res = {};
 
       route._processFromCache(pageInfo, res, () => {});
+      const frData = InjectData.getData(res, 'fast-render-data');
+      expect(frData).to.be.deep.equal(pageInfo.frData);
     });
   });
 

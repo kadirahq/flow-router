@@ -54,8 +54,7 @@ Route = class extends SharedRoute {
     res.write = function() {
       originalWrite.call(this, pageInfo.html);
     };
-
-    res.pushData('fast-render-data', pageInfo.frData);
+    InjectData.pushData(res, 'fast-render-data', pageInfo.frData);
     next();
   }
 
@@ -69,7 +68,7 @@ Route = class extends SharedRoute {
         try {
           // get the data for null subscriptions and add them to the
           // ssrContext
-          const frData = res.getData('fast-render-data');
+          const frData = InjectData.getData(res, 'fast-render-data');
           if (frData) {
             ssrContext.addData(frData.collectionData);
           }
@@ -107,7 +106,7 @@ Route = class extends SharedRoute {
         // cache the page if mentioned a timeout
         if (self._router.pageCacheTimeout) {
           const pageInfo = {
-            frData: res.getData('fast-render-data'),
+            frData: InjectData.getData(res, 'fast-render-data'),
             html: data
           };
           self._cachePage(req.url, req.__userId, pageInfo, self._router.pageCacheTimeout);
