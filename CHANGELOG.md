@@ -1,5 +1,10 @@
 # Changelog
 
+### v3.11.0
+2016-02-19
+
+* Update FastRender and InjectData(to 2.x). This is to support Meteor 1.3. To do that, we had to change the InjectData api a bit and release it as 2.0.0.
+
 ### v3.10.0
 * Add userId into the page cache logic. So, now a page is cache key is generate using the userId and the url. So, now there won't be data leaks with caching
 
