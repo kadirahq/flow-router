@@ -22,6 +22,14 @@ You need to write your app with FlowRouter and [ReactLayout](https://github.com/
 * Now your code runs on both on the client and the server, so make special attention to that. (Always, check the server console for errors)
 * If you need to write client specific code, write it in `componentDidMount` life cycle method - It doesn't run on the server.
 
+## Subscriptions & Collection Data
+
+It's important to note that in order to simulate the **client state** on the **server**, FlowRouter SSR only makes available collection data *that you've subscribed to*, even on the server.
+
+In other words, if you write something like `Posts.find().fetch()`, it will return the same exact posts on both the client and server while called by FlowRouter SSR, even though more posts are (presumably) available on the server when accessed through normal means. 
+
+Aditionally, since server code is not reactive you should always `subscribe()` first before trying to retrieve data with `fetch()`, otherwise you'll only get an empty array in return.
+
 ## Caching
 
 Rendering React Components are extremely [CPU intensive](https://twitter.com/kadirahq/status/620467416749838336) on the server. This will negatively impact your app's peformance specially if you've high page view throughput.
