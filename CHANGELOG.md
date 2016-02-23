@@ -1,5 +1,10 @@
 # Changelog
 
+### v3.11.1
+2016-02-23
+
+* Delay handling of back button with PR [538](https://github.com/kadirahq/flow-router/pull/538). Fixes [#536](https://github.com/kadirahq/flow-router/issues/536) 
+
 ### v3.11.0
 2016-02-19
 
