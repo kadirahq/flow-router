@@ -37,7 +37,6 @@ Router = class extends SharedRouter {
 
     this._initTriggersAPI();
     this._initClickAnchorHandlers();
-    this._initiateHandlingBackButton();
   }
 
   initialize(options) {
@@ -49,6 +48,7 @@ Router = class extends SharedRouter {
 
     this._initialized = true;
     const path = location.pathname + location.search + (location.hash || '');
+    this._initiateHandlingBackButton();
     this.go(path);
   }
 
