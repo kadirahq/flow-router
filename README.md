@@ -12,7 +12,7 @@ So, for the FlowRouter related documentation, visit [here](https://github.com/ka
 
 ## Usage
 
-> Currently, SSR only works with React. It's technically possible to add SSR support for Blaze. But Blaze Templates are not available on the server. We'll figure our something for that.
+> Currently, SSR only works with React. It's technically possible to add SSR support for Blaze. But Blaze Templates are not available on the server. We'll figure out something for that.
 
 You need to write your app with FlowRouter and [ReactLayout](https://github.com/kadirahq/meteor-react-layout). Visit here to [learn](https://kadira.io/academy/meteor-routing-guide/content/rendering-react-components) how to do that.
 
