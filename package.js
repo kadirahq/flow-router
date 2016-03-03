@@ -68,7 +68,7 @@ function configure(api) {
   api.use('reactive-var');
   api.use('ddp');
   api.use('ejson');
-  api.use('meteorhacks:fast-render@2.12.0', ['client', 'server']);
+  api.use('meteorhacks:fast-render@2.13.0', ['client', 'server']);
   api.use('cosmos:browserify@0.9.2', 'client');
   api.use('meteorhacks:picker@1.0.3', 'server');
   api.use('meteorhacks:inject-data@2.0.0');
