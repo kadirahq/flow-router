@@ -1,9 +1,14 @@
 # Changelog
 
+### v3.11.2
+2016-03-03
+
+* Update fast-render to 2.13.0. This version comes with much better implementation for the publication context. It's now more like Meteor.
+
 ### v3.11.1
 2016-02-23
 
-* Delay handling of back button with PR [538](https://github.com/kadirahq/flow-router/pull/538). Fixes [#536](https://github.com/kadirahq/flow-router/issues/536) 
+* Delay handling of back button with PR [538](https://github.com/kadirahq/flow-router/pull/538). Fixes [#536](https://github.com/kadirahq/flow-router/issues/536)
 
 ### v3.11.0
 2016-02-19
