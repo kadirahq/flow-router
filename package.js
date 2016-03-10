@@ -1,7 +1,7 @@
 Package.describe({
   name: 'kadira:flow-router',
   summary: 'Carefully Designed Client Side Router for Meteor',
-  version: '2.10.1',
+  version: '2.11.0',
   git: 'https://github.com/kadirahq/flow-router.git'
 });
 
@@ -60,9 +60,9 @@ function configure(api) {
   api.use('reactive-dict');
   api.use('reactive-var');
   api.use('ejson');
+  api.use('modules');
 
   api.use('meteorhacks:fast-render@2.10.0', ['client', 'server'], {weak: true});
-  api.use('cosmos:browserify@0.9.2', 'client');
 
   api.addFiles('client.browserify.js', 'client');
   api.addFiles('client/triggers.js', 'client');
