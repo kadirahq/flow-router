@@ -181,7 +181,7 @@ FlowRouter.route('/blog/:postId', {
 
 ## Triggers
 
-Triggers are the way FlowRouter allows you to perform tasks before **enter** into a route and after **exit** from a route.
+Triggers are the way FlowRouter allows you to perform tasks before you **enter** into a route and after you **exit** from a route.
 
 #### Defining triggers for a route
 
