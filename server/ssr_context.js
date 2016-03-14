@@ -1,4 +1,4 @@
-const deepMerge = Npm.require('deepmerge');
+const deepMerge = require('deepmerge');
 
 SsrContext = class {
   constructor() {

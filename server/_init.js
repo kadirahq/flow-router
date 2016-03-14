@@ -4,5 +4,3 @@
 // sandstrom.io
 // Now it's supported by SSR using this
 FlowRouter.basePath = __meteor_runtime_config__.ROOT_URL_PATH_PREFIX || '';
-Qs = Npm.require('qs');
-PathToRegexp = Npm.require('path-to-regexp');
