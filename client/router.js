@@ -1,7 +1,7 @@
 /* eslint new-cap: 0, no-loop-func: 0, prefer-arrow-callback: 0 */
-import Qs = require('qs');
-import PathToRegexp = require('path-to-regexp');
-import ParseUrl = require('parseurl');
+var Qs = require('qs');
+var PathToRegexp = require('path-to-regexp');
+var ParseUrl = require('parseurl');
 const logger = console;
 
 Router = class extends SharedRouter {
