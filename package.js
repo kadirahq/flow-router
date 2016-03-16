@@ -1,20 +1,8 @@
 Package.describe({
   name: 'kadira:flow-router-ssr',
   summary: 'Same as kadira:flow-router, but with SSR support',
-  version: '3.11.2',
+  version: '3.11.3',
   git: 'https://github.com/kadirahq/flow-router.git'
-});
-
-Npm.depends({
-  deepmerge: '0.2.10',
-  'cookie-parser': '1.4.0',
-  cheerio: '0.19.0',
-  // In order to support IE9, we had to fork pagejs and apply
-  // this PR: https://github.com/visionmedia/page.js/pull/288
-  page: 'https://github.com/kadirahq/page.js/archive/34ddf45ea8e4c37269ce3df456b44fc0efc595c6.tar.gz',
-  qs: '5.2.0',
-  'path-to-regexp': '1.2.1',
-  'parseurl': '1.3.1'
 });
 
 Package.onUse(function(api) {
@@ -33,8 +21,9 @@ Package.onTest(function(api) {
   // We use accounts-base to get `Meteor.user()`.
   // It's used for page caching.
   api.use('accounts-base');
-  api.use('practicalmeteor:sinon');
-  api.use('smithy:describe@1.0.0');
+
+  api.addFiles('test/_engine/utils.js');
+  api.addFiles('test/_engine/describe.js');
 
   api.addFiles('test/client/_helpers.js', 'client');
   api.addFiles('test/server/_helpers.js', 'server');
@@ -59,8 +48,7 @@ Package.onTest(function(api) {
 });
 
 function configure(api) {
-  api.versionsFrom('1.2');
-
+  api.versionsFrom('METEOR@1.3-rc.1');
   api.use('ecmascript');
   api.use('underscore');
   api.use('tracker');
@@ -68,8 +56,8 @@ function configure(api) {
   api.use('reactive-var');
   api.use('ddp');
   api.use('ejson');
+  api.use('modules', ['client', 'server']);
   api.use('meteorhacks:fast-render@2.13.0', ['client', 'server']);
-  api.use('cosmos:browserify@0.9.2', 'client');
   api.use('meteorhacks:picker@1.0.3', 'server');
   api.use('meteorhacks:inject-data@2.0.0');
 
@@ -77,7 +65,6 @@ function configure(api) {
   api.addFiles('lib/group.js', ['client', 'server']);
   api.addFiles('lib/route.js', ['client', 'server']);
 
-  api.addFiles('client.browserify.js', 'client');
   api.addFiles('client/triggers.js', 'client');
   api.addFiles('client/router.js', 'client');
   api.addFiles('client/group.js', 'client');

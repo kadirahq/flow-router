@@ -1,5 +1,5 @@
-const Url = Npm.require('url');
-const Cheerio = Npm.require('cheerio');
+const Url = require('url');
+const Cheerio = require('cheerio');
 const logger = console;
 
 Route = class extends SharedRoute {
@@ -10,7 +10,7 @@ Route = class extends SharedRoute {
   }
 
   _init() {
-    const cookieParser = Npm.require('cookie-parser');
+    const cookieParser = require('cookie-parser');
     Picker.middleware(cookieParser());
     // process null subscriptions with FR support
     Picker.middleware(FastRender.handleOnAllRoutes);
