@@ -22,7 +22,9 @@ Package.onTest(function(api) {
   // It's used for page caching.
   api.use('accounts-base');
   api.use('practicalmeteor:sinon');
-  api.use('smithy:describe@1.0.0');
+
+  api.addFiles('test/_engine/utils.js');
+  api.addFiles('test/_engine/describe.js');
 
   api.addFiles('test/client/_helpers.js', 'client');
   api.addFiles('test/server/_helpers.js', 'server');
