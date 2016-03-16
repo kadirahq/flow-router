@@ -1,5 +1,10 @@
 # Changelog
 
+### v3.12.1
+2016-03-17
+
+* Publish with npm modules
+
 ### v3.12.0
 2016-03-17
 
