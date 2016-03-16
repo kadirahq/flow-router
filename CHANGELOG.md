@@ -1,5 +1,10 @@
 # Changelog
 
+### v2.11.0
+
+* Add support for Meteor 1.3 RC-1.
+* Removes browserify and get modules from Meteor 1.3.
+
 ### v2.10.1
 * Fix the url generation for prefixed paths. See: [#508](https://github.com/kadirahq/flow-router/issues/508)
 
