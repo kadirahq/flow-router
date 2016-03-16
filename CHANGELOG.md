@@ -1,5 +1,11 @@
 # Changelog
 
+### v3.12.0
+2016-03-17
+
+* Add Support for METEOR@1.3-rc.1.
+* Currently, some tests are failing for no reason. But, still a good idea to release for testing. That's why we ship this.
+
 ### v3.11.2
 2016-03-03
 
