@@ -1,7 +1,7 @@
 Package.describe({
   name: 'kadira:flow-router-ssr',
   summary: 'Same as kadira:flow-router, but with SSR support',
-  version: '3.11.2',
+  version: '3.11.3',
   git: 'https://github.com/kadirahq/flow-router.git'
 });
 
@@ -47,7 +47,7 @@ Package.onTest(function(api) {
 });
 
 function configure(api) {
-  api.versionsFrom('METEOR@1.3-beta.12');
+  api.versionsFrom('METEOR@1.3-rc.1');
   api.use('ecmascript');
   api.use('underscore');
   api.use('tracker');
