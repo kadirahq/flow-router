@@ -21,7 +21,6 @@ Package.onTest(function(api) {
   // We use accounts-base to get `Meteor.user()`.
   // It's used for page caching.
   api.use('accounts-base');
-  api.use('practicalmeteor:sinon');
 
   api.addFiles('test/_engine/utils.js');
   api.addFiles('test/_engine/describe.js');
