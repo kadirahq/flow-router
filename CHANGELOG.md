@@ -1,5 +1,10 @@
 # Changelog
 
+### v3.12.2
+2016-03-17
+
+* Fix all failing tests. It seems like Meteor 1.3 RC doesn't like the spread operator. See: [PR564](https://github.com/kadirahq/flow-router/pull/564)
+
 ### v3.12.1
 2016-03-17
 
