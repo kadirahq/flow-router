@@ -123,9 +123,9 @@ describe('SSR Context', () => {
         const ssrContext = new SsrContext();
         const data = [[{_id: 'aa'}]];
         const frContext = {
-          subscribe: (name, ...params) => {
+          subscribe: (name, p1, p2) => {
             expect(name).to.be.equal('mysub');
-            expect(params).to.be.deep.equal(['one', 'two']);
+            expect([p1, p2]).to.be.deep.equal(['one', 'two']);
             return data;
           }
         };
