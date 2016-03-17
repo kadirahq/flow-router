@@ -302,8 +302,8 @@ Router = class extends SharedRouter {
 
   _runTriggers(triggers, context) {
     let redirectArgs;
-    const redirectFn = (...args) => {
-      if (/^http(s)?:\/\//.test(args[0])) {
+    const redirectFn = (url, params, queryParams) => {
+      if (/^http(s)?:\/\//.test(url)) {
         const message = `
           Redirects to URLs outside of the app are not supported
           in this version of Flow Router.
@@ -311,7 +311,7 @@ Router = class extends SharedRouter {
         `;
         throw new Error(message);
       }
-      redirectArgs = args;
+      redirectArgs = [url, params, queryParams];
     };
 
     Triggers.runTriggers(
