@@ -54,7 +54,7 @@ function configure(api) {
   api.use('ejson');
   api.use('modules');
 
-  api.use('meteorhacks:fast-render@2.10.0', ['client', 'server'], {weak: true});
+  api.use('meteorhacks:fast-render@2.14.0', ['client', 'server'], {weak: true});
 
   api.addFiles('client-modules.js', 'client');
   api.addFiles('client/triggers.js', 'client');
