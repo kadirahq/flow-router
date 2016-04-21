@@ -1,5 +1,9 @@
 # Changelog
 
+### v2.12.0
+
+* Update Fast Render to v2.14.0
+
 ### v2.11.0
 
 * Add support for Meteor 1.3 RC-1.
