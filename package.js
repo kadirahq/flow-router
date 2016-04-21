@@ -57,7 +57,7 @@ function configure(api) {
   api.use('ddp');
   api.use('ejson');
   api.use('modules', ['client', 'server']);
-  api.use('meteorhacks:fast-render@2.13.0', ['client', 'server']);
+  api.use('meteorhacks:fast-render@2.14.0', ['client', 'server']);
   api.use('meteorhacks:picker@1.0.3', 'server');
   api.use('meteorhacks:inject-data@2.0.0');
 
