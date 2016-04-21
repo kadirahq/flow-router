@@ -1,7 +1,7 @@
 
 # FlowRouter SSR
 
-This is the SSR version of FlowRouter and this will be the [FlowRouter 4.0](https://kadira.io/blog/meteor/flow-router-4-0-and-future-of-routing-in-meteor). This is compatibile with FlowRouter 2.x expect for [subscription registration](https://github.com/kadirahq/flow-router#subscription-management). It has been removed from this version.
+This is the SSR version of FlowRouter and this will be the [FlowRouter 4.0](https://kadira.io/blog/meteor/flow-router-4-0-and-future-of-routing-in-meteor). This is compatibile with FlowRouter 2.x except for [subscription registration](https://github.com/kadirahq/flow-router#subscription-management). It has been removed from this version.
 
 So, for the FlowRouter related documentation, visit [here](https://github.com/kadirahq/flow-router).
 
