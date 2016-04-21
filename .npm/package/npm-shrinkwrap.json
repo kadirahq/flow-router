@@ -1,0 +1,28 @@
+{
+  "dependencies": {
+    "page": {
+      "version": "1.6.4",
+      "resolved": "https://github.com/kadirahq/page.js/archive/34ddf45ea8e4c37269ce3df456b44fc0efc595c6.tar.gz",
+      "from": "https://github.com/kadirahq/page.js/archive/34ddf45ea8e4c37269ce3df456b44fc0efc595c6.tar.gz",
+      "dependencies": {
+        "path-to-regexp": {
+          "version": "1.2.1",
+          "resolved": "https://registry.npmjs.org/path-to-regexp/-/path-to-regexp-1.2.1.tgz",
+          "from": "path-to-regexp@>=1.2.1 <1.3.0",
+          "dependencies": {
+            "isarray": {
+              "version": "0.0.1",
+              "resolved": "https://registry.npmjs.org/isarray/-/isarray-0.0.1.tgz",
+              "from": "isarray@0.0.1"
+            }
+          }
+        }
+      }
+    },
+    "qs": {
+      "version": "5.2.0",
+      "resolved": "https://registry.npmjs.org/qs/-/qs-5.2.0.tgz",
+      "from": "qs@5.2.0"
+    }
+  }
+}
