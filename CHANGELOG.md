@@ -1,5 +1,9 @@
 # Changelog
 
+### v2.12.1
+
+* Add NPM modules back. Fixes: [#602](https://github.com/kadirahq/flow-router/issues/602)
+
 ### v2.12.0
 
 * Update Fast Render to v2.14.0
