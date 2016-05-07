@@ -42,6 +42,11 @@ Router = function () {
   // but when it's the time for a trigger redirect we've a chain
   this._oldRouteChain = [];
 
+  // This in turn is a list of all routes targeted by the Router.go() function.
+  // It serves the purpose to avoid that FlowRouter goes on an infinite loop by calling Router.go().
+  this._infiniteGoLoopHistory = [];
+  this._infiniteGoLoopThreshold = 100;  // Number of tests that must be fullfilled until a loop is seen to be detected.
+
   this.env = {
     replaceState: new Meteor.EnvironmentVariable(),
     reload: new Meteor.EnvironmentVariable(),
@@ -186,7 +191,12 @@ Router.prototype.path = function(pathDef, fields, queryParams) {
 
 Router.prototype.go = function(pathDef, fields, queryParams) {
   var path = this.path(pathDef, fields, queryParams);
+  this._infiniteGoLoopHistory.push(path);
 
+  // Test for infinite loop in .go()
+  if(this.testInfiniteLoop() === false) return false;
+
+  // Finish
   var useReplaceState = this.env.replaceState.get();
   if(useReplaceState) {
     this._page.replace(path);
@@ -194,6 +204,57 @@ Router.prototype.go = function(pathDef, fields, queryParams) {
     this._page(path);
   }
 };
+
+/**
+ * Each time the .go() function is triggered, it records a history of all routes that go() itself has targeted.
+ * However, within .go() there is a check for infinite loop. When the function is executed, it triggers a series of tests.
+ * If these tests indicate, that FlowRouter is on a loop, it stops the application.
+ * @return {boolean} If false, FlowRouter is allegedly on an infinite loop.
+ */
+Router.prototype.testInfiniteLoop = function() {
+
+  // Vars
+  let loop = this._infiniteGoLoopHistory; // The routers go() history, allegedly indicating an infinite loop
+  let tests = loop.length; // Number of tests.
+  let threshold = this._infiniteGoLoopThreshold;     // Number of tests that must be fullfilled until a loop is seen to be detected.
+
+  // Work around to kill infinite loop if two routes point to each other
+  if(loop) {
+    if(tests >= threshold) {
+      // Run tests only if routeChain is long enough
+      for(let t = tests; t > 0; t--) {
+        // If many tests were valid, lets assume a loop was detected
+        if(t === 3) {
+          let errorMsg = "Router.go() is on an infinite loop. Please check your routes definitions.";
+          this._infiniteGoLoopHistory = [];
+          console.error(errorMsg);
+          throw new Error(errorMsg);
+          return false;
+        }
+
+        // Do the testing (Pattern: i=RouteA; i-1=Route B; i-2=RouteA; i-3=RouteB ...)
+        let i = t-1;
+        if(loop[i] === loop[i-2]
+          && loop[i-1] === loop[i-3]) {
+          continue; // Keep the tests running
+        } else {
+          break;  // No loop detected
+        }
+      }
+    }
+  }
+
+  // TODO: Manually failing infinite go loop test.
+  // The problem now is, that theoretically the user could manually .go() for many many times on the same route.
+  // Let's say we run tests on the last 100 entries in the .go() history. Probably the user visited for 100 times the same
+  // route with .go(). For instance, he triggered 100 times .go('/friends'). Then the infinite loop tests falsely would
+  // stop the Router from executing.
+  // To avoid this, there is a clean-up in the go history. Any-time
+  /* fix this with another commit */
+
+  // No infinite loop detected
+  return true;
+}
 
 Router.prototype.reload = function() {
   var self = this;
