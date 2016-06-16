@@ -149,7 +149,7 @@ Router.prototype.path = function(pathDef, fields, queryParams) {
   }
 
   fields = fields || {};
-  var regExp = /(:[\w\(\)\\\+\*\.\?]+)+/g;
+  var regExp = /(:[\w\(\)\\\+\*\.\?\[\]\-]+)+/g;
   path += pathDef.replace(regExp, function(key) {
     var firstRegexpChar = key.indexOf("(");
     // get the content behind : and (\\d+/)
