@@ -11,8 +11,14 @@ Group = function(router, options, parent) {
   this.name = options.name;
   this.options = options;
 
-  this._triggersEnter = options.triggersEnter || [];
-  this._triggersExit = options.triggersExit || [];
+  this._triggersEnter = []; 
+  if (options.triggersEnter) {
+    this._triggersEnter.concat(options.triggersEnter);
+  }
+  this._triggersExit = [];
+  if (options._triggersExit) {
+    this._triggersExit.concat(options._triggersExit);
+  }
   this._subscriptions = options.subscriptions || Function.prototype;
 
   this.parent = parent;
