@@ -74,7 +74,7 @@ Route = class extends SharedRoute {
           }
 
           if (self.options.action) {
-            self.options.action(routeContext.params, routeContext.queryParams);
+            self.options.action(routeContext.params, routeContext.queryParams, req);
           }
         } catch (ex) {
           logger.error(`Error when doing SSR. path:${req.url}: ${ex.message}`);
