@@ -26,9 +26,15 @@ Mongo.Collection.prototype.find = function(selector, options) {
   selector = selector || {};
   const ssrContext = FlowRouter.ssrContext.get();
   if (ssrContext && !FlowRouter.inSubscription.get()) {
+    console.log('A find for ' +  this._name);
     const collName = this._name;
     const collection = ssrContext.getCollection(collName);
     const cursor = collection.find(selector, options);
+
+    if (FlowRouter.mongoTransforms[colName]) {
+      cursor._transform = FlowRouter.mongoTransforms[collName];
+    }
+
     return cursor;
   }
 
