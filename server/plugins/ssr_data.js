@@ -29,6 +29,11 @@ Mongo.Collection.prototype.find = function(selector, options) {
     const collName = this._name;
     const collection = ssrContext.getCollection(collName);
     const cursor = collection.find(selector, options);
+
+    if (FlowRouter.mongoTransforms[collName]) {
+      cursor._transform = FlowRouter.mongoTransforms[collName];
+    }
+
     return cursor;
   }
 

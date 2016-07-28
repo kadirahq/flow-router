@@ -74,7 +74,7 @@ Route = class extends SharedRoute {
           }
 
           if (self.options.action) {
-            self.options.action(routeContext.params, routeContext.queryParams);
+            self.options.action(routeContext.params, routeContext.queryParams, req, res);
           }
         } catch (ex) {
           logger.error(`Error when doing SSR. path:${req.url}: ${ex.message}`);
@@ -153,20 +153,15 @@ Route = class extends SharedRoute {
   _isHtmlPage(url) {
     const pathname = Url.parse(url).pathname;
     const ext = pathname.split('.').slice(1).join('.');
-
     // if there is no extention, yes that's a html page
     if (!ext) {
       return true;
     }
-
-    // if this is htm or html, yes that's a html page
-    if (/^htm/.test(ext)) {
-      return true;
+    if (/^(gif|jpg|jpeg|tiff|png|pdf|css|ico|map|js)/.test(ext)) {
+      return false;
     }
-
-    // if not we assume this is not as a html page
-    // this doesn't do any harm. But no SSR
-    return false;
+    // then return true
+    return true;
   }
 
   _getCachedPage(url, userId) {
