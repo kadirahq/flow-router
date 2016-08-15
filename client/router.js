@@ -102,7 +102,20 @@ Router.prototype.route = function(pathDef, options, group) {
     };
 
     var triggers = self._triggersEnter.concat(route._triggersEnter);
-    Triggers.runTriggers(
+    var triggersEnterInvocationContext = {
+      type: "enter",
+      route: route,
+      newRoute: route,
+      oldRoute: oldRoute,
+      router: self,
+      stopped: false,
+      isReentrant: !!self.__is_reentrant_following_stop_exit__
+    };
+    delete self.__is_reentrant_following_stop_exit__;
+
+    // triggers for entry aren't run when "going back to an old route"
+    // after stopping entry to another route
+    Triggers.runTriggers.call(triggersEnterInvocationContext,
       triggers,
       self._current,
       self._redirectFn,
@@ -113,7 +126,14 @@ Router.prototype.route = function(pathDef, options, group) {
   // calls when you exit from the page js route
   route._exitHandle = function(context, next) {
     var triggers = self._triggersExit.concat(route._triggersExit);
-    Triggers.runTriggers(
+    var triggersExitInvocationContext = {
+      type: "exit",
+      route: route,
+      oldRoute: route,
+      router: self,
+      stopped: false
+    };
+    Triggers.runTriggers.call(triggersExitInvocationContext,
       triggers,
       self._current,
       self._redirectFn,
