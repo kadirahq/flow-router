@@ -12,11 +12,16 @@ Route = class extends SharedRoute {
   _init() {
     const cookieParser = require('cookie-parser');
     Picker.middleware(cookieParser());
-    // process null subscriptions with FR support
-    Picker.middleware(FastRender.handleOnAllRoutes);
 
     const route = FlowRouter.basePath + this.pathDef;
-    Picker.route(route, this._handleRoute.bind(this));
+
+    // only run fast render for defined routes
+    Picker.route(route, (params, req, res, next) => {
+      // process null subscriptions with FR support
+      FastRender.handleOnAllRoutes(req, res, () => {
+        this._handleRoute.bind(this)(params, req, res, next);
+      });
+    });
   }
 
   _handleRoute(params, req, res, next) {
