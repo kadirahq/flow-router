@@ -14,7 +14,7 @@ Route = class extends SharedRoute {
     Picker.middleware(cookieParser());
 
     const route = FlowRouter.basePath + this.pathDef;
-    
+
     // only run fast render for defined routes
     Picker.route(route, (params, req, res, next) => {
       // process null subscriptions with FR support
