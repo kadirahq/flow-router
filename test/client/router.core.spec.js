@@ -613,6 +613,19 @@ function(test, done) {
   resetBasePath();
 });
 
+Tinytest.add(
+'Client - Router - base path - url generation',
+function(test, done) {
+  _.each(['/flow', '/flow/', 'flow/', 'flow'], function(simulatedBasePath) {
+    var rand = Random.id();
+    setBasePath(simulatedBasePath);
+
+    Meteor.absoluteUrl.defaultOptions.rootUrl = 'http://example.com/flow'
+    test.equal(FlowRouter.url('/' + rand), 'http://example.com/flow/' + rand);
+  });
+  resetBasePath();
+});
+
 
 function setBasePath(path) {
   FlowRouter._initialized = false;
