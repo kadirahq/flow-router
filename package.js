@@ -14,6 +14,7 @@ Npm.depends({
 
 Package.onUse(function(api) {
   configure(api);
+  api.use('ecmascript');
   api.export('FlowRouter');
 });
 

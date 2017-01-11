@@ -291,6 +291,113 @@ function localeCheck(context, redirect, stop) {
 
 > **Note**: When using the stop function, you should always pass the second **redirect** argument, even if you won't use it.
 
+#### New Behaviour of Stop, and the Invocation Context of Trigger Functions
+
+This segment outlines new behavior added to `stop`.
+
+From the forgoing discussion, we learnt that that triggers are invoked with three arguments:
+ 1. `context`: information about the route (specifically, the output of `FlowRouter.current()`)
+ 2. `redirect`: a function that may be used for redirection to other routes
+ 3. `stop`: a function that aborts routing when invoked
+
+`stop` now takes a single argument called `goBackOnStop` which defaults to `false` (its original behavior in FlowRouter). When set to `true`:
+ - After using the `stop` function in `triggersExit` function, a duplicate history item (in the "next" slot) will be created. (Sorry...) But `triggersExit` triggers will fire again when attempting to route away once more. The process is as follows:
+   1. `stop` is called
+   2. a "re-entrant" exit (more below) is made from the "new route" which was prevented from completing
+   3. a "re-entrant" entry (more below) is made into the "old route" from which stop was called
+ - After using the `stop` function in `triggersEnter` function, a history item (in the "next" slot) will be created for the route on which "enter" was "stopped".
+   1. `stop` is called
+   2. a "re-entrant" exit (more below) is made from the "new route" which was prevented from completing
+   3. a "re-entrant" entry (more below) is made into the "old route" that was exited before stop was called if it exists (i.e.: the failed entry is not into the first history item)
+
+However, to achieve that, the router will "exit" the routes whose routing attempts didn't successfully complete after being aborted with `stop`. It will then enter the original source route. This information is made available to all trigger functions in their invocation contexts.
+
+Additional information is available to entry/exit triggers in the form of their invocation context (i.e.: `this`).
+
+In particular, for entry triggers `this` takes the form:
+```javascript
+{
+  type: "enter",
+  route: /* new route */,
+  newRoute: /* new route */,
+  oldRoute: /* previous route */,
+  router: /* essentially FlowRouter */,
+  stopped: /* whether stop has been called */,
+  isReentrant_followingStoppedExit: /* a boolean that indicates whether this
+                                       entry is a result of route entry/exit 
+                                       after an exit is stopped using the stop
+                                       function (third argument of a trigger)
+
+                                      what happens is:
+                                        (1) stop is called
+                                        (2) a "re-entrant" exit is made from the
+                                            "new route" which was prevented from
+                                            completing
+                                        (3) a "re-entrant" entry is made into
+                                            the "old route" from which stop was
+                                            called
+                                    */,
+  isReentrant_followingStoppedEnter:/* a boolean that indicates whether this
+                                       entry is a result of route entry/exit 
+                                       after an enter is stopped using the stop
+                                       function (third argument of a trigger)
+
+                                      what happens is:
+                                        (1) stop is called
+                                        (2) a "re-entrant" exit is made from the
+                                            "new route" which was prevented from
+                                            completing
+                                        (3) a "re-entrant" entry is made into
+                                            the "old route" that was exited
+                                            before stop was called if it exists
+                                            (i.e.: the failed entry is not into
+                                            the first history item)
+                                    */
+}
+```
+
+In particular, and for exit triggers `this` takes the form:
+```javascript
+{
+  type: "exit",
+  route: /* current, soon to be former, route */,
+  oldRoute: /* current, soon to be former, route */,
+  router: /* essentially FlowRouter */,
+  stopped: /* whether stop has been called */
+  isReentrant_followingStoppedExit: /* a boolean that indicates whether this
+                                       entry is a result of route entry/exit 
+                                       after an exit is stopped using the stop
+                                       function (third argument of a trigger)
+
+                                      what happens is:
+                                        (1) stop is called
+                                        (2) a "re-entrant" exit is made from the
+                                            "new route" which was prevented from
+                                            completing
+                                        (3) a "re-entrant" entry is made into
+                                            the "old route" from which stop was
+                                            called
+                                    */,
+  isReentrant_followingStoppedEnter:/* a boolean that indicates whether this
+                                       entry is a result of route entry/exit 
+                                       after an enter is stopped using the stop
+                                       function (third argument of a trigger)
+
+                                      what happens is:
+                                        (1) stop is called
+                                        (2) a "re-entrant" exit is made from the
+                                            "new route" which was prevented from
+                                            completing
+                                        (3) a "re-entrant" entry is made into
+                                            the "old route" that was exited
+                                            before stop was called if it exists
+                                            (i.e.: the failed entry is not into
+                                            the first history item)
+                                    */
+}
+```
+
+
 ## Not Found Routes
 
 You can configure Not Found routes like this:

@@ -55,7 +55,7 @@ Triggers.createRouteBoundTriggers = function(triggers, names, negate) {
       matched = (negate)? matched * -1 : matched;
 
       if(matched === 1) {
-        originalTrigger(context, next);
+        originalTrigger.apply(this, arguments);
       }
     };
     return modifiedTrigger;
@@ -74,11 +74,53 @@ Triggers.runTriggers = function(triggers, context, redirectFn, after) {
   var inCurrentLoop = true;
   var alreadyRedirected = false;
 
+  var triggerInvocationContext = this;
+  var _goBackOnStop = false;
+
   for(var lc=0; lc<triggers.length; lc++) {
     var trigger = triggers[lc];
-    trigger(context, doRedirect, doStop);
+    trigger.call(triggerInvocationContext, context, doRedirect, doStop);
 
     if(abort) {
+      // Sorry to say, quick hack like this to enable firing off exit triggers
+      // again following a stop comes at a price of a repeat entry in one's
+      // browser history (as the next item). Benign, perhaps, but annoying.
+      //
+      // This seems to be an outcome of the way FlowRouter's trigger system is
+      // designed.
+
+      if (triggerInvocationContext.stopped && _goBackOnStop) {
+        var router = triggerInvocationContext.router;
+
+        if (triggerInvocationContext.type === "exit") {
+          Meteor.defer(function() {
+            // FlowRouter will rebuild this eventually
+            router._current = {
+              // path: context.path,  // need to leave this out
+              params: context.params,
+              queryParams: context.queryParams,
+              route: triggerInvocationContext.route,
+              oldRoute: triggerInvocationContext.route,
+            };
+
+            router.__is_reentrant_following_stop_exit__ = true;
+            router._page.replace(context.path);
+            Meteor.defer(function() {
+              if (router._page.len > 0) {
+                router._page.back();
+              }
+            });
+          });
+        }
+
+        if (triggerInvocationContext.type === "enter") {
+          Meteor.defer(function() {
+            router.__is_reentrant_following_stop_enter__ = true;
+            router._page.back();
+          });
+        }
+      }
+
       return;
     }
   }
@@ -106,7 +148,9 @@ Triggers.runTriggers = function(triggers, context, redirectFn, after) {
     redirectFn(url, params, queryParams);
   }
 
-  function doStop() {
+  function doStop(goBackOnStop = false) {
+    _goBackOnStop = goBackOnStop;
     abort = true;
+    triggerInvocationContext.stopped = abort;
   }
 };
