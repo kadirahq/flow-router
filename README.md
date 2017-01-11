@@ -194,7 +194,7 @@ FlowRouter.route('/home', {
   action: function() {
     // do something you like
   },
-  // calls when when we decide to move to another route
+  // calls when we decide to move to another route
   // but calls before the next route started
   triggersExit: [trackRouteClose]
 });
