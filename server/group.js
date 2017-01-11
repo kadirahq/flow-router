@@ -1,8 +1,20 @@
-Group = function(router, options) {
+Group = function(router, options, parent) {
   options = options || {};
-  this.prefix = options.prefix || '';
-  this.options = options;
+
+  if (options.prefix && !/^\/.*/.test(options.prefix)) {
+    var message = "group's prefix must start with '/'";
+    throw new Error(message);
+  }
+
   this._router = router;
+  this.prefix = options.prefix || '';
+  this.name = options.name;
+  this.options = options;
+
+  this.parent = parent;
+  if (this.parent) {
+    this.prefix = parent.prefix + this.prefix;
+  }
 };
 
 Group.prototype.route = function(pathDef, options) {
@@ -11,8 +23,5 @@ Group.prototype.route = function(pathDef, options) {
 };
 
 Group.prototype.group = function(options) {
-  var group = new Group(this._router, options);
-  group.parent = this;
-
-  return group;
+  return new Group(this._router, options, this);
 };
