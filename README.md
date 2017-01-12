@@ -291,6 +291,44 @@ function localeCheck(context, redirect, stop) {
 
 > **Note**: When using the stop function, you should always pass the second **redirect** argument, even if you won't use it.
 
+> **Note**: After using the `stop` function in a `triggersExit` function, a duplicate history item (in the "next" slot) will be created. (Sorry...) But `triggersExit` triggers will fire again when attempting to route away once more.
+
+#### Triggers and their Invocation Context
+
+From the forgoing discussion, we learnt that that triggers are invoked with three arguments:
+ 1. `context`: information about the route (specifically, the output of `FlowRouter.current()`)
+ 2. `redirect`: a function that may be used for redirection to other routes
+ 3. `stop`: a function that aborts routing when invoked
+
+Additional information is available to entry/exit triggers in the form of their invocation context (i.e.: `this`).
+
+In particular, for entry triggers `this` takes the form:
+```javascript
+{
+  type: "enter",
+  route: /* new route */,
+  newRoute: /* new route */,
+  oldRoute: /* previous route */,
+  router: /* essentially FlowRouter */,
+  stopped: /* whether stop has been called */,
+  isReentrant: /* a boolean that indicates whether this entry is a
+                  result of re-entering a route after an exit is stopped
+                  using the stop function (third argument of a trigger) */
+}
+```
+
+In particular, and for exit triggers `this` takes the form:
+```javascript
+{
+  type: "exit",
+  route: /* current, soon to be former, route */,
+  oldRoute: /* current, soon to be former, route */,
+  router: /* essentially FlowRouter */,
+  stopped: /* whether stop has been called */
+}
+```
+
+
 ## Not Found Routes
 
 You can configure Not Found routes like this:

@@ -74,11 +74,40 @@ Triggers.runTriggers = function(triggers, context, redirectFn, after) {
   var inCurrentLoop = true;
   var alreadyRedirected = false;
 
+  var triggerInvocationContext = this;
+
   for(var lc=0; lc<triggers.length; lc++) {
     var trigger = triggers[lc];
-    trigger(context, doRedirect, doStop);
+    trigger.call(triggerInvocationContext, context, doRedirect, doStop);
 
     if(abort) {
+      // Sorry to say, quick hack like this to enable firing off exit triggers
+      // again following a stop comes at a price of a repeat entry in one's
+      // browser history (as the next item). Benign, perhaps, but annoying.
+      //
+      // This seems to be an outcome of the way FlowRouter's trigger system is
+      // designed.
+
+      var router = triggerInvocationContext.router;
+
+      if (triggerInvocationContext.type === "exit") {
+        Meteor.defer(function() {
+          router._current = triggerInvocationContext.route;
+          router.__is_reentrant_following_stop_exit__ = true;
+          router._page.replace(context.path);
+          Meteor.defer(function() {
+            router._page.back();
+          });
+        });
+      }
+
+      if (triggerInvocationContext.type === "enter") {
+        Meteor.defer(function() {
+          router._current = triggerInvocationContext.oldRoute;
+          router._page.back();
+        });
+      }
+
       return;
     }
   }
@@ -108,5 +137,6 @@ Triggers.runTriggers = function(triggers, context, redirectFn, after) {
 
   function doStop() {
     abort = true;
+    triggerInvocationContext.stopped = abort;
   }
 };
