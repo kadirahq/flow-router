@@ -15,13 +15,20 @@ function(test, done) {
   var store = [];
   var url = "http://google.com";
   var triggers = MakeTriggers(2, store);
+  var oldRouteClosed;
+  var context = {
+    oldRoute: {
+      registerRouteClose: function () { oldRouteClosed = true; }
+    }
+  };
   triggers.splice(1, 0, function(context, redirect) {
     redirect(url); 
   });
 
-  Triggers.runTriggers(triggers, null, function(u) {
+  Triggers.runTriggers(triggers, context, function(u) {
     test.equal(store, [0]);
     test.equal(u, url);
+    test.isTrue(oldRouteClosed);
     done();
   }, null);
 });

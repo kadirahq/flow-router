@@ -103,6 +103,12 @@ Triggers.runTriggers = function(triggers, context, redirectFn, after) {
 
     abort = true;
     alreadyRedirected = true;
+
+    // Need to close old route prior to redirecting to fix #314
+    if (context && context.oldRoute) {
+      context.oldRoute.registerRouteClose();
+    }
+
     redirectFn(url, params, queryParams);
   }
 
