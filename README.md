@@ -588,6 +588,10 @@ Template.myTemplate.events({
       FlowRouter.subsReady("myPost", function() {
          // do something
       });
+      // Or, to run the callback when all subs are ready:
+      FlowRouter.subsReady(function() {
+         // do something
+      });
   }
 });
 ~~~
