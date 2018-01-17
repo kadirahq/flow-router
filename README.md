@@ -217,7 +217,7 @@ This is how you can define triggers on a group definition.
 var adminRoutes = FlowRouter.group({
   prefix: '/admin',
   triggersEnter: [trackRouteEntry],
-  triggersExit: [trackRouteEntry]
+  triggersExit: [trackRouteExit]
 });
 ~~~
 
