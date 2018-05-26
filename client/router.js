@@ -51,8 +51,8 @@ Router = function () {
   // redirect function used inside triggers
   this._redirectFn = function(pathDef, fields, queryParams) {
     if (/^http(s)?:\/\//.test(pathDef)) {
-        var message = "Redirects to URLs outside of the app are not supported in this version of Flow Router. Use 'window.location = yourUrl' instead";
-        throw new Error(message);
+      var message = "Redirects to URLs outside of the app are not supported in this version of Flow Router. Use 'window.location = yourUrl' instead";
+      throw new Error(message);
     }
     self.withReplaceState(function() {
       var path = FlowRouter.path(pathDef, fields, queryParams);
@@ -176,7 +176,8 @@ Router.prototype.path = function(pathDef, fields, queryParams) {
     path += "/";
   }
 
-  var strQueryParams = this._qs.stringify(queryParams || {});
+  var queryStringParams = {encode: true, arrayFormat: 'repeat'}
+  var strQueryParams = this._qs.stringify(queryParams || {}, queryStringParams);
   if(strQueryParams) {
     path += "?" + strQueryParams;
   }
@@ -581,6 +582,87 @@ Router.prototype._triggerRouteRegister = function(currentRoute) {
   _.each(this._onRouteCallbacks, function(cb) {
     cb(routePublicApi);
   });
+};
+
+
+var _Context = page.Context;
+var hashbang = false;
+var base = '';
+var decodeURLComponents = true;
+
+function decodeURLEncodedURIComponent(val) {
+  if (typeof val !== 'string') { return val; }
+  return decodeURLComponents ? decodeURIComponent(val.replace(/\+/g, ' ')) : val;
+}
+
+function FlowContext(path, state) {
+  if ('/' === path[0] && 0 !== path.indexOf(base)) path = base + (hashbang ? '#!' : '') + path;
+  var i = path.indexOf('?');
+
+  this.canonicalPath = path;
+  this.path = path.replace(base, '') || '/';
+  if (hashbang) this.path = this.path.replace('#!', '') || '/';
+
+  this.title = document.title;
+  this.state = state || {};
+  this.state.path = path;
+  // this.querystring = ~i ? decodeURLEncodedURIComponent(path.slice(i + 1)) : '';
+  this.querystring = ~i ? path.slice(i + 1) : '';
+  this.pathname = decodeURLEncodedURIComponent(~i ? path.slice(0, i) : path);
+  this.params = {};
+
+  // fragment
+  this.hash = '';
+  if (!hashbang) {
+    if (!~this.path.indexOf('#')) return;
+    var parts = this.path.split('#');
+    this.path = parts[0];
+    this.hash = decodeURLEncodedURIComponent(parts[1]) || '';
+    this.querystring = this.querystring.split('#')[0];
+  }
+
+  return this;
+}
+
+FlowContext.prototype = Object.create(_Context.prototype);
+FlowContext.prototype.constructor = FlowContext;
+
+page.Context = FlowContext;
+
+
+page.replace = function(path, state, init, dispatch) {
+  var ctx = new page.Context(path, state);
+  page.current = ctx.path;
+  ctx.init = init;
+  ctx.save(); // save before dispatching, which may redirect
+  if (false !== dispatch) page.dispatch(ctx);
+  return ctx;
+};
+
+page.show = function(path, state, dispatch, push) {
+  var ctx = new page.Context(path, state);
+  page.current = ctx.path;
+  if (false !== dispatch) page.dispatch(ctx);
+  if (false !== ctx.handled && false !== push) ctx.pushState();
+  return ctx;
+};
+
+var _pageStart = page.start;
+page.start = function(options) {
+  var result = _pageStart.apply(page, arguments);
+
+  options = options || {};
+  if (true === options.hashbang) hashbang = true;
+  if (false === options.decodeURLComponents) decodeURLComponents = false;
+
+  return result;
+};
+
+var _pageBase = page.base;
+page.base = function(path) {
+  _pageBase.apply(page, arguments);
+  if (0 === arguments.length) return base;
+  base = path;
 };
 
 Router.prototype._page = page;

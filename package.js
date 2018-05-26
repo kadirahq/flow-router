@@ -1,8 +1,8 @@
 Package.describe({
-  name: 'kadira:flow-router',
+  name: 'bogdan-srk:flow-router',
   summary: 'Carefully Designed Client Side Router for Meteor',
   version: '2.12.1',
-  git: 'https://github.com/kadirahq/flow-router.git'
+  git: 'https://github.com/bogdan-srk/flow-router.git'
 });
 
 Npm.depends({
