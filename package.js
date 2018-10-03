@@ -1,13 +1,23 @@
 Package.describe({
   name: 'baotuan:flow-router-ssr',
   summary: 'Same as kadira:flow-router, but with SSR support',
-  version: '3.13.0',
+  version: '3.13.2',
   git: 'https://github.com/BillTuan/flow-router.git'
 })
 
 Package.onUse(function (api) {
   configure(api)
   api.export('FlowRouter')
+})
+
+Npm.depends({
+  cheerio: '0.19.0',
+  'cookie-parser': '1.4.0',
+  deepmerge: '0.2.10',
+  parseurl: '1.3.1',
+  'path-to-regexp': '1.2.1',
+  qs: '6.1.0',
+  url: '0.11.0'
 })
 
 Package.onTest(function (api) {
@@ -57,7 +67,7 @@ function configure (api) {
   api.use('ddp')
   api.use('ejson')
   api.use('modules', ['client', 'server'])
-  api.use('staringatlights:fast-render@3.0.3', ['client', 'server'])
+  api.use('staringatlights:fast-render@2.16.5', ['client', 'server'])
   api.use('meteorhacks:picker@1.0.3', 'server')
   api.use('meteorhacks:inject-data@2.0.0')
 

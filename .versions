@@ -2,7 +2,7 @@ accounts-base@1.4.2
 allow-deny@1.1.0
 babel-compiler@7.1.1
 babel-runtime@1.2.7
-baotuan:flow-router-ssr@3.13.0
+baotuan:flow-router-ssr@3.13.2
 base64@1.0.11
 binary-heap@1.0.10
 boilerplate-generator@1.5.0
@@ -27,7 +27,7 @@ http@1.4.1
 id-map@1.1.0
 jquery@1.0.2
 livedata@1.0.18
-local-test:baotuan:flow-router-ssr@3.13.0
+local-test:baotuan:flow-router-ssr@3.13.2
 localstorage@1.2.0
 logging@1.1.20
 meteor@1.9.2
@@ -51,10 +51,9 @@ reactive-var@1.0.11
 reload@1.2.0
 retry@1.1.0
 routepolicy@1.0.13
-server-render@0.3.1
 service-configuration@1.0.11
 socket-stream-client@0.2.2
-staringatlights:fast-render@3.0.4
+staringatlights:fast-render@2.16.5
 staringatlights:inject-data@2.2.0
 tinytest@1.1.0
 tracker@1.2.0
