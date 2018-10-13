@@ -3,3 +3,4 @@
 *.browserify.js.map
 node_modules
 .jshintrc
+.npm
