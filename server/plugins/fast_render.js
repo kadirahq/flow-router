@@ -1,8 +1,8 @@
-if(!Package['meteorhacks:fast-render']) {
+if(!Package['communitypackages:fast-render']) {
   return;
 }
 
-FastRender = Package['meteorhacks:fast-render'].FastRender;
+FastRender = Package['communitypackages:fast-render'].FastRender;
 
 // hack to run after eveything else on startup
 Meteor.startup(function () {

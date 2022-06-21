@@ -24,8 +24,6 @@ Package.onTest(function(api) {
   api.use('mongo');
   api.use('http');
   api.use('random');
-  api.use('meteorhacks:fast-render');
-  api.use('meteorhacks:inject-data');
   api.use('tmeasday:html5-history-api');
 
   api.addFiles('test/common/fast_render_route.js', ['client', 'server']);
@@ -61,7 +59,8 @@ function configure(api) {
   api.use('ejson');
   api.use('modules');
 
-  api.use('meteorhacks:fast-render@2.14.0', ['client', 'server'], {weak: true});
+  api.use('communitypackages:fast-render@4.0.6');
+  api.use('communitypackages:inject-data@2.3.1');
 
   api.addFiles('client/modules.js', 'client');
   api.addFiles('client/triggers.js', 'client');

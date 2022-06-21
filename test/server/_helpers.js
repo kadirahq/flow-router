@@ -23,7 +23,7 @@ Meteor.publish('readyness', function (doIt) {
   }
 });
 
-InjectData = Package['meteorhacks:inject-data'].InjectData;
+InjectData = Package['communitypackages:inject-data'].InjectData;
 var urlResolve = Npm.require('url').resolve;
 GetFRData = function GetFRData(path) {
   var url = urlResolve(process.env.ROOT_URL, path);
