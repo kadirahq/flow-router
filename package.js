@@ -52,7 +52,7 @@ Package.onTest(function(api) {
 });
 
 function configure(api) {
-  api.versionsFrom('METEOR@1.3-rc.1');
+  api.versionsFrom('METEOR@2.3');
 
   api.use('underscore');
   api.use('tracker');
