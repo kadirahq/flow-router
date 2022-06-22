@@ -69,16 +69,37 @@ Triggers.createRouteBoundTriggers = function(triggers, names, negate) {
 //  @context - context we need to pass (it must have the route)
 //  @redirectFn - function which used to redirect 
 //  @after - called after if only all the triggers runs
-Triggers.runTriggers = function(triggers, context, redirectFn, after) {
-  var abort = false;
-  var inCurrentLoop = true;
-  var alreadyRedirected = false;
+Triggers.runTriggers = (triggers, context, redirectFn, after) => {
+  let abort = false;
+  let inCurrentLoop = true;
+  let alreadyRedirected = false;
 
-  for(var lc=0; lc<triggers.length; lc++) {
-    var trigger = triggers[lc];
-    trigger(context, doRedirect, doStop);
+  const doRedirect = (url, params, queryParams) => {
+    if(alreadyRedirected) {
+      throw new Error('already redirected');
+    }
 
-    if(abort) {
+    if(!inCurrentLoop) {
+      throw new Error('redirect needs to be done in sync');
+    }
+
+    if(!url) {
+      throw new Error('trigger redirect requires an URL');
+    }
+
+    abort = true;
+    alreadyRedirected = true;
+    redirectFn(url, params, queryParams);
+  };
+
+  const doStop = () => {
+    abort = true;
+  };
+
+  for (let lc = 0; lc < triggers.length; lc++) {
+    triggers[lc](context, doRedirect, doStop);
+
+    if (abort) {
       return;
     }
   }
@@ -87,26 +108,4 @@ Triggers.runTriggers = function(triggers, context, redirectFn, after) {
   // this set of triggers.
   inCurrentLoop = false;
   after();
-
-  function doRedirect(url, params, queryParams) {
-    if(alreadyRedirected) {
-      throw new Error("already redirected");
-    }
-
-    if(!inCurrentLoop) {
-      throw new Error("redirect needs to be done in sync");
-    }
-
-    if(!url) {
-      throw new Error("trigger redirect requires an URL");
-    }
-
-    abort = true;
-    alreadyRedirected = true;
-    redirectFn(url, params, queryParams);
-  }
-
-  function doStop() {
-    abort = true;
-  }
 };
